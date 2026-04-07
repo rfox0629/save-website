@@ -1,0 +1,11 @@
+{
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "redirects": [
+    {
+      "source": "/apply",
+      "destination": "/portal/inquiry",
+      "permanent": false
+    }
+  ]
+}
