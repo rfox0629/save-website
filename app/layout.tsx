@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 
+import { AuthProvider } from "@/components/AuthProvider";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/server";
 
 import "./globals.css";
 
@@ -22,11 +24,16 @@ export const metadata: Metadata = {
   description: "Project scaffold for Save Website",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <html
       lang="en"
@@ -34,7 +41,7 @@ export default function RootLayout({
       className={cn(geistSans.variable, geistMono.variable)}
     >
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
-        {children}
+        <AuthProvider initialUser={user}>{children}</AuthProvider>
       </body>
     </html>
   );

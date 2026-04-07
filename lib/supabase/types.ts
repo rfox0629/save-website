@@ -1,0 +1,658 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
+
+export type Database = {
+  public: {
+    Tables: {
+      organizations: {
+        Row: {
+          assigned_reviewer_id: string | null;
+          countries: string[];
+          created_at: string;
+          dba_name: string | null;
+          ein: string | null;
+          entity_type: string | null;
+          geographic_scope: string[];
+          id: string;
+          legal_name: string;
+          notes: string | null;
+          primary_focus: string[];
+          state_of_incorporation: string | null;
+          status: string;
+          updated_at: string;
+          website_url: string | null;
+          year_founded: number | null;
+        };
+        Insert: {
+          assigned_reviewer_id?: string | null;
+          countries?: string[];
+          created_at?: string;
+          dba_name?: string | null;
+          ein?: string | null;
+          entity_type?: string | null;
+          geographic_scope?: string[];
+          id?: string;
+          legal_name: string;
+          notes?: string | null;
+          primary_focus?: string[];
+          state_of_incorporation?: string | null;
+          status?: string;
+          updated_at?: string;
+          website_url?: string | null;
+          year_founded?: number | null;
+        };
+        Update: {
+          assigned_reviewer_id?: string | null;
+          countries?: string[];
+          created_at?: string;
+          dba_name?: string | null;
+          ein?: string | null;
+          entity_type?: string | null;
+          geographic_scope?: string[];
+          id?: string;
+          legal_name?: string;
+          notes?: string | null;
+          primary_focus?: string[];
+          state_of_incorporation?: string | null;
+          status?: string;
+          updated_at?: string;
+          website_url?: string | null;
+          year_founded?: number | null;
+        };
+      };
+      applications: {
+        Row: {
+          created_at: string;
+          cycle_year: number | null;
+          decision: string | null;
+          decision_date: string | null;
+          decision_made_by: string | null;
+          decision_notes: string | null;
+          id: string;
+          organization_id: string;
+          status: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          cycle_year?: number | null;
+          decision?: string | null;
+          decision_date?: string | null;
+          decision_made_by?: string | null;
+          decision_notes?: string | null;
+          id?: string;
+          organization_id: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          cycle_year?: number | null;
+          decision?: string | null;
+          decision_date?: string | null;
+          decision_made_by?: string | null;
+          decision_notes?: string | null;
+          id?: string;
+          organization_id?: string;
+          status?: string;
+          updated_at?: string;
+        };
+      };
+      inquiry_responses: {
+        Row: {
+          annual_reach: number | null;
+          annual_revenue_range: string | null;
+          application_id: string;
+          audit_level: string | null;
+          baptism_position: string | null;
+          board_approved_budget: boolean | null;
+          board_compensated: boolean | null;
+          board_size: number | null;
+          created_at: string;
+          denomination: string | null;
+          doctrinal_statement_url: string | null;
+          files_990: boolean | null;
+          financial_investigation: boolean | null;
+          funding_rationale: string | null;
+          funding_sources: string[];
+          gospel_clarity: string | null;
+          has_references: boolean | null;
+          id: string;
+          key_metric: string | null;
+          lead_name: string | null;
+          legal_action: boolean | null;
+          moral_failure: boolean | null;
+          ordination_status: string | null;
+          raw_data: Json;
+          referral_source: string | null;
+          scripture_position: string | null;
+          theological_education: string | null;
+          updated_at: string;
+          years_in_role: number | null;
+        };
+        Insert: {
+          annual_reach?: number | null;
+          annual_revenue_range?: string | null;
+          application_id: string;
+          audit_level?: string | null;
+          baptism_position?: string | null;
+          board_approved_budget?: boolean | null;
+          board_compensated?: boolean | null;
+          board_size?: number | null;
+          created_at?: string;
+          denomination?: string | null;
+          doctrinal_statement_url?: string | null;
+          files_990?: boolean | null;
+          financial_investigation?: boolean | null;
+          funding_rationale?: string | null;
+          funding_sources?: string[];
+          gospel_clarity?: string | null;
+          has_references?: boolean | null;
+          id?: string;
+          key_metric?: string | null;
+          lead_name?: string | null;
+          legal_action?: boolean | null;
+          moral_failure?: boolean | null;
+          ordination_status?: string | null;
+          raw_data?: Json;
+          referral_source?: string | null;
+          scripture_position?: string | null;
+          theological_education?: string | null;
+          updated_at?: string;
+          years_in_role?: number | null;
+        };
+        Update: {
+          annual_reach?: number | null;
+          annual_revenue_range?: string | null;
+          application_id?: string;
+          audit_level?: string | null;
+          baptism_position?: string | null;
+          board_approved_budget?: boolean | null;
+          board_compensated?: boolean | null;
+          board_size?: number | null;
+          created_at?: string;
+          denomination?: string | null;
+          doctrinal_statement_url?: string | null;
+          files_990?: boolean | null;
+          financial_investigation?: boolean | null;
+          funding_rationale?: string | null;
+          funding_sources?: string[];
+          gospel_clarity?: string | null;
+          has_references?: boolean | null;
+          id?: string;
+          key_metric?: string | null;
+          lead_name?: string | null;
+          legal_action?: boolean | null;
+          moral_failure?: boolean | null;
+          ordination_status?: string | null;
+          raw_data?: Json;
+          referral_source?: string | null;
+          scripture_position?: string | null;
+          theological_education?: string | null;
+          updated_at?: string;
+          years_in_role?: number | null;
+        };
+      };
+      vetting_responses: {
+        Row: {
+          annual_ed_review: boolean | null;
+          application_id: string;
+          attestation_name: string | null;
+          attestation_signed_at: string | null;
+          attestation_title: string | null;
+          attests_doctrinal_alignment: boolean | null;
+          attests_financial_integrity: boolean | null;
+          attests_information_is_true: boolean | null;
+          board_confrontation_willingness: number | null;
+          board_meeting_frequency: string | null;
+          compensation_set_by_board: boolean | null;
+          conflict_of_interest_policy: boolean | null;
+          created_at: string;
+          decision_making_model: string | null;
+          discipleship_outcomes: string | null;
+          doctrinal_distinctives: string | null;
+          exec_salary_benchmark: string | null;
+          family_on_board: boolean | null;
+          governance_model: string | null;
+          id: string;
+          independent_board_count: number | null;
+          leader_accountability: string | null;
+          leader_conversion_narrative: string | null;
+          leader_marital_status: string | null;
+          leadership_conflict_notes: string | null;
+          ministry_fruit_evidence: string | null;
+          overhead_expense_pct: number | null;
+          program_expense_pct: number | null;
+          public_controversy_notes: string | null;
+          raw_data: Json;
+          recent_deficit: boolean | null;
+          reference_check_summary: string | null;
+          reputation_summary: string | null;
+          reserve_fund_level: string | null;
+          restricted_funds_misused: boolean | null;
+          restricted_funds_tracked: boolean | null;
+          sacramental_practice: string | null;
+          statement_of_faith_alignment: string | null;
+          updated_at: string;
+          whistleblower_policy: boolean | null;
+        };
+        Insert: {
+          annual_ed_review?: boolean | null;
+          application_id: string;
+          attestation_name?: string | null;
+          attestation_signed_at?: string | null;
+          attestation_title?: string | null;
+          attests_doctrinal_alignment?: boolean | null;
+          attests_financial_integrity?: boolean | null;
+          attests_information_is_true?: boolean | null;
+          board_confrontation_willingness?: number | null;
+          board_meeting_frequency?: string | null;
+          compensation_set_by_board?: boolean | null;
+          conflict_of_interest_policy?: boolean | null;
+          created_at?: string;
+          decision_making_model?: string | null;
+          discipleship_outcomes?: string | null;
+          doctrinal_distinctives?: string | null;
+          exec_salary_benchmark?: string | null;
+          family_on_board?: boolean | null;
+          governance_model?: string | null;
+          id?: string;
+          independent_board_count?: number | null;
+          leader_accountability?: string | null;
+          leader_conversion_narrative?: string | null;
+          leader_marital_status?: string | null;
+          leadership_conflict_notes?: string | null;
+          ministry_fruit_evidence?: string | null;
+          overhead_expense_pct?: number | null;
+          program_expense_pct?: number | null;
+          public_controversy_notes?: string | null;
+          raw_data?: Json;
+          recent_deficit?: boolean | null;
+          reference_check_summary?: string | null;
+          reputation_summary?: string | null;
+          reserve_fund_level?: string | null;
+          restricted_funds_misused?: boolean | null;
+          restricted_funds_tracked?: boolean | null;
+          sacramental_practice?: string | null;
+          statement_of_faith_alignment?: string | null;
+          updated_at?: string;
+          whistleblower_policy?: boolean | null;
+        };
+        Update: {
+          annual_ed_review?: boolean | null;
+          application_id?: string;
+          attestation_name?: string | null;
+          attestation_signed_at?: string | null;
+          attestation_title?: string | null;
+          attests_doctrinal_alignment?: boolean | null;
+          attests_financial_integrity?: boolean | null;
+          attests_information_is_true?: boolean | null;
+          board_confrontation_willingness?: number | null;
+          board_meeting_frequency?: string | null;
+          compensation_set_by_board?: boolean | null;
+          conflict_of_interest_policy?: boolean | null;
+          created_at?: string;
+          decision_making_model?: string | null;
+          discipleship_outcomes?: string | null;
+          doctrinal_distinctives?: string | null;
+          exec_salary_benchmark?: string | null;
+          family_on_board?: boolean | null;
+          governance_model?: string | null;
+          id?: string;
+          independent_board_count?: number | null;
+          leader_accountability?: string | null;
+          leader_conversion_narrative?: string | null;
+          leader_marital_status?: string | null;
+          leadership_conflict_notes?: string | null;
+          ministry_fruit_evidence?: string | null;
+          overhead_expense_pct?: number | null;
+          program_expense_pct?: number | null;
+          public_controversy_notes?: string | null;
+          raw_data?: Json;
+          recent_deficit?: boolean | null;
+          reference_check_summary?: string | null;
+          reputation_summary?: string | null;
+          reserve_fund_level?: string | null;
+          restricted_funds_misused?: boolean | null;
+          restricted_funds_tracked?: boolean | null;
+          sacramental_practice?: string | null;
+          statement_of_faith_alignment?: string | null;
+          updated_at?: string;
+          whistleblower_policy?: boolean | null;
+        };
+      };
+      scores: {
+        Row: {
+          application_id: string;
+          calculated_at: string;
+          calculated_by: string;
+          doctrine_score: number | null;
+          external_trust_score: number | null;
+          financial_score: number | null;
+          fruit_score: number | null;
+          governance_score: number | null;
+          hard_stop_reason: string | null;
+          id: string;
+          is_hard_stop: boolean;
+          leadership_score: number | null;
+          override_by: string | null;
+          override_notes: string | null;
+          total_score: number | null;
+        };
+        Insert: {
+          application_id: string;
+          calculated_at?: string;
+          calculated_by?: string;
+          doctrine_score?: number | null;
+          external_trust_score?: number | null;
+          financial_score?: number | null;
+          fruit_score?: number | null;
+          governance_score?: number | null;
+          hard_stop_reason?: string | null;
+          id?: string;
+          is_hard_stop?: boolean;
+          leadership_score?: number | null;
+          override_by?: string | null;
+          override_notes?: string | null;
+          total_score?: number | null;
+        };
+        Update: {
+          application_id?: string;
+          calculated_at?: string;
+          calculated_by?: string;
+          doctrine_score?: number | null;
+          external_trust_score?: number | null;
+          financial_score?: number | null;
+          fruit_score?: number | null;
+          governance_score?: number | null;
+          hard_stop_reason?: string | null;
+          id?: string;
+          is_hard_stop?: boolean;
+          leadership_score?: number | null;
+          override_by?: string | null;
+          override_notes?: string | null;
+          total_score?: number | null;
+        };
+      };
+      score_components: {
+        Row: {
+          awarded_points: number;
+          category: string;
+          criterion: string;
+          id: string;
+          max_points: number;
+          rationale: string | null;
+          score_id: string;
+        };
+        Insert: {
+          awarded_points: number;
+          category: string;
+          criterion: string;
+          id?: string;
+          max_points: number;
+          rationale?: string | null;
+          score_id: string;
+        };
+        Update: {
+          awarded_points?: number;
+          category?: string;
+          criterion?: string;
+          id?: string;
+          max_points?: number;
+          rationale?: string | null;
+          score_id?: string;
+        };
+      };
+      risk_flags: {
+        Row: {
+          application_id: string;
+          category: string;
+          description: string;
+          flag_code: string;
+          flagged_at: string;
+          flagged_by: string;
+          id: string;
+          resolution_notes: string | null;
+          resolved: boolean;
+          resolved_at: string | null;
+          resolved_by: string | null;
+          severity: "high" | "hard_stop" | "low" | "medium";
+        };
+        Insert: {
+          application_id: string;
+          category: string;
+          description: string;
+          flag_code: string;
+          flagged_at?: string;
+          flagged_by?: string;
+          id?: string;
+          resolution_notes?: string | null;
+          resolved?: boolean;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          severity: "high" | "hard_stop" | "low" | "medium";
+        };
+        Update: {
+          application_id?: string;
+          category?: string;
+          description?: string;
+          flag_code?: string;
+          flagged_at?: string;
+          flagged_by?: string;
+          id?: string;
+          resolution_notes?: string | null;
+          resolved?: boolean;
+          resolved_at?: string | null;
+          resolved_by?: string | null;
+          severity?: "high" | "hard_stop" | "low" | "medium";
+        };
+      };
+      reviewer_notes: {
+        Row: {
+          application_id: string;
+          created_at: string;
+          id: string;
+          is_internal: boolean;
+          note: string;
+          reviewer_id: string;
+          section: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          application_id: string;
+          created_at?: string;
+          id?: string;
+          is_internal?: boolean;
+          note: string;
+          reviewer_id: string;
+          section?: string | null;
+          updated_at?: string;
+        };
+        Update: {
+          application_id?: string;
+          created_at?: string;
+          id?: string;
+          is_internal?: boolean;
+          note?: string;
+          reviewer_id?: string;
+          section?: string | null;
+          updated_at?: string;
+        };
+      };
+      documents: {
+        Row: {
+          application_id: string;
+          document_type: string;
+          file_name: string;
+          file_size_bytes: number | null;
+          id: string;
+          review_notes: string | null;
+          reviewed: boolean;
+          reviewer_id: string | null;
+          storage_path: string;
+          uploaded_at: string;
+          uploaded_by: string | null;
+        };
+        Insert: {
+          application_id: string;
+          document_type: string;
+          file_name: string;
+          file_size_bytes?: number | null;
+          id?: string;
+          review_notes?: string | null;
+          reviewed?: boolean;
+          reviewer_id?: string | null;
+          storage_path: string;
+          uploaded_at?: string;
+          uploaded_by?: string | null;
+        };
+        Update: {
+          application_id?: string;
+          document_type?: string;
+          file_name?: string;
+          file_size_bytes?: number | null;
+          id?: string;
+          review_notes?: string | null;
+          reviewed?: boolean;
+          reviewer_id?: string | null;
+          storage_path?: string;
+          uploaded_at?: string;
+          uploaded_by?: string | null;
+        };
+      };
+      external_checks: {
+        Row: {
+          application_id: string;
+          checked_at: string;
+          checked_by: string | null;
+          id: string;
+          raw_result: Json;
+          score_impact: number | null;
+          source: string;
+          status: string;
+          summary: string | null;
+        };
+        Insert: {
+          application_id: string;
+          checked_at?: string;
+          checked_by?: string | null;
+          id?: string;
+          raw_result?: Json;
+          score_impact?: number | null;
+          source: string;
+          status: string;
+          summary?: string | null;
+        };
+        Update: {
+          application_id?: string;
+          checked_at?: string;
+          checked_by?: string | null;
+          id?: string;
+          raw_result?: Json;
+          score_impact?: number | null;
+          source?: string;
+          status?: string;
+          summary?: string | null;
+        };
+      };
+      donor_briefs: {
+        Row: {
+          application_id: string;
+          cautions: string[];
+          commendations: string[];
+          generated_at: string;
+          generated_by: string | null;
+          headline: string | null;
+          id: string;
+          ministry_description: string | null;
+          pdf_path: string | null;
+          published: boolean;
+          published_at: string | null;
+          recommendation_level: string | null;
+          slug: string | null;
+        };
+        Insert: {
+          application_id: string;
+          cautions?: string[];
+          commendations?: string[];
+          generated_at?: string;
+          generated_by?: string | null;
+          headline?: string | null;
+          id?: string;
+          ministry_description?: string | null;
+          pdf_path?: string | null;
+          published?: boolean;
+          published_at?: string | null;
+          recommendation_level?: string | null;
+          slug?: string | null;
+        };
+        Update: {
+          application_id?: string;
+          cautions?: string[];
+          commendations?: string[];
+          generated_at?: string;
+          generated_by?: string | null;
+          headline?: string | null;
+          id?: string;
+          ministry_description?: string | null;
+          pdf_path?: string | null;
+          published?: boolean;
+          published_at?: string | null;
+          recommendation_level?: string | null;
+          slug?: string | null;
+        };
+      };
+      profiles: {
+        Row: {
+          created_at: string;
+          id: string;
+          organization_id: string | null;
+          role: "admin" | "analyst" | "donor" | "ministry" | "reviewer";
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          id: string;
+          organization_id?: string | null;
+          role: "admin" | "analyst" | "donor" | "ministry" | "reviewer";
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          organization_id?: string | null;
+          role?: "admin" | "analyst" | "donor" | "ministry" | "reviewer";
+          updated_at?: string;
+        };
+      };
+    };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
+  };
+};
+
+export type Organizations =
+  Database["public"]["Tables"]["organizations"]["Row"];
+export type Applications = Database["public"]["Tables"]["applications"]["Row"];
+export type InquiryResponse =
+  Database["public"]["Tables"]["inquiry_responses"]["Row"];
+export type VettingResponse =
+  Database["public"]["Tables"]["vetting_responses"]["Row"];
+export type Score = Database["public"]["Tables"]["scores"]["Row"];
+export type ScoreComponent =
+  Database["public"]["Tables"]["score_components"]["Row"];
+export type RiskFlag = Database["public"]["Tables"]["risk_flags"]["Row"];
+export type ReviewerNote =
+  Database["public"]["Tables"]["reviewer_notes"]["Row"];
+export type Document = Database["public"]["Tables"]["documents"]["Row"];
+export type ExternalCheck =
+  Database["public"]["Tables"]["external_checks"]["Row"];
+export type DonorBrief = Database["public"]["Tables"]["donor_briefs"]["Row"];
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];

@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SAVE Platform
 
-## Getting Started
+SAVE is a grant diligence and review platform designed to serve both ministries and donors. Ministries can submit inquiry and vetting materials, upload supporting documents, and track application progress. Internal reviewers can score applications, manage flags, review evidence, and produce donor-facing briefs. Donors ultimately receive clear, publishable ministry briefs that summarize diligence without exposing internal review data.
 
-First, run the development server:
+## Tech Stack
+
+- Next.js 14 with the App Router
+- TypeScript
+- Tailwind CSS
+- shadcn/ui
+- Supabase Auth, Postgres, Storage, and SSR helpers
+- React Hook Form and Zod for forms and validation
+- ESLint and Prettier
+
+## Local Development
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create `.env.local` with:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+```
+
+3. Start the dev server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open the app in your browser:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```text
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Project Areas
 
-## Learn More
+- Public marketing pages for ministries and donors
+- Ministry portal for inquiry, vetting, and document uploads
+- Reviewer dashboard for internal application review
+- Scoring engine and risk flag generation
+- Donor brief editor and public donor brief pages
 
-To learn more about Next.js, take a look at the following resources:
+## Quality Checks
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Run the standard checks before pushing changes:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run lint
+npm run build
+```
