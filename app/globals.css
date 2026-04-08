@@ -88,4 +88,18 @@
   body {
     @apply min-h-screen bg-background font-sans text-foreground antialiased;
   }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .font-public-sans {
+    font-family: var(--font-public-sans), sans-serif;
+  }
+
+  .font-public-serif {
+    font-family: var(--font-public-serif), serif;
+  }
 }
