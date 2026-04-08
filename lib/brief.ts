@@ -67,7 +67,7 @@ export async function getBriefEditorData(
     org: resolvedOrganization,
     publicUrl:
       resolvedBrief?.published && resolvedBrief.slug
-        ? `${baseUrl}/brief/${resolvedBrief.slug}`
+        ? `${baseUrl}/donors/${resolvedBrief.slug}`
         : null,
   };
 }

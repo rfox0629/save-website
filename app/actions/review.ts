@@ -76,6 +76,8 @@ export async function markDocumentReviewedAction(formData: FormData) {
 export async function saveExternalCheckAction(formData: FormData) {
   await saveExternalCheck({
     applicationId: getString(formData, "application_id"),
+    checkId: getString(formData, "check_id") || undefined,
+    note: getString(formData, "note") || undefined,
     scoreImpact: getString(formData, "score_impact")
       ? Number(getString(formData, "score_impact"))
       : null,

@@ -101,18 +101,46 @@ const SCORE_SEGMENT_COLORS = [
 ] as const;
 
 const EXTERNAL_CHECK_SOURCES = [
-  "IRS TEOS",
-  "Form 990",
-  "Charity Navigator",
-  "Candid",
-  "Website",
-  "News Search",
-  "ECFA",
-  "References",
+  "irs_teos",
+  "form_990",
+  "charity_navigator",
+  "candid",
+  "website",
+  "news_search",
+  "ecfa_search",
+  "references",
 ] as const;
 
 export function getExternalCheckSources() {
   return [...EXTERNAL_CHECK_SOURCES];
+}
+
+export function getExternalCheckLabel(source: string) {
+  if (source.startsWith("form_990_")) {
+    return `Form 990 ${source.replace("form_990_", "")}`;
+  }
+
+  const labels: Record<string, string> = {
+    "990_analysis": "990 Analysis",
+    bylaws_analysis: "Bylaws Analysis",
+    candid: "Candid",
+    charity_navigator: "Charity Navigator",
+    doctrinal_analysis: "Doctrinal Analysis",
+    ecfa_search: "ECFA",
+    form_990: "Form 990",
+    irs_teos: "IRS TEOS",
+    news_search: "News Search",
+    references: "References",
+    website: "Website",
+  };
+
+  return (
+    labels[source] ??
+    source
+      .split("_")
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ")
+  );
 }
 
 function severityRank(severity: FlagSeverity) {
@@ -300,6 +328,28 @@ export async function requireReviewerPageAccess() {
     context.profile?.role !== "reviewer"
   ) {
     redirect("/login");
+  }
+
+  return context;
+}
+
+export async function requireAdminPageAccess() {
+  const context = await getCurrentProfile();
+
+  if (!context?.user) {
+    redirect("/login");
+  }
+
+  if (context.profile?.role === "ministry") {
+    redirect("/portal");
+  }
+
+  if (context.profile?.role === "donor") {
+    redirect("/donors");
+  }
+
+  if (context.profile?.role !== "admin") {
+    redirect("/dashboard");
   }
 
   return context;
@@ -600,24 +650,23 @@ export async function getApplicationDetail(
       : null,
     brief: resolvedBrief,
     documents: signedDocuments,
-    externalChecks: EXTERNAL_CHECK_SOURCES.map((source) => {
-      const match = resolvedExternalChecks.find(
-        (item) => item.source === source,
-      );
-      return (
-        match ?? {
-          application_id: applicationId,
-          checked_at: "",
-          checked_by: null,
-          id: "",
-          raw_result: {},
-          score_impact: null,
-          source,
-          status: "pending",
-          summary: null,
-        }
-      );
-    }),
+    externalChecks: [
+      ...resolvedExternalChecks,
+      ...EXTERNAL_CHECK_SOURCES.filter(
+        (source) =>
+          !resolvedExternalChecks.some((check) => check.source === source),
+      ).map((source) => ({
+        application_id: applicationId,
+        checked_at: "",
+        checked_by: null,
+        id: "",
+        raw_result: {},
+        score_impact: null,
+        source,
+        status: "pending",
+        summary: null,
+      })),
+    ],
     flags: resolvedFlags,
     latestScore,
     notes: resolvedNotes.map((note) => ({
@@ -845,6 +894,9 @@ export async function markDocumentReviewed(params: {
 
 export async function saveExternalCheck(params: {
   applicationId: string;
+  checkId?: string;
+  note?: string;
+  rawResult?: Database["public"]["Tables"]["external_checks"]["Row"]["raw_result"];
   scoreImpact?: number | null;
   source: string;
   status: string;
@@ -856,26 +908,48 @@ export async function saveExternalCheck(params: {
   const db = admin as any;
   const { data: existing } = await admin
     .from("external_checks")
-    .select("id")
+    .select("*")
     .eq("application_id", params.applicationId)
-    .eq("source", params.source)
+    .eq(params.checkId ? "id" : "source", params.checkId ?? params.source)
     .order("checked_at", { ascending: false })
     .limit(1);
-  const existingId = ((existing ?? []) as Pick<ExternalCheck, "id">[])[0]?.id;
+  const existingRow = ((existing ?? []) as ExternalCheck[])[0] ?? null;
+  const existingRawResult =
+    existingRow?.raw_result &&
+    typeof existingRow.raw_result === "object" &&
+    !Array.isArray(existingRow.raw_result)
+      ? (existingRow.raw_result as Record<string, unknown>)
+      : {};
 
   const payload: Database["public"]["Tables"]["external_checks"]["Insert"] = {
     application_id: params.applicationId,
     checked_at: new Date().toISOString(),
     checked_by: user.id,
-    raw_result: {},
+    raw_result: {
+      ...existingRawResult,
+      ...(params.rawResult &&
+      typeof params.rawResult === "object" &&
+      !Array.isArray(params.rawResult)
+        ? params.rawResult
+        : {}),
+      ...(params.note?.trim()
+        ? {
+            reviewer_override: {
+              note: params.note.trim(),
+              overridden_at: new Date().toISOString(),
+              overridden_by: user.id,
+            },
+          }
+        : {}),
+    },
     score_impact: params.scoreImpact ?? null,
     source: params.source,
     status: params.status,
     summary: params.summary,
   };
 
-  const query = existingId
-    ? db.from("external_checks").update(payload).eq("id", existingId)
+  const query = existingRow?.id
+    ? db.from("external_checks").update(payload).eq("id", existingRow.id)
     : db.from("external_checks").insert(payload);
 
   const { error } = await query;

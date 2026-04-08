@@ -109,7 +109,10 @@ export async function POST(request: Request) {
     };
 
     const query = resolvedExistingBrief?.id
-      ? db.from("donor_briefs").update(payload).eq("id", resolvedExistingBrief.id)
+      ? db
+          .from("donor_briefs")
+          .update(payload)
+          .eq("id", resolvedExistingBrief.id)
       : db.from("donor_briefs").insert(payload);
 
     const { error } = await query;
@@ -124,7 +127,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       public_slug: publicSlug,
-      public_url: publicSlug ? `${baseUrl}/brief/${publicSlug}` : null,
+      public_url: publicSlug ? `${baseUrl}/donors/${publicSlug}` : null,
     });
   } catch (error) {
     return NextResponse.json(

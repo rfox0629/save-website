@@ -302,6 +302,8 @@ export function ExternalChecksManager({
   applicationId: string;
   checks: {
     checked_at: string;
+    id: string;
+    raw_result: unknown;
     score_impact: number | null;
     source: string;
     status: string;
@@ -312,18 +314,49 @@ export function ExternalChecksManager({
   const [rows, setRows] = useState(
     checks.map((check) => ({
       ...check,
+      note: "",
       summary: check.summary ?? "",
     })),
   );
   const [pendingSource, setPendingSource] = useState<string | null>(null);
 
+  function getSourceLabel(source: string) {
+    if (source.startsWith("form_990_")) {
+      return `Form 990 ${source.replace("form_990_", "")}`;
+    }
+
+    const labels: Record<string, string> = {
+      "990_analysis": "990 Analysis",
+      bylaws_analysis: "Bylaws Analysis",
+      candid: "Candid",
+      charity_navigator: "Charity Navigator",
+      doctrinal_analysis: "Doctrinal Analysis",
+      ecfa_search: "ECFA",
+      form_990: "Form 990",
+      irs_teos: "IRS TEOS",
+      news_search: "News Search",
+      references: "References",
+      website: "Website",
+    };
+
+    return (
+      labels[source] ??
+      source
+        .split("_")
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ")
+    );
+  }
+
   async function saveRow(index: number) {
     const row = rows[index];
 
-    setPendingSource(row.source);
+    setPendingSource(row.id || row.source);
 
     try {
       await postJson(`/api/applications/${applicationId}/external-checks`, {
+        check_id: row.id || undefined,
+        note: row.note,
         score_impact: row.score_impact,
         source: row.source,
         status: row.status,
@@ -336,74 +369,126 @@ export function ExternalChecksManager({
   }
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-white/10">
-      <table className="min-w-full divide-y divide-white/10 text-left text-sm">
-        <thead className="bg-white/5 text-slate-300">
-          <tr>
-            <th className="px-4 py-3">Source</th>
-            <th className="px-4 py-3">Status</th>
-            <th className="px-4 py-3">Summary</th>
-            <th className="px-4 py-3">Last checked</th>
-            <th className="px-4 py-3">Save</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-white/10 bg-[#102133]/60">
-          {rows.map((row, index) => (
-            <tr key={row.source}>
-              <td className="px-4 py-3 font-medium text-white">{row.source}</td>
-              <td className="px-4 py-3">
-                <select
-                  className="rounded-xl border border-white/10 bg-[#0B1622] px-3 py-2 text-white"
-                  onChange={(event) => {
-                    const nextRows = [...rows];
-                    nextRows[index] = {
-                      ...nextRows[index],
-                      status: event.target.value,
-                    };
-                    setRows(nextRows);
-                  }}
-                  value={row.status}
-                >
-                  {["pending", "pass", "flag", "fail", "N/A"].map((option) => (
+    <div className="space-y-4">
+      {rows.map((row, index) => (
+        <article
+          className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-5"
+          key={`${row.id || row.source}-${index}`}
+        >
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-white">
+                {getSourceLabel(row.source)}
+              </h3>
+              <p className="mt-1 text-xs uppercase tracking-[0.25em] text-slate-400">
+                {row.source}
+              </p>
+            </div>
+            <div className="text-right text-sm text-slate-300">
+              <p>
+                {row.checked_at
+                  ? new Date(row.checked_at).toLocaleString()
+                  : "Not run yet"}
+              </p>
+              {typeof row.score_impact === "number" ? (
+                <p className="mt-1 text-xs text-slate-400">
+                  Score impact: {row.score_impact > 0 ? "+" : ""}
+                  {row.score_impact}
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="mt-5 grid gap-4 lg:grid-cols-[220px,1fr]">
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                Status
+              </label>
+              <select
+                className="w-full rounded-xl border border-white/10 bg-[#0B1622] px-3 py-2 text-white"
+                onChange={(event) => {
+                  const nextRows = [...rows];
+                  nextRows[index] = {
+                    ...nextRows[index],
+                    status: event.target.value,
+                  };
+                  setRows(nextRows);
+                }}
+                value={row.status}
+              >
+                {["pending", "pass", "flag", "fail", "not_applicable"].map(
+                  (option) => (
                     <option key={option} value={option}>
                       {option}
                     </option>
-                  ))}
-                </select>
-              </td>
-              <td className="px-4 py-3">
-                <textarea
-                  className="min-h-24 w-full rounded-xl border border-white/10 bg-[#0B1622] px-3 py-2 text-white"
-                  onChange={(event) => {
-                    const nextRows = [...rows];
-                    nextRows[index] = {
-                      ...nextRows[index],
-                      summary: event.target.value,
-                    };
-                    setRows(nextRows);
-                  }}
-                  value={row.summary}
-                />
-              </td>
-              <td className="px-4 py-3 text-slate-300">
-                {row.checked_at
-                  ? new Date(row.checked_at).toLocaleDateString()
-                  : "Not checked"}
-              </td>
-              <td className="px-4 py-3">
-                <Button
-                  disabled={pendingSource === row.source}
-                  onClick={() => void saveRow(index)}
-                  size="sm"
-                  type="button"
-                >
-                  Save
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                  ),
+                )}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                Summary
+              </label>
+              <textarea
+                className="min-h-24 w-full rounded-xl border border-white/10 bg-[#0B1622] px-3 py-2 text-white"
+                onChange={(event) => {
+                  const nextRows = [...rows];
+                  nextRows[index] = {
+                    ...nextRows[index],
+                    summary: event.target.value,
+                  };
+                  setRows(nextRows);
+                }}
+                value={row.summary}
+              />
+            </div>
+          </div>
+
+          <div className="mt-4 space-y-2">
+            <label className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+              Reviewer override note
+            </label>
+            <textarea
+              className="min-h-20 w-full rounded-xl border border-white/10 bg-[#0B1622] px-3 py-2 text-white"
+              onChange={(event) => {
+                const nextRows = [...rows];
+                nextRows[index] = {
+                  ...nextRows[index],
+                  note: event.target.value,
+                };
+                setRows(nextRows);
+              }}
+              placeholder="Explain why you are overriding this check."
+              value={row.note}
+            />
+          </div>
+
+          <details className="mt-4 rounded-2xl border border-white/10 bg-[#0B1622]/70 p-4">
+            <summary className="cursor-pointer text-sm font-medium text-slate-200">
+              View raw data
+            </summary>
+            <pre className="mt-4 overflow-x-auto whitespace-pre-wrap text-xs text-slate-300">
+              {JSON.stringify(row.raw_result ?? {}, null, 2)}
+            </pre>
+          </details>
+
+          <div className="mt-4 flex justify-end">
+            <Button
+              disabled={pendingSource === (row.id || row.source)}
+              onClick={() => void saveRow(index)}
+              size="sm"
+              type="button"
+            >
+              Save override
+            </Button>
+          </div>
+        </article>
+      ))}
+      {rows.length === 0 ? (
+        <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-10 text-center text-slate-400">
+          No external checks have been recorded yet.
+        </div>
+      ) : null}
     </div>
   );
 }

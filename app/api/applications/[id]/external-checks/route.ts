@@ -11,6 +11,8 @@ export async function POST(
   try {
     await saveExternalCheck({
       applicationId: params.id,
+      checkId: typeof body?.check_id === "string" ? body.check_id : undefined,
+      note: typeof body?.note === "string" ? body.note : undefined,
       scoreImpact:
         body?.score_impact === undefined || body?.score_impact === null
           ? null
