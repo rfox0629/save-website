@@ -5,15 +5,19 @@ import { redirect } from "next/navigation";
 import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
+import { getPathForRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import type { Profile } from "@/lib/supabase/types";
 
 const loginSchema = z.object({
   email: z.string().email("Enter a valid email address."),
   password: z.string().min(8, "Password must be at least 8 characters."),
+  redirectTo: z.string().optional(),
 });
 
 const magicLinkSchema = z.object({
   email: z.string().email("Enter a valid email address."),
+  redirectTo: z.string().optional(),
 });
 
 const registerSchema = z.object({
@@ -31,6 +35,17 @@ const registerSchema = z.object({
 type AuthActionResult = {
   error?: string;
 };
+
+async function getRoleRedirect(userId: string) {
+  const supabase = createClient();
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
+    .maybeSingle();
+
+  return getPathForRole((profile as Pick<Profile, "role"> | null)?.role);
+}
 
 function getBaseUrl() {
   const headerList = headers();
@@ -66,6 +81,7 @@ function getServiceRoleClient() {
 export async function login(values: {
   email: string;
   password: string;
+  redirectTo?: string;
 }): Promise<AuthActionResult> {
   const parsed = loginSchema.safeParse(values);
 
@@ -74,17 +90,23 @@ export async function login(values: {
   }
 
   const supabase = createClient();
-  const { error } = await supabase.auth.signInWithPassword(parsed.data);
+  const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
     return { error: error.message };
   }
 
-  redirect("/dashboard");
+  const userId = data.user?.id;
+  const destination =
+    parsed.data.redirectTo ||
+    (userId ? await getRoleRedirect(userId) : "/portal");
+
+  redirect(destination);
 }
 
 export async function sendMagicLink(values: {
   email: string;
+  redirectTo?: string;
 }): Promise<AuthActionResult> {
   const parsed = magicLinkSchema.safeParse(values);
 
@@ -93,10 +115,13 @@ export async function sendMagicLink(values: {
   }
 
   const supabase = createClient();
+  const nextPath = parsed.data.redirectTo || "/auth/confirm";
   const { error } = await supabase.auth.signInWithOtp({
     email: parsed.data.email,
     options: {
-      emailRedirectTo: `${getBaseUrl()}/auth/confirm?next=/dashboard`,
+      emailRedirectTo: `${getBaseUrl()}/auth/confirm?next=${encodeURIComponent(
+        nextPath,
+      )}`,
     },
   });
 
@@ -167,11 +192,29 @@ export async function register(values: {
     return { error: profileError.message };
   }
 
-  if (data.session) {
-    redirect("/dashboard");
+  const { error: applicationError } = await admin.from("applications").insert({
+    organization_id: organization.id,
+    status: "inquiry_submitted",
+  });
+
+  if (applicationError) {
+    return { error: applicationError.message };
   }
 
-  redirect("/login?message=check-email");
+  if (data.session) {
+    redirect("/portal?welcome=1");
+  }
+
+  const { error: signInError } = await supabase.auth.signInWithPassword({
+    email: parsed.data.email,
+    password: parsed.data.password,
+  });
+
+  if (!signInError) {
+    redirect("/portal?welcome=1");
+  }
+
+  redirect("/login?message=check-email&redirectTo=%2Fportal");
 }
 
 export async function logout() {

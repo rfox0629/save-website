@@ -12,8 +12,12 @@ import type {
 import { vettingFormSchema, type VettingFormValues } from "@/lib/vetting";
 
 type VettingLoadResult = {
-  applicationId: string;
+  applicationId: string | null;
+  applicationStatus: string | null;
   initialValues: Partial<VettingFormValues>;
+  organizationId: string | null;
+  readOnly: boolean;
+  submittedAt: string | null;
   uploadedDocuments: Partial<
     Record<string, { fileName: string; storagePath: string }>
   >;
@@ -38,7 +42,7 @@ function getBaseUrl() {
   return host ? `${protocol}://${host}` : "http://localhost:3000";
 }
 
-async function getApprovedApplicationContext() {
+async function getMinistryApplicationContext() {
   const supabase = createClient();
   const {
     data: { user },
@@ -72,21 +76,15 @@ async function getApprovedApplicationContext() {
     .eq("organization_id", resolvedProfile.organization_id)
     .order("created_at", { ascending: false })
     .limit(1)
-    .single();
+    .maybeSingle();
   const resolvedApplication = application as Pick<
     Applications,
     "id" | "status"
   > | null;
 
-  if (
-    !resolvedApplication ||
-    resolvedApplication.status !== "inquiry_approved"
-  ) {
-    redirect("/portal");
-  }
-
   return {
-    applicationId: resolvedApplication.id,
+    applicationId: resolvedApplication?.id ?? null,
+    applicationStatus: resolvedApplication?.status ?? null,
     organizationId: resolvedProfile.organization_id,
     supabase,
     user,
@@ -97,8 +95,36 @@ function asFormValue<T>(value: T | null | undefined): T | undefined {
   return value ?? undefined;
 }
 
+function isReadOnlyStatus(status: string | null, submittedAt: string | null) {
+  if (submittedAt) {
+    return true;
+  }
+
+  return [
+    "vetting_submitted",
+    "under_review",
+    "approved",
+    "declined",
+    "hard_stop",
+    "decided",
+  ].includes(status ?? "");
+}
+
 export async function loadVettingDraft(): Promise<VettingLoadResult> {
-  const { applicationId, supabase } = await getApprovedApplicationContext();
+  const { applicationId, applicationStatus, organizationId, supabase } =
+    await getMinistryApplicationContext();
+
+  if (!applicationId) {
+    return {
+      applicationId: null,
+      applicationStatus,
+      initialValues: {},
+      organizationId,
+      readOnly: false,
+      submittedAt: null,
+      uploadedDocuments: {},
+    };
+  }
 
   const [{ data: vetting }, { data: documents }] = await Promise.all([
     supabase
@@ -135,13 +161,14 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
 
   return {
     applicationId,
+    applicationStatus,
     initialValues: {
       annual_ed_review: resolvedVetting?.annual_ed_review ?? undefined,
-      attestation_authorized: asFormValue(
-        rawData.attestation_authorized as boolean | undefined,
+      attestation_complete: asFormValue(
+        rawData.attestation_complete as boolean | undefined,
       ),
-      attestation_truthful: asFormValue(
-        rawData.attestation_truthful as boolean | undefined,
+      attestation_research: asFormValue(
+        rawData.attestation_research as boolean | undefined,
       ),
       board_confrontation_willingness:
         resolvedVetting?.board_confrontation_willingness ?? undefined,
@@ -155,53 +182,35 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
         rawData.board_turnover_notes as string | undefined,
       ),
       case_study_1: asFormValue(rawData.case_study_1 as string | undefined),
-      case_study_2: asFormValue(rawData.case_study_2 as string | undefined),
-      church_partner_1_contact: asFormValue(
-        rawData.church_partner_1_contact as string | undefined,
-      ),
-      church_partner_1_name: asFormValue(
-        rawData.church_partner_1_name as string | undefined,
-      ),
-      church_partner_1_pastor: asFormValue(
-        rawData.church_partner_1_pastor as string | undefined,
-      ),
-      church_partner_2_contact: asFormValue(
-        rawData.church_partner_2_contact as string | undefined,
-      ),
-      church_partner_2_name: asFormValue(
-        rawData.church_partner_2_name as string | undefined,
-      ),
-      church_partner_2_pastor: asFormValue(
-        rawData.church_partner_2_pastor as string | undefined,
-      ),
       compensation_set_by_board:
         resolvedVetting?.compensation_set_by_board ?? undefined,
       conflict_of_interest_policy:
         resolvedVetting?.conflict_of_interest_policy ?? undefined,
       crypto_policy: asFormValue(rawData.crypto_policy as boolean | undefined),
-      crypto_policy_description: asFormValue(
-        rawData.crypto_policy_description as string | undefined,
-      ),
       decision_making_model: asFormValue(
-        resolvedVetting?.decision_making_model as
-          | VettingFormValues["decision_making_model"]
-          | null
-          | undefined,
+        resolvedVetting?.decision_making_model === "Lead pastor with staff"
+          ? ("Lead pastor with staff input" as VettingFormValues["decision_making_model"])
+          : (resolvedVetting?.decision_making_model as
+              | VettingFormValues["decision_making_model"]
+              | null
+              | undefined),
+      ),
+      deficit_explanation: asFormValue(
+        rawData.deficit_explanation as string | undefined,
+      ),
+      doctrinal_affirmation_required: asFormValue(
+        rawData.doctrinal_affirmation_required as boolean | undefined,
       ),
       doctrinal_clarity_self_score: asFormValue(
         rawData.doctrinal_clarity_self_score as number | undefined,
-      ),
-      doctrinal_conflict_handling: asFormValue(
-        rawData.doctrinal_conflict_handling as string | undefined,
-      ),
-      doctrinal_statement_text: asFormValue(
-        rawData.doctrinal_statement_text as string | undefined,
       ),
       ecfa_body: asFormValue(rawData.ecfa_body as string | undefined),
       ecfa_lapsed: asFormValue(rawData.ecfa_lapsed as boolean | undefined),
       ecfa_member: asFormValue(rawData.ecfa_member as boolean | undefined),
       exec_salary_benchmark: asFormValue(
-        resolvedVetting?.exec_salary_benchmark as
+        (resolvedVetting?.exec_salary_benchmark === "Significantly below"
+          ? "Significantly below peer benchmark"
+          : resolvedVetting?.exec_salary_benchmark) as
           | VettingFormValues["exec_salary_benchmark"]
           | null
           | undefined,
@@ -223,7 +232,11 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
       independent_board_count:
         resolvedVetting?.independent_board_count ?? undefined,
       leader_accountability: asFormValue(
-        resolvedVetting?.leader_accountability as
+        (resolvedVetting?.leader_accountability === "Yes formal"
+          ? "Yes — formal structure"
+          : resolvedVetting?.leader_accountability === "Yes informal"
+            ? "Yes — informal"
+            : resolvedVetting?.leader_accountability) as
           | VettingFormValues["leader_accountability"]
           | null
           | undefined,
@@ -232,7 +245,12 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
         resolvedVetting?.leader_conversion_narrative,
       ),
       leader_marital_status: asFormValue(
-        resolvedVetting?.leader_marital_status as
+        (resolvedVetting?.leader_marital_status === "Divorced prior to ministry"
+          ? "Divorced — prior to ministry"
+          : resolvedVetting?.leader_marital_status ===
+              "Divorced during ministry"
+            ? "Divorced — during ministry"
+            : resolvedVetting?.leader_marital_status) as
           | VettingFormValues["leader_marital_status"]
           | null
           | undefined,
@@ -249,13 +267,24 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
       negative_press: asFormValue(
         rawData.negative_press as boolean | undefined,
       ),
-      negative_press_description: asFormValue(
-        rawData.negative_press_description as string | undefined,
-      ),
-      negative_press_url: asFormValue(
-        rawData.negative_press_url as string | undefined,
+      negative_press_notes: asFormValue(
+        rawData.negative_press_notes as string | undefined,
       ),
       overhead_expense_pct: resolvedVetting?.overhead_expense_pct ?? undefined,
+      partner_1_contact: asFormValue(
+        rawData.partner_1_contact as string | undefined,
+      ),
+      partner_1_name: asFormValue(rawData.partner_1_name as string | undefined),
+      partner_1_pastor: asFormValue(
+        rawData.partner_1_pastor as string | undefined,
+      ),
+      partner_2_contact: asFormValue(
+        rawData.partner_2_contact as string | undefined,
+      ),
+      partner_2_name: asFormValue(rawData.partner_2_name as string | undefined),
+      partner_2_pastor: asFormValue(
+        rawData.partner_2_pastor as string | undefined,
+      ),
       primary_output_count: asFormValue(
         rawData.primary_output_count as number | undefined,
       ),
@@ -264,47 +293,30 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
       ),
       program_expense_pct: resolvedVetting?.program_expense_pct ?? undefined,
       recent_deficit: resolvedVetting?.recent_deficit ?? undefined,
-      recent_deficit_explanation: asFormValue(
-        rawData.recent_deficit_explanation as string | undefined,
+      ref_1_email: asFormValue(rawData.ref_1_email as string | undefined),
+      ref_1_name: asFormValue(rawData.ref_1_name as string | undefined),
+      ref_1_relationship: asFormValue(
+        rawData.ref_1_relationship as string | undefined,
       ),
-      reference_1_email: asFormValue(
-        rawData.reference_1_email as string | undefined,
+      ref_1_role: asFormValue(rawData.ref_1_role as string | undefined),
+      ref_2_email: asFormValue(rawData.ref_2_email as string | undefined),
+      ref_2_name: asFormValue(rawData.ref_2_name as string | undefined),
+      ref_2_relationship: asFormValue(
+        rawData.ref_2_relationship as string | undefined,
       ),
-      reference_1_name: asFormValue(
-        rawData.reference_1_name as string | undefined,
+      ref_2_role: asFormValue(rawData.ref_2_role as string | undefined),
+      ref_3_email: asFormValue(rawData.ref_3_email as string | undefined),
+      ref_3_name: asFormValue(rawData.ref_3_name as string | undefined),
+      ref_3_relationship: asFormValue(
+        rawData.ref_3_relationship as string | undefined,
       ),
-      reference_1_relationship: asFormValue(
-        rawData.reference_1_relationship as string | undefined,
-      ),
-      reference_1_role: asFormValue(
-        rawData.reference_1_role as string | undefined,
-      ),
-      reference_2_email: asFormValue(
-        rawData.reference_2_email as string | undefined,
-      ),
-      reference_2_name: asFormValue(
-        rawData.reference_2_name as string | undefined,
-      ),
-      reference_2_relationship: asFormValue(
-        rawData.reference_2_relationship as string | undefined,
-      ),
-      reference_2_role: asFormValue(
-        rawData.reference_2_role as string | undefined,
-      ),
-      reference_3_email: asFormValue(
-        rawData.reference_3_email as string | undefined,
-      ),
-      reference_3_name: asFormValue(
-        rawData.reference_3_name as string | undefined,
-      ),
-      reference_3_relationship: asFormValue(
-        rawData.reference_3_relationship as string | undefined,
-      ),
-      reference_3_role: asFormValue(
-        rawData.reference_3_role as string | undefined,
-      ),
+      ref_3_role: asFormValue(rawData.ref_3_role as string | undefined),
       reserve_fund_level: asFormValue(
-        resolvedVetting?.reserve_fund_level as
+        (resolvedVetting?.reserve_fund_level === "No reserve"
+          ? "No reserve fund"
+          : resolvedVetting?.reserve_fund_level === "Less than 3 months"
+            ? "Less than 3 months operating"
+            : resolvedVetting?.reserve_fund_level) as
           | VettingFormValues["reserve_fund_level"]
           | null
           | undefined,
@@ -319,9 +331,6 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
       signatory_name: asFormValue(rawData.signatory_name as string | undefined),
       signatory_title: asFormValue(
         rawData.signatory_title as string | undefined,
-      ),
-      staff_doctrinal_affirmation: asFormValue(
-        rawData.staff_doctrinal_affirmation as boolean | undefined,
       ),
       strategic_clarity_self_score: asFormValue(
         rawData.strategic_clarity_self_score as number | undefined,
@@ -343,11 +352,17 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
       three_year_plan: asFormValue(
         rawData.three_year_plan as string | undefined,
       ),
-      whistleblower_policy: resolvedVetting?.whistleblower_policy ?? undefined,
       spiritual_measurement_method: asFormValue(
         rawData.spiritual_measurement_method as string | undefined,
       ),
+      whistleblower_policy: resolvedVetting?.whistleblower_policy ?? undefined,
     },
+    organizationId,
+    readOnly: isReadOnlyStatus(
+      applicationStatus,
+      resolvedVetting?.submitted_at ?? null,
+    ),
+    submittedAt: resolvedVetting?.submitted_at ?? null,
     uploadedDocuments,
   };
 }
@@ -361,42 +376,57 @@ function mapVettingToPersistence(values: VettingFormValues) {
       board_meeting_frequency: values.board_meeting_frequency,
       compensation_set_by_board: values.compensation_set_by_board,
       conflict_of_interest_policy: values.conflict_of_interest_policy,
-      decision_making_model: values.decision_making_model,
-      exec_salary_benchmark: values.exec_salary_benchmark,
+      decision_making_model:
+        values.decision_making_model === "Lead pastor with staff input"
+          ? "Lead pastor with staff"
+          : values.decision_making_model,
+      exec_salary_benchmark:
+        values.exec_salary_benchmark === "Significantly below peer benchmark"
+          ? "Significantly below"
+          : values.exec_salary_benchmark,
       family_on_board: values.family_on_board,
       independent_board_count: values.independent_board_count,
-      leader_accountability: values.leader_accountability,
+      leader_accountability:
+        values.leader_accountability === "Yes — formal structure"
+          ? "Yes formal"
+          : values.leader_accountability === "Yes — informal"
+            ? "Yes informal"
+            : values.leader_accountability,
       leader_conversion_narrative: values.leader_conversion_narrative,
-      leader_marital_status: values.leader_marital_status,
+      leader_marital_status:
+        values.leader_marital_status === "Divorced — prior to ministry"
+          ? "Divorced prior to ministry"
+          : values.leader_marital_status === "Divorced — during ministry"
+            ? "Divorced during ministry"
+            : values.leader_marital_status,
       leadership_conflict_notes: values.leadership_conflict_notes,
       overhead_expense_pct: values.overhead_expense_pct,
       program_expense_pct: values.program_expense_pct,
+      raw_data: {},
       recent_deficit: values.recent_deficit,
-      reserve_fund_level: values.reserve_fund_level,
+      reserve_fund_level:
+        values.reserve_fund_level === "No reserve fund"
+          ? "No reserve"
+          : values.reserve_fund_level === "Less than 3 months operating"
+            ? "Less than 3 months"
+            : values.reserve_fund_level,
       restricted_funds_misused: values.restricted_funds_misused,
       restricted_funds_tracked: values.restricted_funds_tracked,
       whistleblower_policy: values.whistleblower_policy,
     },
     rawData: {
-      attestation_authorized: values.attestation_authorized,
-      attestation_truthful: values.attestation_truthful,
+      attestation_complete: values.attestation_complete,
+      attestation_research: values.attestation_research,
       board_turnover_notes: values.board_turnover_notes,
       case_study_1: values.case_study_1,
-      case_study_2: values.case_study_2,
-      church_partner_1_contact: values.church_partner_1_contact,
-      church_partner_1_name: values.church_partner_1_name,
-      church_partner_1_pastor: values.church_partner_1_pastor,
-      church_partner_2_contact: values.church_partner_2_contact,
-      church_partner_2_name: values.church_partner_2_name,
-      church_partner_2_pastor: values.church_partner_2_pastor,
       crypto_policy: values.crypto_policy,
-      crypto_policy_description: values.crypto_policy_description,
+      deficit_explanation: values.deficit_explanation,
+      doctrinal_affirmation_required: values.doctrinal_affirmation_required,
       doctrinal_clarity_self_score: values.doctrinal_clarity_self_score,
-      doctrinal_conflict_handling: values.doctrinal_conflict_handling,
-      doctrinal_statement_text: values.doctrinal_statement_text,
       ecfa_body: values.ecfa_body,
       ecfa_lapsed: values.ecfa_lapsed,
       ecfa_member: values.ecfa_member,
+      family_on_board_relationship: values.family_on_board_relationship,
       fruit_self_score: values.fruit_self_score,
       funding_impact: values.funding_impact,
       funding_reduction_response: values.funding_reduction_response,
@@ -404,27 +434,30 @@ function mapVettingToPersistence(values: VettingFormValues) {
       marriage_sexuality_public: values.marriage_sexuality_public,
       marriage_sexuality_url: values.marriage_sexuality_url,
       negative_press: values.negative_press,
-      negative_press_description: values.negative_press_description,
-      negative_press_url: values.negative_press_url,
+      negative_press_notes: values.negative_press_notes,
+      partner_1_contact: values.partner_1_contact,
+      partner_1_name: values.partner_1_name,
+      partner_1_pastor: values.partner_1_pastor,
+      partner_2_contact: values.partner_2_contact,
+      partner_2_name: values.partner_2_name,
+      partner_2_pastor: values.partner_2_pastor,
       primary_output_count: values.primary_output_count,
       primary_output_unit: values.primary_output_unit,
-      recent_deficit_explanation: values.recent_deficit_explanation,
-      reference_1_email: values.reference_1_email,
-      reference_1_name: values.reference_1_name,
-      reference_1_relationship: values.reference_1_relationship,
-      reference_1_role: values.reference_1_role,
-      reference_2_email: values.reference_2_email,
-      reference_2_name: values.reference_2_name,
-      reference_2_relationship: values.reference_2_relationship,
-      reference_2_role: values.reference_2_role,
-      reference_3_email: values.reference_3_email,
-      reference_3_name: values.reference_3_name,
-      reference_3_relationship: values.reference_3_relationship,
-      reference_3_role: values.reference_3_role,
+      ref_1_email: values.ref_1_email,
+      ref_1_name: values.ref_1_name,
+      ref_1_relationship: values.ref_1_relationship,
+      ref_1_role: values.ref_1_role,
+      ref_2_email: values.ref_2_email,
+      ref_2_name: values.ref_2_name,
+      ref_2_relationship: values.ref_2_relationship,
+      ref_2_role: values.ref_2_role,
+      ref_3_email: values.ref_3_email,
+      ref_3_name: values.ref_3_name,
+      ref_3_relationship: values.ref_3_relationship,
+      ref_3_role: values.ref_3_role,
+      signed_at: values.signed_at,
       signatory_name: values.signatory_name,
       signatory_title: values.signatory_title,
-      signed_at: values.signed_at,
-      staff_doctrinal_affirmation: values.staff_doctrinal_affirmation,
       strategic_clarity_self_score: values.strategic_clarity_self_score,
       strategy_description: values.strategy_description,
       syncretism_practice: values.syncretism_practice,
@@ -432,24 +465,44 @@ function mapVettingToPersistence(values: VettingFormValues) {
       third_party_evaluation: values.third_party_evaluation,
       three_year_plan: values.three_year_plan,
       spiritual_measurement_method: values.spiritual_measurement_method,
-      family_on_board_relationship: values.family_on_board_relationship,
     },
   };
 }
 
 export async function saveVettingDraft(
   values: VettingFormValues,
+  applicationId?: string | null,
 ): Promise<VettingDraftResult> {
-  const { applicationId, supabase } = await getApprovedApplicationContext();
+  const context = await getMinistryApplicationContext();
+
+  if (
+    context.applicationStatus !== "inquiry_approved" &&
+    context.applicationStatus !== "vetting_submitted" &&
+    context.applicationStatus !== "under_review" &&
+    context.applicationStatus !== "approved" &&
+    context.applicationStatus !== "declined"
+  ) {
+    return {
+      error: "This form will be unlocked once your inquiry has been approved.",
+    };
+  }
+
+  const resolvedApplicationId = applicationId ?? context.applicationId;
+
+  if (!resolvedApplicationId) {
+    return { error: "No application is available for vetting." };
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
+  const db = context.supabase as any;
   const payload = mapVettingToPersistence(values);
 
   const { error } = await db.from("vetting_responses").upsert(
     {
       ...payload.direct,
-      application_id: applicationId,
+      application_id: resolvedApplicationId,
       raw_data: payload.rawData,
+      submitted_at: null,
     },
     {
       onConflict: "application_id",
@@ -460,11 +513,12 @@ export async function saveVettingDraft(
     return { error: error.message };
   }
 
-  return { applicationId };
+  return { applicationId: resolvedApplicationId };
 }
 
 export async function submitVetting(
   values: VettingFormValues,
+  applicationId?: string | null,
 ): Promise<VettingDraftResult> {
   const parsed = vettingFormSchema.safeParse(values);
 
@@ -472,41 +526,62 @@ export async function submitVetting(
     return { error: parsed.error.issues[0]?.message };
   }
 
-  if (parsed.data.restricted_funds_misused) {
-    return {
-      error:
-        "This application cannot be submitted because restricted funds were reported as misused.",
-    };
-  }
-
-  const draft = await saveVettingDraft(parsed.data);
+  const draft = await saveVettingDraft(parsed.data, applicationId);
 
   if (draft.error || !draft.applicationId) {
     return draft;
   }
 
-  const { applicationId, organizationId, supabase } =
-    await getApprovedApplicationContext();
+  const { applicationId: contextApplicationId, organizationId, supabase } =
+    await getMinistryApplicationContext();
+  const resolvedApplicationId = draft.applicationId ?? contextApplicationId;
+
+  if (!resolvedApplicationId) {
+    return { error: "No application is available for submission." };
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = supabase as any;
+
+  const { error: vettingError } = await db
+    .from("vetting_responses")
+    .update({ submitted_at: new Date().toISOString() })
+    .eq("application_id", resolvedApplicationId);
+
+  if (vettingError) {
+    return { error: vettingError.message };
+  }
 
   const { error } = await db
     .from("applications")
     .update({ status: "vetting_submitted" })
-    .eq("id", applicationId)
+    .eq("id", resolvedApplicationId)
     .eq("organization_id", organizationId);
 
   if (error) {
     return { error: error.message };
   }
 
-  await fetch(`${getBaseUrl()}/api/score`, {
-    body: JSON.stringify({ application_id: applicationId }),
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `${getBaseUrl()}/api/vetting/${resolvedApplicationId}/run`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "x-save-background-token":
+          process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+      },
+      method: "POST",
     },
-    method: "POST",
-  });
+  );
 
-  return { applicationId };
+  if (!response.ok) {
+    const body = (await response.json().catch(() => null)) as
+      | { error?: string }
+      | null;
+    return {
+      error: body?.error ?? "Unable to start background vetting checks.",
+    };
+  }
+
+  return { applicationId: resolvedApplicationId };
 }

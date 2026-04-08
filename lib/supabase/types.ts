@@ -67,6 +67,7 @@ export type Database = {
       };
       applications: {
         Row: {
+          ai_summary: string | null;
           created_at: string;
           cycle_year: number | null;
           decision: string | null;
@@ -74,11 +75,14 @@ export type Database = {
           decision_made_by: string | null;
           decision_notes: string | null;
           id: string;
+          immersive_discernment_notes: string | null;
+          immersive_discernment_status: string | null;
           organization_id: string;
           status: string;
           updated_at: string;
         };
         Insert: {
+          ai_summary?: string | null;
           created_at?: string;
           cycle_year?: number | null;
           decision?: string | null;
@@ -86,11 +90,14 @@ export type Database = {
           decision_made_by?: string | null;
           decision_notes?: string | null;
           id?: string;
+          immersive_discernment_notes?: string | null;
+          immersive_discernment_status?: string | null;
           organization_id: string;
           status?: string;
           updated_at?: string;
         };
         Update: {
+          ai_summary?: string | null;
           created_at?: string;
           cycle_year?: number | null;
           decision?: string | null;
@@ -98,6 +105,8 @@ export type Database = {
           decision_made_by?: string | null;
           decision_notes?: string | null;
           id?: string;
+          immersive_discernment_notes?: string | null;
+          immersive_discernment_status?: string | null;
           organization_id?: string;
           status?: string;
           updated_at?: string;
@@ -131,6 +140,7 @@ export type Database = {
           raw_data: Json;
           referral_source: string | null;
           scripture_position: string | null;
+          submitted_at: string | null;
           theological_education: string | null;
           updated_at: string;
           years_in_role: number | null;
@@ -162,6 +172,7 @@ export type Database = {
           raw_data?: Json;
           referral_source?: string | null;
           scripture_position?: string | null;
+          submitted_at?: string | null;
           theological_education?: string | null;
           updated_at?: string;
           years_in_role?: number | null;
@@ -193,6 +204,7 @@ export type Database = {
           raw_data?: Json;
           referral_source?: string | null;
           scripture_position?: string | null;
+          submitted_at?: string | null;
           theological_education?: string | null;
           updated_at?: string;
           years_in_role?: number | null;
@@ -238,6 +250,7 @@ export type Database = {
           restricted_funds_tracked: boolean | null;
           sacramental_practice: string | null;
           statement_of_faith_alignment: string | null;
+          submitted_at: string | null;
           updated_at: string;
           whistleblower_policy: boolean | null;
         };
@@ -280,6 +293,7 @@ export type Database = {
           restricted_funds_tracked?: boolean | null;
           sacramental_practice?: string | null;
           statement_of_faith_alignment?: string | null;
+          submitted_at?: string | null;
           updated_at?: string;
           whistleblower_policy?: boolean | null;
         };
@@ -322,6 +336,7 @@ export type Database = {
           restricted_funds_tracked?: boolean | null;
           sacramental_practice?: string | null;
           statement_of_faith_alignment?: string | null;
+          submitted_at?: string | null;
           updated_at?: string;
           whistleblower_policy?: boolean | null;
         };
@@ -573,6 +588,7 @@ export type Database = {
           pdf_path: string | null;
           published: boolean;
           published_at: string | null;
+          rationale: string | null;
           recommendation_level: string | null;
           slug: string | null;
         };
@@ -588,6 +604,7 @@ export type Database = {
           pdf_path?: string | null;
           published?: boolean;
           published_at?: string | null;
+          rationale?: string | null;
           recommendation_level?: string | null;
           slug?: string | null;
         };
@@ -603,8 +620,41 @@ export type Database = {
           pdf_path?: string | null;
           published?: boolean;
           published_at?: string | null;
+          rationale?: string | null;
           recommendation_level?: string | null;
           slug?: string | null;
+        };
+      };
+      donor_requests: {
+        Row: {
+          created_at: string;
+          email: string;
+          full_name: string;
+          giving_focus: string;
+          id: string;
+          organization: string | null;
+          referral_source: string;
+          status: "approved" | "declined" | "pending";
+        };
+        Insert: {
+          created_at?: string;
+          email: string;
+          full_name: string;
+          giving_focus: string;
+          id?: string;
+          organization?: string | null;
+          referral_source: string;
+          status?: "approved" | "declined" | "pending";
+        };
+        Update: {
+          created_at?: string;
+          email?: string;
+          full_name?: string;
+          giving_focus?: string;
+          id?: string;
+          organization?: string | null;
+          referral_source?: string;
+          status?: "approved" | "declined" | "pending";
         };
       };
       profiles: {
@@ -655,4 +705,6 @@ export type Document = Database["public"]["Tables"]["documents"]["Row"];
 export type ExternalCheck =
   Database["public"]["Tables"]["external_checks"]["Row"];
 export type DonorBrief = Database["public"]["Tables"]["donor_briefs"]["Row"];
+export type DonorRequest =
+  Database["public"]["Tables"]["donor_requests"]["Row"];
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];

@@ -3,9 +3,23 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import type { Database } from "@/lib/supabase/types";
 
-const PROTECTED_PATHS = ["/dashboard", "/applications", "/admin"];
+const PROTECTED_PATHS = [
+  "/dashboard",
+  "/applications",
+  "/admin",
+  "/portal",
+  "/donors",
+];
 
 function isProtectedPath(pathname: string) {
+  if (pathname === "/donors") {
+    return true;
+  }
+
+  if (pathname.startsWith("/donors/")) {
+    return false;
+  }
+
   return PROTECTED_PATHS.some(
     (path) => pathname === path || pathname.startsWith(`${path}/`),
   );
@@ -60,6 +74,9 @@ export async function updateSession(request: NextRequest) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
     redirectUrl.searchParams.set("redirectTo", request.nextUrl.pathname);
+    if (request.nextUrl.pathname.startsWith("/portal")) {
+      redirectUrl.searchParams.set("intent", "ministry");
+    }
 
     return NextResponse.redirect(redirectUrl);
   }

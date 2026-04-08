@@ -3,22 +3,29 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { register } from "@/app/actions/auth";
 
-const registerSchema = z.object({
-  email: z.string().email("Enter a valid email address."),
-  password: z.string().min(8, "Password must be at least 8 characters."),
-  organizationLegalName: z
-    .string()
-    .min(2, "Organization legal name is required."),
-  ein: z
-    .string()
-    .min(1, "EIN is required.")
-    .regex(/^\d{2}-?\d{7}$/, "Enter a valid EIN."),
-});
+const registerSchema = z
+  .object({
+    confirmPassword: z.string().min(8, "Confirm your password."),
+    email: z.string().email("Enter a valid email address."),
+    ein: z
+      .string()
+      .min(1, "EIN is required.")
+      .regex(/^\d{2}-?\d{7}$/, "Enter a valid EIN."),
+    organizationLegalName: z
+      .string()
+      .min(2, "Organization legal name is required."),
+    password: z.string().min(8, "Password must be at least 8 characters."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
 
 type RegisterValues = z.infer<typeof registerSchema>;
 
@@ -27,7 +34,7 @@ function FieldError({ message }: { message?: string }) {
     return null;
   }
 
-  return <p className="text-sm text-red-300">{message}</p>;
+  return <p className="text-sm text-[#9B2C2C]">{message}</p>;
 }
 
 export default function RegisterPage() {
@@ -37,10 +44,11 @@ export default function RegisterPage() {
   const form = useForm<RegisterValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
+      confirmPassword: "",
       email: "",
-      password: "",
-      organizationLegalName: "",
       ein: "",
+      organizationLegalName: "",
+      password: "",
     },
   });
 
@@ -48,158 +56,183 @@ export default function RegisterPage() {
     setFormError(null);
 
     startTransition(async () => {
-      const result = await register(values);
+      const result = await register({
+        email: values.email,
+        ein: values.ein,
+        organizationLegalName: values.organizationLegalName,
+        password: values.password,
+      });
 
       if (result?.error) {
         setFormError(result.error);
+        toast.error(result.error);
       }
     });
   });
 
   return (
-    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden px-6 py-12">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(192,154,69,0.18),_transparent_30%),linear-gradient(180deg,_rgba(17,28,43,0.92),_#0B1622)]" />
-      <div className="absolute bottom-0 left-0 h-72 w-72 rounded-full bg-[#13263B] blur-3xl" />
-      <div className="absolute right-10 top-16 h-48 w-48 rounded-full border border-[#C09A45]/15 bg-[#C09A45]/5 blur-3xl" />
+    <main className="min-h-screen bg-[#F9F6F0] px-6 py-12">
+      <div className="mx-auto grid min-h-[calc(100vh-6rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1fr_480px]">
+        <section className="rounded-[32px] border border-[#D8D1C3] bg-[#FFFDF8] p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)] md:p-12">
+          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
+            Ministry Registration
+          </p>
+          <h1
+            className="mt-6 max-w-[680px] text-5xl leading-[1.05] text-[#1B4D35] md:text-6xl"
+            style={{ fontFamily: "var(--font-auth-serif)" }}
+          >
+            Create your ministry account and start the SAVE application.
+          </h1>
+          <p className="mt-6 max-w-[560px] text-lg leading-8 text-[#4C5E52]">
+            We&apos;ll create your ministry account, organization record, and
+            initial application so you can head straight into the portal.
+          </p>
 
-      <section className="relative z-10 grid w-full max-w-5xl overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-[0_40px_120px_rgba(0,0,0,0.45)] backdrop-blur-xl lg:grid-cols-[0.95fr_1.05fr]">
-        <div className="flex flex-col justify-between border-b border-white/10 px-8 py-10 lg:border-b-0 lg:border-r lg:px-12 lg:py-14">
-          <div className="space-y-6">
-            <p className="text-sm uppercase tracking-[0.4em] text-[#C09A45]">
-              Ministry Registration
+          <div className="mt-10 rounded-[28px] border border-[#D8D1C3] bg-[#F4EFE4] p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
+              What you&apos;ll need
             </p>
-            <div className="space-y-4">
-              <h1 className="max-w-md text-4xl font-semibold leading-tight text-white md:text-5xl">
-                Start your ministry application with a secure account.
-              </h1>
-              <p className="max-w-lg text-base leading-7 text-slate-300">
-                This registration flow is reserved for ministry applicants. We
-                create your organization record and link it to your account so
-                future application data stays scoped correctly.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-12 rounded-3xl border border-[#C09A45]/20 bg-[#0F2031]/80 p-6 text-sm text-slate-300">
-            <p className="text-xs uppercase tracking-[0.3em] text-[#C09A45]">
-              What you need
-            </p>
-            <ul className="mt-3 space-y-3 leading-7">
+            <ul className="mt-3 space-y-2 text-base leading-8 text-[#4C5E52]">
               <li>Your ministry email address</li>
-              <li>Your legal organization name</li>
-              <li>Your EIN for organization matching</li>
+              <li>Your organization legal name</li>
+              <li>Your EIN in the format XX-XXXXXXX</li>
             </ul>
           </div>
-        </div>
+        </section>
 
-        <div className="bg-[#0D1A29]/95 px-8 py-10 lg:px-12 lg:py-14">
-          <div className="space-y-8">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-semibold text-white">
-                Create a ministry account
-              </h2>
-              <p className="text-sm text-slate-400">
-                Your role will be provisioned as{" "}
-                <span className="text-[#F1D9A1]">ministry</span>.
-              </p>
-            </div>
-
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div className="space-y-2">
-                <label
-                  className="text-sm font-medium text-slate-200"
-                  htmlFor="email"
-                >
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#C09A45] focus:ring-2 focus:ring-[#C09A45]/30"
-                  placeholder="director@ministry.org"
-                  {...form.register("email")}
-                />
-                <FieldError message={form.formState.errors.email?.message} />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  className="text-sm font-medium text-slate-200"
-                  htmlFor="password"
-                >
-                  Password
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  autoComplete="new-password"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#C09A45] focus:ring-2 focus:ring-[#C09A45]/30"
-                  placeholder="Choose a secure password"
-                  {...form.register("password")}
-                />
-                <FieldError message={form.formState.errors.password?.message} />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  className="text-sm font-medium text-slate-200"
-                  htmlFor="organizationLegalName"
-                >
-                  Organization legal name
-                </label>
-                <input
-                  id="organizationLegalName"
-                  type="text"
-                  autoComplete="organization"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#C09A45] focus:ring-2 focus:ring-[#C09A45]/30"
-                  placeholder="Ministry Organization, Inc."
-                  {...form.register("organizationLegalName")}
-                />
-                <FieldError
-                  message={form.formState.errors.organizationLegalName?.message}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  className="text-sm font-medium text-slate-200"
-                  htmlFor="ein"
-                >
-                  EIN
-                </label>
-                <input
-                  id="ein"
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="off"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#C09A45] focus:ring-2 focus:ring-[#C09A45]/30"
-                  placeholder="12-3456789"
-                  {...form.register("ein")}
-                />
-                <FieldError message={form.formState.errors.ein?.message} />
-              </div>
-
-              <FieldError message={formError ?? undefined} />
-
-              <button
-                type="submit"
-                disabled={isPending}
-                className="w-full rounded-2xl bg-[#C09A45] px-4 py-3 text-sm font-semibold text-[#0B1622] transition hover:bg-[#d3ac56] disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {isPending ? "Creating account..." : "Create ministry account"}
-              </button>
-            </form>
-
-            <p className="text-sm text-slate-400">
-              Already have access?{" "}
-              <Link className="text-[#F1D9A1] hover:text-white" href="/login">
-                Sign in here
-              </Link>
+        <section className="rounded-[32px] border border-[#D8D1C3] bg-white p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)] md:p-10">
+          <div className="space-y-2">
+            <h2
+              className="text-4xl text-[#1B4D35]"
+              style={{ fontFamily: "var(--font-auth-serif)" }}
+            >
+              Register
+            </h2>
+            <p className="text-sm leading-7 text-[#5D7264]">
+              Your account will be provisioned with the{" "}
+              <span className="font-semibold text-[#1B4D35]">ministry</span>{" "}
+              role.
             </p>
           </div>
-        </div>
-      </section>
+
+          <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <label
+                className="text-sm font-medium text-[#1B4D35]"
+                htmlFor="email"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                placeholder="director@ministry.org"
+                {...form.register("email")}
+              />
+              <FieldError message={form.formState.errors.email?.message} />
+            </div>
+
+            <div className="space-y-2">
+              <label
+                className="text-sm font-medium text-[#1B4D35]"
+                htmlFor="password"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                autoComplete="new-password"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                placeholder="Choose a secure password"
+                {...form.register("password")}
+              />
+              <FieldError message={form.formState.errors.password?.message} />
+            </div>
+
+            <div className="space-y-2">
+              <label
+                className="text-sm font-medium text-[#1B4D35]"
+                htmlFor="confirmPassword"
+              >
+                Confirm Password
+              </label>
+              <input
+                id="confirmPassword"
+                type="password"
+                autoComplete="new-password"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                placeholder="Re-enter your password"
+                {...form.register("confirmPassword")}
+              />
+              <FieldError
+                message={form.formState.errors.confirmPassword?.message}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label
+                className="text-sm font-medium text-[#1B4D35]"
+                htmlFor="organizationLegalName"
+              >
+                Organization Legal Name
+              </label>
+              <input
+                id="organizationLegalName"
+                type="text"
+                autoComplete="organization"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                placeholder="Ministry Organization, Inc."
+                {...form.register("organizationLegalName")}
+              />
+              <FieldError
+                message={form.formState.errors.organizationLegalName?.message}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label
+                className="text-sm font-medium text-[#1B4D35]"
+                htmlFor="ein"
+              >
+                EIN
+              </label>
+              <input
+                id="ein"
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                placeholder="12-3456789"
+                {...form.register("ein")}
+              />
+              <FieldError message={form.formState.errors.ein?.message} />
+            </div>
+
+            <FieldError message={formError ?? undefined} />
+
+            <button
+              type="submit"
+              disabled={isPending}
+              className="w-full rounded-2xl bg-[#1B4D35] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#236645] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isPending ? "Creating account..." : "Create account"}
+            </button>
+          </form>
+
+          <p className="mt-8 text-sm text-[#5D7264]">
+            Already have an account?{" "}
+            <Link
+              className="font-semibold text-[#1B4D35] underline-offset-4 hover:underline"
+              href="/login"
+            >
+              Sign in
+            </Link>
+          </p>
+        </section>
+      </div>
     </main>
   );
 }

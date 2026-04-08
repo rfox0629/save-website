@@ -7,7 +7,10 @@ export default async function InquiryPage() {
   return (
     <InquiryForm
       applicationId={draft.applicationId}
+      applicationStatus={draft.applicationStatus}
       initialValues={draft.initialValues}
+      readOnly={draft.readOnly}
+      submittedAt={draft.submittedAt}
     />
   );
 }

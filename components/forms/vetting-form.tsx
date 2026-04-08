@@ -1,19 +1,27 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo, useState, useTransition, type ChangeEvent } from "react";
-import { useForm, type Resolver } from "react-hook-form";
+import {
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+  type ChangeEvent,
+} from "react";
+import { useForm, type FieldPath, type FieldValues } from "react-hook-form";
+import { toast } from "sonner";
 
+import { saveVettingDraft, submitVetting } from "@/app/actions/vetting";
+import { MinistryNav } from "@/components/portal/ministry-nav";
 import { createClient } from "@/lib/supabase/client";
 import {
   type VettingDocumentType,
   vettingDefaultValues,
-  vettingFormSchema,
+  vettingDocumentTypes,
   vettingStepFields,
+  vettingStepSchemas,
   vettingStepTitles,
   type VettingFormValues,
 } from "@/lib/vetting";
-import { saveVettingDraft, submitVetting } from "@/app/actions/vetting";
 
 type UploadedDoc = {
   fileName: string;
@@ -21,12 +29,33 @@ type UploadedDoc = {
 };
 
 type VettingFormProps = {
-  applicationId: string;
+  applicationId: string | null;
+  applicationStatus: string | null;
   initialValues: Partial<VettingFormValues>;
+  organizationId: string | null;
+  readOnly: boolean;
+  submittedAt: string | null;
   uploadedDocuments: Partial<Record<string, UploadedDoc>>;
 };
 
 type FileState = Partial<Record<VettingDocumentType, File | null>>;
+type UploadingState = Partial<Record<VettingDocumentType, boolean>>;
+
+const DOCUMENT_LABELS: Record<VettingDocumentType, string> = {
+  audit_review: "Most recent audit or financial review",
+  board_minutes: "Board meeting minutes (last 2 years)",
+  budget: "Board-approved budget",
+  bylaws: "Current bylaws",
+  doctrinal_statement: "Doctrinal statement (if not publicly available)",
+  form_990: "Most recent Form 990 (if applicable)",
+};
+
+const STEP_DOCUMENT_FIELDS: Record<number, readonly VettingDocumentType[]> = {
+  7: vettingDocumentTypes,
+};
+
+const REFERENCE_ROWS = [1, 2, 3] as const;
+const PARTNER_ROWS = [1, 2] as const;
 
 function mergeDefaults(
   initialValues: Partial<VettingFormValues>,
@@ -42,172 +71,179 @@ function FieldError({ message }: { message?: string }) {
     return null;
   }
 
-  return <p className="text-sm text-red-300">{message}</p>;
+  return <p className="text-sm text-[#9B2C2C]">{message}</p>;
 }
 
-function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
+function TextInput({
+  readOnly = false,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement> & {
+  readOnly?: boolean;
+}) {
   return (
     <input
       {...props}
-      className={`w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#C09A45] focus:ring-2 focus:ring-[#C09A45]/30 ${props.className ?? ""}`}
+      readOnly={readOnly}
+      className={`w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10 ${readOnly ? "cursor-not-allowed bg-[#F4EFE4] text-[#617367]" : ""} ${props.className ?? ""}`}
     />
   );
 }
 
-function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
+function SelectInput({
+  disabled = false,
+  ...props
+}: React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       {...props}
-      className={`w-full rounded-2xl border border-white/10 bg-[#112131] px-4 py-3 text-white outline-none transition focus:border-[#C09A45] focus:ring-2 focus:ring-[#C09A45]/30 ${props.className ?? ""}`}
+      disabled={disabled}
+      className={`w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10 ${disabled ? "cursor-not-allowed bg-[#F4EFE4] text-[#617367]" : ""} ${props.className ?? ""}`}
     />
   );
 }
 
-function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
+function TextArea({
+  readOnly = false,
+  ...props
+}: React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
+  readOnly?: boolean;
+}) {
   return (
     <textarea
       {...props}
-      className={`min-h-32 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#C09A45] focus:ring-2 focus:ring-[#C09A45]/30 ${props.className ?? ""}`}
+      readOnly={readOnly}
+      className={`min-h-[120px] w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10 ${readOnly ? "cursor-not-allowed bg-[#F4EFE4] text-[#617367]" : ""} ${props.className ?? ""}`}
     />
   );
 }
 
-function Toggle({
-  value,
+function SliderInput({
+  disabled = false,
+  ...props
+}: React.InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input
+      {...props}
+      disabled={disabled}
+      type="range"
+      className={`w-full accent-[#1B4D35] ${disabled ? "cursor-not-allowed opacity-60" : ""}`}
+    />
+  );
+}
+
+function StepHeader({ currentStep }: { currentStep: number }) {
+  const progress = ((currentStep + 1) / vettingStepTitles.length) * 100;
+
+  return (
+    <div className="rounded-[28px] border border-[#D8D1C3] bg-white px-6 py-5 shadow-[0_18px_40px_rgba(27,77,53,0.06)]">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
+          Step {currentStep + 1} of 8 — {vettingStepTitles[currentStep]}
+        </p>
+        <p className="text-sm text-[#617367]">
+          Draft saves on every Next click
+        </p>
+      </div>
+      <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#E8E0D3]">
+        <div
+          className="h-full rounded-full bg-[#1B4D35] transition-all duration-300"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function RadioGroup({
+  disabled = false,
+  labels = ["No", "Yes"],
   onChange,
+  value,
 }: {
-  value: boolean;
+  disabled?: boolean;
+  labels?: [string, string];
   onChange: (value: boolean) => void;
+  value?: boolean;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-2 rounded-2xl border border-white/10 bg-white/5 p-1">
-      {[false, true].map((option) => (
+    <div className="grid grid-cols-2 gap-2 rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] p-1">
+      {[false, true].map((option, index) => (
         <button
-          key={String(option)}
-          className={`rounded-[1rem] px-4 py-2 text-sm font-medium transition ${
+          className={`rounded-[14px] px-4 py-2 text-sm font-semibold transition ${
             value === option
-              ? "bg-[#C09A45] text-[#0B1622]"
-              : "text-slate-300 hover:bg-white/5"
-          }`}
+              ? "bg-[#1B4D35] text-white"
+              : "text-[#617367] hover:bg-[#F4EFE4]"
+          } ${disabled ? "cursor-not-allowed opacity-70" : ""}`}
+          disabled={disabled}
+          key={String(option)}
           onClick={() => onChange(option)}
           type="button"
         >
-          {option ? "Yes" : "No"}
+          {labels[index]}
         </button>
       ))}
     </div>
   );
 }
 
-function Stepper({ currentStep }: { currentStep: number }) {
-  const progress = ((currentStep + 1) / vettingStepTitles.length) * 100;
-
+function CheckboxCard({
+  checked,
+  disabled = false,
+  label,
+  onToggle,
+}: {
+  checked: boolean;
+  disabled?: boolean;
+  label: string;
+  onToggle: () => void;
+}) {
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between text-sm text-slate-300">
-        <p className="uppercase tracking-[0.35em] text-[#C09A45]">
-          Deep Vetting
-        </p>
-        <p>
-          Step {currentStep + 1} of {vettingStepTitles.length}
-        </p>
-      </div>
-      <div className="h-2 overflow-hidden rounded-full bg-white/10">
-        <div
-          className="h-full rounded-full bg-[#C09A45] transition-all duration-300"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-      <div className="grid gap-2 md:grid-cols-4 xl:grid-cols-8">
-        {vettingStepTitles.map((title, index) => (
-          <div
-            key={title}
-            className={`rounded-2xl border px-3 py-3 text-xs ${
-              index === currentStep
-                ? "border-[#C09A45]/60 bg-[#C09A45]/10 text-[#F1D9A1]"
-                : index < currentStep
-                  ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200"
-                  : "border-white/10 bg-white/[0.03] text-slate-400"
-            }`}
-          >
-            <p className="font-semibold uppercase tracking-[0.2em]">
-              {index + 1}
-            </p>
-            <p className="mt-2 tracking-normal">{title}</p>
-          </div>
-        ))}
-      </div>
-    </div>
+    <label
+      className={`flex items-center gap-3 rounded-2xl border border-[#D8D1C3] px-4 py-3 text-sm text-[#1B4D35] ${
+        disabled ? "bg-[#F4EFE4] text-[#617367]" : "bg-[#FFFDF8]"
+      }`}
+    >
+      <input
+        checked={checked}
+        disabled={disabled}
+        onChange={onToggle}
+        type="checkbox"
+      />
+      <span>{label}</span>
+    </label>
   );
 }
 
-const documentFieldConfig: Record<
-  VettingDocumentType,
-  { label: string; documentType: VettingDocumentType }
-> = {
-  audit: { documentType: "audit", label: "Audit upload" },
-  board_minutes: {
-    documentType: "board_minutes",
-    label: "Board minutes upload",
-  },
-  budget: { documentType: "budget", label: "Budget upload" },
-  bylaws: { documentType: "bylaws", label: "Bylaws upload" },
-  doctrinal_statement: {
-    documentType: "doctrinal_statement",
-    label: "Doctrinal statement file",
-  },
-  form_990: { documentType: "form_990", label: "Form 990 upload" },
-  third_party_evaluation: {
-    documentType: "third_party_evaluation",
-    label: "Third-party evaluation upload",
-  },
-};
+function pickStepValues<T extends FieldValues>(
+  values: T,
+  fields: readonly string[],
+): Record<string, unknown> {
+  const result: Record<string, unknown> = {};
 
-const stepDocumentFields: Record<number, VettingDocumentType[]> = {
-  1: ["doctrinal_statement"],
-  2: ["bylaws", "board_minutes"],
-  3: ["form_990", "audit", "budget"],
-  4: ["third_party_evaluation"],
-};
+  for (const field of fields) {
+    result[field] = values[field as keyof T];
+  }
 
-const referenceFieldSets = [
-  {
-    email: "reference_1_email",
-    name: "reference_1_name",
-    relationship: "reference_1_relationship",
-    role: "reference_1_role",
-    title: "Reference 1",
-  },
-  {
-    email: "reference_2_email",
-    name: "reference_2_name",
-    relationship: "reference_2_relationship",
-    role: "reference_2_role",
-    title: "Reference 2",
-  },
-  {
-    email: "reference_3_email",
-    name: "reference_3_name",
-    relationship: "reference_3_relationship",
-    role: "reference_3_role",
-    title: "Reference 3",
-  },
-] as const;
+  return result;
+}
 
-const partnerFieldSets = [
-  {
-    contact: "church_partner_1_contact",
-    name: "church_partner_1_name",
-    pastor: "church_partner_1_pastor",
-    title: "Church partner 1",
-  },
-  {
-    contact: "church_partner_2_contact",
-    name: "church_partner_2_name",
-    pastor: "church_partner_2_pastor",
-    title: "Church partner 2",
-  },
-] as const;
+function ReadOnlyBanner({ submittedAt }: { submittedAt: string | null }) {
+  if (!submittedAt) {
+    return null;
+  }
+
+  return (
+    <div className="rounded-[28px] border border-[#C9BA98] bg-[#FFF8E8] px-6 py-5 text-[#1B4D35]">
+      <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#9A7A2D]">
+        Submitted
+      </p>
+      <p className="mt-2 text-base leading-7">
+        Submitted on {new Date(submittedAt).toLocaleDateString()}. This vetting
+        form is now read-only while our team completes review.
+      </p>
+    </div>
+  );
+}
 
 function sanitizeFilename(fileName: string) {
   return fileName.replace(/\s+/g, "-").replace(/[^a-zA-Z0-9._-]/g, "");
@@ -215,36 +251,109 @@ function sanitizeFilename(fileName: string) {
 
 export function VettingForm({
   applicationId,
+  applicationStatus,
   initialValues,
+  organizationId,
+  readOnly,
+  submittedAt,
   uploadedDocuments: initialDocuments,
 }: VettingFormProps) {
   const supabase = useMemo(() => createClient(), []);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = supabase as any;
   const [currentStep, setCurrentStep] = useState(0);
-  const [uploadedDocuments, setUploadedDocuments] = useState(initialDocuments);
-  const [pendingFiles, setPendingFiles] = useState<FileState>({});
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [confirmationVisible, setConfirmationVisible] = useState(false);
+  const [processingVisible, setProcessingVisible] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState<string | null>(
+    applicationStatus,
+  );
+  const [pendingFiles, setPendingFiles] = useState<FileState>({});
+  const [uploadedDocuments, setUploadedDocuments] = useState(initialDocuments);
+  const [uploading, setUploading] = useState<UploadingState>({});
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<VettingFormValues>({
     defaultValues: mergeDefaults(initialValues),
-    resolver: zodResolver(vettingFormSchema) as Resolver<VettingFormValues>,
   });
 
-  const restrictedFundsMisused = form.watch("restricted_funds_misused");
   const marriageSexualityPublic = form.watch("marriage_sexuality_public");
   const familyOnBoard = form.watch("family_on_board");
   const recentDeficit = form.watch("recent_deficit");
-  const cryptoPolicy = form.watch("crypto_policy");
   const negativePress = form.watch("negative_press");
   const ecfaMember = form.watch("ecfa_member");
-  const thirdPartyEvaluation = form.watch("third_party_evaluation");
+  const restrictedFundsMisused = form.watch("restricted_funds_misused");
 
-  const disqualified = restrictedFundsMisused;
+  useEffect(() => {
+    if (!processingVisible || !applicationId) {
+      return;
+    }
 
-  const stepFields = vettingStepFields[currentStep];
+    let cancelled = false;
+
+    const poll = async () => {
+      try {
+        const response = await fetch(`/api/status/${applicationId}`, {
+          cache: "no-store",
+        });
+
+        if (!response.ok || cancelled) {
+          return;
+        }
+
+        const body = (await response.json()) as { status?: string };
+        const nextStatus = body.status ?? null;
+        setProcessingStatus(nextStatus);
+
+        if (nextStatus && nextStatus !== "vetting_submitted") {
+          setProcessingVisible(false);
+          setConfirmationVisible(true);
+          toast.success("Background diligence checks are underway.");
+        }
+      } catch {
+        // Ignore a single polling error and try again on the next interval.
+      }
+    };
+
+    void poll();
+    const interval = window.setInterval(() => {
+      void poll();
+    }, 5000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [applicationId, processingVisible]);
+
+  const validateStep = async () => {
+    const fields = vettingStepFields[currentStep];
+    const values = form.getValues();
+    const schema = vettingStepSchemas[currentStep];
+    const stepValues = pickStepValues(values, fields);
+
+    fields.forEach((field) =>
+      form.clearErrors(field as FieldPath<VettingFormValues>),
+    );
+
+    const result = schema.safeParse(stepValues);
+
+    if (result.success) {
+      return true;
+    }
+
+    result.error.issues.forEach((issue) => {
+      const path = issue.path[0];
+      if (typeof path === "string") {
+        form.setError(path as FieldPath<VettingFormValues>, {
+          message: issue.message,
+          type: "manual",
+        });
+      }
+    });
+
+    return false;
+  };
 
   const updatePendingFile =
     (field: VettingDocumentType) => (event: ChangeEvent<HTMLInputElement>) => {
@@ -256,7 +365,11 @@ export function VettingForm({
     };
 
   const uploadStepFiles = async () => {
-    const fields = stepDocumentFields[currentStep] ?? [];
+    const fields = STEP_DOCUMENT_FIELDS[currentStep] ?? [];
+
+    if (!applicationId || !organizationId) {
+      return;
+    }
 
     for (const field of fields) {
       const file = pendingFiles[field];
@@ -265,8 +378,18 @@ export function VettingForm({
         continue;
       }
 
+      if (file.type !== "application/pdf") {
+        throw new Error("Only PDF files are allowed.");
+      }
+
+      if (file.size > 10 * 1024 * 1024) {
+        throw new Error("Each file must be 10MB or smaller.");
+      }
+
+      setUploading((current) => ({ ...current, [field]: true }));
+
       const safeName = sanitizeFilename(file.name);
-      const storagePath = `${applicationId}/${field}/${safeName}`;
+      const storagePath = `${organizationId}/vetting/${field}/${safeName}`;
 
       const { error: uploadError } = await supabase.storage
         .from("ministry-documents")
@@ -276,10 +399,11 @@ export function VettingForm({
         });
 
       if (uploadError) {
+        setUploading((current) => ({ ...current, [field]: false }));
         throw new Error(uploadError.message);
       }
 
-      const { error: documentError } = await db.from("documents").insert({
+      const { error: insertError } = await db.from("documents").insert({
         application_id: applicationId,
         document_type: field,
         file_name: safeName,
@@ -288,8 +412,10 @@ export function VettingForm({
         storage_path: storagePath,
       });
 
-      if (documentError) {
-        throw new Error(documentError.message);
+      setUploading((current) => ({ ...current, [field]: false }));
+
+      if (insertError) {
+        throw new Error(insertError.message);
       }
 
       setUploadedDocuments((current) => ({
@@ -306,93 +432,123 @@ export function VettingForm({
     }
   };
 
-  const saveCurrentStep = async () => {
-    const isValid = await form.trigger(stepFields);
-
-    if (!isValid) {
-      return false;
-    }
-
-    try {
-      await uploadStepFiles();
-    } catch (error) {
-      setGlobalError(
-        error instanceof Error
-          ? error.message
-          : "We could not upload one of the files.",
-      );
-      return false;
-    }
-
-    const result = await saveVettingDraft(form.getValues());
-
-    if (result.error) {
-      setGlobalError(result.error);
-      return false;
-    }
-
-    setGlobalError(null);
-    return true;
-  };
-
   const handleNext = () => {
     startTransition(async () => {
-      const success = await saveCurrentStep();
+      setGlobalError(null);
+      const isValid = await validateStep();
 
-      if (success) {
-        setCurrentStep((step) =>
-          Math.min(step + 1, vettingStepTitles.length - 1),
-        );
+      if (!isValid) {
+        return;
       }
-    });
-  };
 
-  const handlePrevious = () => {
-    setGlobalError(null);
-    setCurrentStep((step) => Math.max(step - 1, 0));
+      try {
+        await uploadStepFiles();
+      } catch (error) {
+        const nextMessage =
+          error instanceof Error ? error.message : "Unable to upload files.";
+        setGlobalError(nextMessage);
+        toast.error(nextMessage);
+        return;
+      }
+
+      const result = await saveVettingDraft(form.getValues(), applicationId);
+
+      if (result.error) {
+        setGlobalError(result.error);
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success("Vetting draft saved.");
+      setCurrentStep((step) =>
+        Math.min(step + 1, vettingStepTitles.length - 1),
+      );
+    });
   };
 
   const handleSubmit = form.handleSubmit((values) => {
     startTransition(async () => {
+      setGlobalError(null);
+      const isValid = await validateStep();
+
+      if (!isValid) {
+        return;
+      }
+
       try {
         await uploadStepFiles();
       } catch (error) {
-        setGlobalError(
-          error instanceof Error
-            ? error.message
-            : "We could not upload one of the files.",
-        );
+        const nextMessage =
+          error instanceof Error ? error.message : "Unable to upload files.";
+        setGlobalError(nextMessage);
+        toast.error(nextMessage);
         return;
       }
 
-      const result = await submitVetting(values);
+      const result = await submitVetting(values, applicationId);
 
       if (result.error) {
         setGlobalError(result.error);
+        toast.error(result.error);
         return;
       }
 
-      setGlobalError(null);
-      setConfirmationVisible(true);
+      toast.success("Vetting materials submitted. Processing your submission...");
+      setProcessingStatus("vetting_submitted");
+      setProcessingVisible(true);
     });
   });
 
+  if (processingVisible) {
+    return (
+      <main className="min-h-screen bg-[#F9F6F0] px-6 py-10">
+        <div className="mx-auto max-w-6xl space-y-8">
+          <MinistryNav active="vetting" />
+          <div className="mx-auto max-w-3xl rounded-[32px] border border-[#D8D1C3] bg-white px-8 py-12 text-center shadow-[0_25px_80px_rgba(27,77,53,0.08)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
+              Processing Submission
+            </p>
+            <h1
+              className="mt-6 text-5xl leading-tight text-[#1B4D35]"
+              style={{ fontFamily: "var(--font-auth-serif)" }}
+            >
+              We’re processing your vetting materials.
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-[#4F6357]">
+              This can take up to a minute while SAVE runs your external checks
+              and prepares your file for reviewer assessment.
+            </p>
+            <div className="mx-auto mt-8 h-3 max-w-xl overflow-hidden rounded-full bg-[#E8E0D3]">
+              <div className="h-full w-1/2 animate-pulse rounded-full bg-[#C09A45]" />
+            </div>
+            <p className="mt-4 text-sm text-[#6B8570]">
+              Current status: {processingStatus?.replace(/_/g, " ") ?? "pending"}
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   if (confirmationVisible) {
     return (
-      <main className="relative isolate min-h-screen overflow-hidden bg-[#0B1622] px-6 py-12 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(192,154,69,0.12),_transparent_35%),linear-gradient(180deg,_rgba(17,28,43,0.92),_#0B1622)]" />
-        <div className="relative mx-auto max-w-3xl rounded-[2rem] border border-white/10 bg-white/5 px-8 py-14 text-center shadow-[0_40px_120px_rgba(0,0,0,0.45)] backdrop-blur-xl">
-          <p className="text-sm uppercase tracking-[0.35em] text-[#C09A45]">
-            Vetting Submitted
-          </p>
-          <h1 className="mt-6 text-4xl font-semibold">
-            Your deep vetting materials are now in review.
-          </h1>
-          <p className="mt-4 text-slate-300">
-            We saved your responses, marked the application as vetting
-            submitted, and triggered the scoring route for downstream review
-            workflows.
-          </p>
+      <main className="min-h-screen bg-[#F9F6F0] px-6 py-10">
+        <div className="mx-auto max-w-6xl space-y-8">
+          <MinistryNav active="vetting" />
+          <div className="mx-auto max-w-3xl rounded-[32px] border border-[#D8D1C3] bg-white px-8 py-12 text-center shadow-[0_25px_80px_rgba(27,77,53,0.08)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
+              Vetting Submitted
+            </p>
+            <h1
+              className="mt-6 text-5xl leading-tight text-[#1B4D35]"
+              style={{ fontFamily: "var(--font-auth-serif)" }}
+            >
+              Your vetting materials have been submitted.
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-[#4F6357]">
+              Our team will be in touch within 2–3 weeks.
+            </p>
+          </div>
         </div>
       </main>
     );
@@ -403,16 +559,24 @@ export function VettingForm({
     const pending = pendingFiles[field];
 
     return (
-      <div className="space-y-2">
-        <label className="text-sm font-medium text-slate-200">
-          {documentFieldConfig[field].label}
+      <div className="space-y-2" key={field}>
+        <label className="text-sm font-medium text-[#1B4D35]">
+          {DOCUMENT_LABELS[field]}
         </label>
-        <Input onChange={updatePendingFile(field)} type="file" />
+        <TextInput
+          accept="application/pdf"
+          disabled={readOnly}
+          onChange={updatePendingFile(field)}
+          type="file"
+        />
+        {uploading[field] ? (
+          <p className="text-xs text-[#6B8570]">Uploading...</p>
+        ) : null}
         {pending ? (
-          <p className="text-xs text-[#F1D9A1]">Selected: {pending.name}</p>
+          <p className="text-xs text-[#6B8570]">Selected: {pending.name}</p>
         ) : null}
         {existing ? (
-          <p className="text-xs text-emerald-200">
+          <p className="text-xs text-[#2F7A53]">
             Uploaded: {existing.fileName}
           </p>
         ) : null}
@@ -421,861 +585,887 @@ export function VettingForm({
   };
 
   return (
-    <main className="relative isolate min-h-screen overflow-hidden bg-[#0B1622] px-6 py-10 text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(192,154,69,0.15),_transparent_32%),linear-gradient(180deg,_rgba(13,26,41,0.96),_#0B1622)]" />
-      <div className="relative mx-auto max-w-6xl">
-        <Stepper currentStep={currentStep} />
+    <main className="min-h-screen bg-[#F9F6F0] px-6 py-10 text-[#1B4D35]">
+      <div className="mx-auto max-w-6xl space-y-8">
+        <MinistryNav active="vetting" />
+        <ReadOnlyBanner submittedAt={submittedAt} />
+        {!readOnly ? <StepHeader currentStep={currentStep} /> : null}
 
-        <section className="mt-8 grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-          <aside className="rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.35)] backdrop-blur-xl">
-            <p className="text-sm uppercase tracking-[0.3em] text-[#C09A45]">
+        <section className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+          <aside className="rounded-[32px] border border-[#D8D1C3] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EFE4_100%)] p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
               Current Section
             </p>
-            <h1 className="mt-4 text-3xl font-semibold">
-              {vettingStepTitles[currentStep]}
+            <h1
+              className="mt-4 text-4xl leading-tight"
+              style={{ fontFamily: "var(--font-auth-serif)" }}
+            >
+              {readOnly ? "Vetting Submitted" : vettingStepTitles[currentStep]}
             </h1>
-            <p className="mt-4 leading-7 text-slate-300">
-              Each Next button validates the current section, uploads any files
-              attached to this step, and saves your draft to Supabase.
+            <p className="mt-4 text-base leading-8 text-[#4F6357]">
+              {readOnly
+                ? "Your submitted vetting responses are shown below for reference."
+                : "Complete each section carefully. Every Next click saves your draft and keeps your progress intact."}
             </p>
 
-            {disqualified ? (
-              <div className="mt-8 rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-                This submission is blocked because restricted funds were
-                reported as misused.
+            {restrictedFundsMisused ? (
+              <div className="mt-6 rounded-2xl border border-[#D98C8C] bg-[#FFF1F1] px-4 py-3 text-sm text-[#9B2C2C]">
+                This will be reviewed carefully by our team. Please explain in
+                the notes field.
               </div>
             ) : null}
           </aside>
 
           <form
-            className="space-y-6 rounded-[2rem] border border-white/10 bg-[#0D1A29]/95 p-8 shadow-[0_30px_80px_rgba(0,0,0,0.35)]"
+            className="rounded-[32px] border border-[#D8D1C3] bg-white p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)]"
             onSubmit={handleSubmit}
           >
-            {currentStep === 0 ? (
-              <div className="grid gap-5 md:grid-cols-2">
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Leader conversion narrative
-                  </label>
-                  <Textarea
-                    {...form.register("leader_conversion_narrative")}
-                    maxLength={750}
-                  />
-                  <FieldError
-                    message={
-                      form.formState.errors.leader_conversion_narrative?.message
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Leader marital status
-                  </label>
-                  <Select {...form.register("leader_marital_status")}>
-                    {[
-                      "Married and stable",
-                      "Single",
-                      "Widowed",
-                      "Divorced prior to ministry",
-                      "Divorced during ministry",
-                    ].map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Leader accountability
-                  </label>
-                  <Select {...form.register("leader_accountability")}>
-                    {["Yes formal", "Yes informal", "No"].map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Decision-making model
-                  </label>
-                  <Select {...form.register("decision_making_model")}>
-                    {[
-                      "Lead pastor unilaterally",
-                      "Lead pastor with staff",
-                      "Board approval required",
-                      "Congregational vote",
-                      "Elder plurality",
-                    ].map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Compensation set by board
-                  </label>
-                  <Toggle
-                    onChange={(value) =>
-                      form.setValue("compensation_set_by_board", value, {
-                        shouldDirty: true,
-                      })
-                    }
-                    value={form.watch("compensation_set_by_board")}
-                  />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Leadership conflict notes
-                  </label>
-                  <Textarea
-                    {...form.register("leadership_conflict_notes")}
-                    maxLength={750}
-                  />
-                </div>
-                <div className="space-y-3 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Board confrontation willingness
-                  </label>
-                  <input
-                    {...form.register("board_confrontation_willingness", {
-                      valueAsNumber: true,
-                    })}
-                    className="w-full accent-[#C09A45]"
-                    max={5}
-                    min={1}
-                    type="range"
-                  />
-                  <div className="flex justify-between text-xs text-slate-400">
-                    <span>1 = No mechanism</span>
-                    <span>5 = Demonstrated history</span>
-                  </div>
-                </div>
-              </div>
-            ) : null}
-
-            {currentStep === 1 ? (
-              <div className="grid gap-5 md:grid-cols-2">
-                <div className="space-y-2 md:col-span-2">
-                  {renderDocumentField("doctrinal_statement")}
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Doctrinal statement paste
-                  </label>
-                  <Textarea
-                    {...form.register("doctrinal_statement_text")}
-                    maxLength={1500}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Staff doctrinal affirmation
-                  </label>
-                  <Toggle
-                    onChange={(value) =>
-                      form.setValue("staff_doctrinal_affirmation", value, {
-                        shouldDirty: true,
-                      })
-                    }
-                    value={form.watch("staff_doctrinal_affirmation")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Syncretism practice
-                  </label>
-                  <Select {...form.register("syncretism_practice")}>
-                    {[
-                      "Never",
-                      "Occasionally for relational purposes",
-                      "Yes as part of our model",
-                    ].map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Gospel presentation
-                  </label>
-                  <Textarea
-                    {...form.register("gospel_presentation")}
-                    maxLength={500}
-                  />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Marriage and sexuality statement public?
-                  </label>
-                  <Toggle
-                    onChange={(value) =>
-                      form.setValue("marriage_sexuality_public", value, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      })
-                    }
-                    value={marriageSexualityPublic}
-                  />
-                </div>
-                {marriageSexualityPublic ? (
+            <div className="space-y-6">
+              {(readOnly || currentStep === 0) && (
+                <div className="grid gap-5 md:grid-cols-2">
                   <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium text-slate-200">
-                      Public URL
+                    <label className="text-sm font-medium">
+                      Briefly describe the lead pastor or executive
+                      director&apos;s call to ministry
                     </label>
-                    <Input {...form.register("marriage_sexuality_url")} />
-                    <FieldError
-                      message={
-                        form.formState.errors.marriage_sexuality_url?.message
-                      }
+                    <TextArea
+                      maxLength={750}
+                      readOnly={readOnly}
+                      {...form.register("leader_conversion_narrative")}
                     />
-                  </div>
-                ) : null}
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Doctrinal conflict handling
-                  </label>
-                  <Textarea
-                    {...form.register("doctrinal_conflict_handling")}
-                    maxLength={500}
-                  />
-                </div>
-                <div className="space-y-3 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Doctrinal clarity self score
-                  </label>
-                  <input
-                    {...form.register("doctrinal_clarity_self_score", {
-                      valueAsNumber: true,
-                    })}
-                    className="w-full accent-[#C09A45]"
-                    max={5}
-                    min={1}
-                    type="range"
-                  />
-                </div>
-              </div>
-            ) : null}
-
-            {currentStep === 2 ? (
-              <div className="grid gap-5 md:grid-cols-2">
-                <div className="space-y-2">{renderDocumentField("bylaws")}</div>
-                <div className="space-y-2">
-                  {renderDocumentField("board_minutes")}
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Independent board count
-                  </label>
-                  <Input
-                    type="number"
-                    {...form.register("independent_board_count", {
-                      valueAsNumber: true,
-                    })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Board meeting frequency
-                  </label>
-                  <Select {...form.register("board_meeting_frequency")}>
-                    {[
-                      "Monthly",
-                      "Quarterly",
-                      "Semi-annually",
-                      "Annually",
-                      "Irregularly",
-                    ].map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Conflict of interest policy
-                  </label>
-                  <Toggle
-                    onChange={(value) =>
-                      form.setValue("conflict_of_interest_policy", value, {
-                        shouldDirty: true,
-                      })
-                    }
-                    value={form.watch("conflict_of_interest_policy")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Whistleblower policy
-                  </label>
-                  <Toggle
-                    onChange={(value) =>
-                      form.setValue("whistleblower_policy", value, {
-                        shouldDirty: true,
-                      })
-                    }
-                    value={form.watch("whistleblower_policy")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Annual ED review
-                  </label>
-                  <Toggle
-                    onChange={(value) =>
-                      form.setValue("annual_ed_review", value, {
-                        shouldDirty: true,
-                      })
-                    }
-                    value={form.watch("annual_ed_review")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Family on board
-                  </label>
-                  <Toggle
-                    onChange={(value) =>
-                      form.setValue("family_on_board", value, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      })
-                    }
-                    value={familyOnBoard}
-                  />
-                </div>
-                {familyOnBoard ? (
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium text-slate-200">
-                      Relationship
-                    </label>
-                    <Input {...form.register("family_on_board_relationship")} />
                     <FieldError
                       message={
-                        form.formState.errors.family_on_board_relationship
+                        form.formState.errors.leader_conversion_narrative
                           ?.message
                       }
                     />
                   </div>
-                ) : null}
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Board turnover notes
-                  </label>
-                  <Textarea
-                    {...form.register("board_turnover_notes")}
-                    maxLength={500}
-                  />
-                </div>
-              </div>
-            ) : null}
-
-            {currentStep === 3 ? (
-              <div className="grid gap-5 md:grid-cols-2">
-                <div className="space-y-2">
-                  {renderDocumentField("form_990")}
-                </div>
-                <div className="space-y-2">{renderDocumentField("audit")}</div>
-                <div className="space-y-2 md:col-span-2">
-                  {renderDocumentField("budget")}
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Program expense %
-                  </label>
-                  <Input
-                    type="number"
-                    {...form.register("program_expense_pct", {
-                      valueAsNumber: true,
-                    })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Overhead expense %
-                  </label>
-                  <Input
-                    type="number"
-                    {...form.register("overhead_expense_pct", {
-                      valueAsNumber: true,
-                    })}
-                  />
-                  <FieldError
-                    message={
-                      form.formState.errors.overhead_expense_pct?.message
-                    }
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Reserve fund level
-                  </label>
-                  <Select {...form.register("reserve_fund_level")}>
-                    {[
-                      "No reserve",
-                      "Less than 3 months",
-                      "3–6 months",
-                      "6–12 months",
-                      "Over 12 months",
-                    ].map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Exec salary benchmark
-                  </label>
-                  <Select {...form.register("exec_salary_benchmark")}>
-                    {[
-                      "Significantly below",
-                      "At benchmark",
-                      "Above benchmark",
-                      "Unknown",
-                    ].map((option) => (
-                      <option key={option} value={option}>
-                        {option}
-                      </option>
-                    ))}
-                  </Select>
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Recent deficit
-                  </label>
-                  <Toggle
-                    onChange={(value) =>
-                      form.setValue("recent_deficit", value, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      })
-                    }
-                    value={recentDeficit}
-                  />
-                </div>
-                {recentDeficit ? (
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium text-slate-200">
-                      Deficit explanation
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Leader Marital Status
                     </label>
-                    <Textarea
-                      {...form.register("recent_deficit_explanation")}
-                    />
+                    <SelectInput
+                      disabled={readOnly}
+                      {...form.register("leader_marital_status")}
+                    >
+                      {[
+                        "Married and stable",
+                        "Single",
+                        "Widowed",
+                        "Divorced — prior to ministry",
+                        "Divorced — during ministry",
+                      ].map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </SelectInput>
                   </div>
-                ) : null}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Restricted funds tracked
-                  </label>
-                  <Toggle
-                    onChange={(value) =>
-                      form.setValue("restricted_funds_tracked", value, {
-                        shouldDirty: true,
-                      })
-                    }
-                    value={form.watch("restricted_funds_tracked")}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Restricted funds misused
-                  </label>
-                  <Toggle
-                    onChange={(value) =>
-                      form.setValue("restricted_funds_misused", value, {
-                        shouldDirty: true,
-                      })
-                    }
-                    value={restrictedFundsMisused}
-                  />
-                </div>
-                {restrictedFundsMisused ? (
-                  <div className="rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200 md:col-span-2">
-                    This is a hard stop. The application cannot be submitted
-                    while restricted funds misuse is marked yes.
-                  </div>
-                ) : null}
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Crypto policy
-                  </label>
-                  <Toggle
-                    onChange={(value) =>
-                      form.setValue("crypto_policy", value, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      })
-                    }
-                    value={cryptoPolicy}
-                  />
-                </div>
-                {cryptoPolicy ? (
-                  <div className="space-y-2 md:col-span-2">
-                    <label className="text-sm font-medium text-slate-200">
-                      Describe crypto policy
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Leader Accountability
                     </label>
-                    <Textarea {...form.register("crypto_policy_description")} />
+                    <SelectInput
+                      disabled={readOnly}
+                      {...form.register("leader_accountability")}
+                    >
+                      {["Yes — formal structure", "Yes — informal", "No"].map(
+                        (option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ),
+                      )}
+                    </SelectInput>
                   </div>
-                ) : null}
-              </div>
-            ) : null}
-
-            {currentStep === 4 ? (
-              <div className="grid gap-5 md:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Primary output count
-                  </label>
-                  <Input
-                    type="number"
-                    {...form.register("primary_output_count", {
-                      valueAsNumber: true,
-                    })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Primary output unit
-                  </label>
-                  <Input {...form.register("primary_output_unit")} />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Theory of change
-                  </label>
-                  <Textarea
-                    {...form.register("theory_of_change")}
-                    maxLength={750}
-                  />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Spiritual measurement method
-                  </label>
-                  <Textarea
-                    {...form.register("spiritual_measurement_method")}
-                    maxLength={500}
-                  />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Case study 1
-                  </label>
-                  <Textarea
-                    {...form.register("case_study_1")}
-                    maxLength={1000}
-                  />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Case study 2
-                  </label>
-                  <Textarea
-                    {...form.register("case_study_2")}
-                    maxLength={1000}
-                  />
-                </div>
-                <div className="space-y-2 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Third-party evaluation
-                  </label>
-                  <Toggle
-                    onChange={(value) =>
-                      form.setValue("third_party_evaluation", value, {
-                        shouldDirty: true,
-                      })
-                    }
-                    value={thirdPartyEvaluation}
-                  />
-                </div>
-                {thirdPartyEvaluation ? (
                   <div className="space-y-2 md:col-span-2">
-                    {renderDocumentField("third_party_evaluation")}
+                    <label className="text-sm font-medium">
+                      Decision-Making Model
+                    </label>
+                    <SelectInput
+                      disabled={readOnly}
+                      {...form.register("decision_making_model")}
+                    >
+                      {[
+                        "Lead pastor unilaterally",
+                        "Lead pastor with staff input",
+                        "Board approval required",
+                        "Congregational vote",
+                        "Elder plurality",
+                      ].map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </SelectInput>
                   </div>
-                ) : null}
-                <div className="space-y-3 md:col-span-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Fruit self score
-                  </label>
-                  <input
-                    {...form.register("fruit_self_score", {
-                      valueAsNumber: true,
-                    })}
-                    className="w-full accent-[#C09A45]"
-                    max={5}
-                    min={1}
-                    type="range"
-                  />
-                </div>
-              </div>
-            ) : null}
-
-            {currentStep === 5 ? (
-              <div className="space-y-6">
-                {referenceFieldSets.map((reference) => (
-                  <div
-                    key={reference.title}
-                    className="grid gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:grid-cols-2"
-                  >
-                    <p className="text-sm font-medium text-[#F1D9A1] md:col-span-2">
-                      {reference.title}
-                    </p>
-                    <Input
-                      placeholder="Name"
-                      {...form.register(reference.name)}
-                    />
-                    <Input
-                      placeholder="Role"
-                      {...form.register(reference.role)}
-                    />
-                    <Input
-                      placeholder="Email"
-                      {...form.register(reference.email)}
-                    />
-                    <Input
-                      placeholder="Relationship"
-                      {...form.register(reference.relationship)}
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">
+                      Is the lead leader&apos;s compensation set by the board
+                      without their vote?
+                    </label>
+                    <RadioGroup
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        form.setValue("compensation_set_by_board", value)
+                      }
+                      value={form.watch("compensation_set_by_board")}
                     />
                   </div>
-                ))}
-
-                {partnerFieldSets.map((partner) => (
-                  <div
-                    key={partner.title}
-                    className="grid gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:grid-cols-3"
-                  >
-                    <p className="text-sm font-medium text-[#F1D9A1] md:col-span-3">
-                      {partner.title}
-                    </p>
-                    <Input
-                      placeholder="Partner name"
-                      {...form.register(partner.name)}
-                    />
-                    <Input
-                      placeholder="Partner pastor"
-                      {...form.register(partner.pastor)}
-                    />
-                    <Input
-                      placeholder="Partner contact"
-                      {...form.register(partner.contact)}
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">
+                      Describe any significant leadership conflict in the last 3
+                      years and how it was resolved. If none, write
+                      &quot;None.&quot;
+                    </label>
+                    <TextArea
+                      maxLength={750}
+                      readOnly={readOnly}
+                      {...form.register("leadership_conflict_notes")}
                     />
                   </div>
-                ))}
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    Negative press
-                  </label>
-                  <Toggle
-                    onChange={(value) =>
-                      form.setValue("negative_press", value, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      })
-                    }
-                    value={negativePress}
-                  />
-                </div>
-                {negativePress ? (
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <Textarea
-                      className="md:col-span-2"
-                      placeholder="Describe the negative press"
-                      {...form.register("negative_press_description")}
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">
+                      Board confrontation willingness:{" "}
+                      {form.watch("board_confrontation_willingness")}
+                    </label>
+                    <SliderInput
+                      disabled={readOnly}
+                      max={5}
+                      min={1}
+                      {...form.register("board_confrontation_willingness", {
+                        valueAsNumber: true,
+                      })}
                     />
-                    <Input
-                      className="md:col-span-2"
-                      placeholder="URL"
-                      {...form.register("negative_press_url")}
-                    />
-                  </div>
-                ) : null}
-
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">
-                    ECFA member
-                  </label>
-                  <Toggle
-                    onChange={(value) =>
-                      form.setValue("ecfa_member", value, {
-                        shouldDirty: true,
-                        shouldValidate: true,
-                      })
-                    }
-                    value={ecfaMember}
-                  />
-                </div>
-                {ecfaMember ? (
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <Input
-                      placeholder="Which body?"
-                      {...form.register("ecfa_body")}
-                    />
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-slate-200">
-                        ECFA lapsed
-                      </label>
-                      <Toggle
-                        onChange={(value) =>
-                          form.setValue("ecfa_lapsed", value, {
-                            shouldDirty: true,
-                          })
-                        }
-                        value={form.watch("ecfa_lapsed")}
-                      />
+                    <div className="flex justify-between text-xs text-[#6B8570]">
+                      <span>1 = No mechanism exists</span>
+                      <span>5 = Demonstrated history of accountability</span>
                     </div>
                   </div>
-                ) : null}
-              </div>
-            ) : null}
-
-            {currentStep === 6 ? (
-              <div className="space-y-5">
-                <Textarea
-                  maxLength={750}
-                  placeholder="Strategy description"
-                  {...form.register("strategy_description")}
-                />
-                <Textarea
-                  maxLength={500}
-                  placeholder="Three-year plan"
-                  {...form.register("three_year_plan")}
-                />
-                <Textarea
-                  maxLength={500}
-                  placeholder="Funding impact"
-                  {...form.register("funding_impact")}
-                />
-                <Textarea
-                  maxLength={500}
-                  placeholder="Funding reduction response"
-                  {...form.register("funding_reduction_response")}
-                />
-                <div className="space-y-3">
-                  <label className="text-sm font-medium text-slate-200">
-                    Strategic clarity self score
-                  </label>
-                  <input
-                    {...form.register("strategic_clarity_self_score", {
-                      valueAsNumber: true,
-                    })}
-                    className="w-full accent-[#C09A45]"
-                    max={5}
-                    min={1}
-                    type="range"
-                  />
                 </div>
-              </div>
-            ) : null}
+              )}
 
-            {currentStep === 7 ? (
-              <div className="space-y-5">
-                <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200">
-                  <input
-                    className="size-4 accent-[#C09A45]"
-                    type="checkbox"
-                    checked={form.watch("attestation_truthful")}
-                    onChange={(event) =>
-                      form.setValue(
-                        "attestation_truthful",
-                        event.target.checked,
-                        {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        },
-                      )
-                    }
-                  />
-                  I attest that the information provided is accurate.
-                </label>
-                <FieldError
-                  message={form.formState.errors.attestation_truthful?.message}
-                />
-                <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200">
-                  <input
-                    className="size-4 accent-[#C09A45]"
-                    type="checkbox"
-                    checked={form.watch("attestation_authorized")}
-                    onChange={(event) =>
-                      form.setValue(
-                        "attestation_authorized",
-                        event.target.checked,
-                        {
-                          shouldDirty: true,
-                          shouldValidate: true,
-                        },
-                      )
-                    }
-                  />
-                  I am authorized to submit this vetting form on behalf of the
-                  ministry.
-                </label>
-                <FieldError
-                  message={
-                    form.formState.errors.attestation_authorized?.message
-                  }
-                />
-                <Input
-                  placeholder="Signatory name"
-                  {...form.register("signatory_name")}
-                />
-                <FieldError
-                  message={form.formState.errors.signatory_name?.message}
-                />
-                <Input
-                  placeholder="Signatory title"
-                  {...form.register("signatory_title")}
-                />
-                <FieldError
-                  message={form.formState.errors.signatory_title?.message}
-                />
-                <Input type="date" {...form.register("signed_at")} />
-              </div>
-            ) : null}
+              {(readOnly || currentStep === 1) && (
+                <div className="grid gap-5 md:grid-cols-2">
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">
+                      Are staff required to affirm your doctrinal statement
+                      annually?
+                    </label>
+                    <RadioGroup
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        form.setValue("doctrinal_affirmation_required", value)
+                      }
+                      value={form.watch("doctrinal_affirmation_required")}
+                    />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">
+                      How is the gospel presented in your primary outreach?
+                    </label>
+                    <TextArea
+                      maxLength={500}
+                      readOnly={readOnly}
+                      {...form.register("gospel_presentation")}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Syncretism Practice
+                    </label>
+                    <SelectInput
+                      disabled={readOnly}
+                      {...form.register("syncretism_practice")}
+                    >
+                      {[
+                        "Never",
+                        "Occasionally for relational purposes",
+                        "Yes — as part of our model",
+                      ].map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </SelectInput>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Is your ministry&apos;s position on marriage and sexuality
+                      publicly stated?
+                    </label>
+                    <RadioGroup
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        form.setValue("marriage_sexuality_public", value)
+                      }
+                      value={form.watch("marriage_sexuality_public")}
+                    />
+                  </div>
+                  {(readOnly || marriageSexualityPublic) && (
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-sm font-medium">
+                        Marriage and Sexuality URL
+                      </label>
+                      <TextInput
+                        readOnly={readOnly}
+                        {...form.register("marriage_sexuality_url")}
+                      />
+                    </div>
+                  )}
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">
+                      Doctrinal clarity self score:{" "}
+                      {form.watch("doctrinal_clarity_self_score")}
+                    </label>
+                    <SliderInput
+                      disabled={readOnly}
+                      max={5}
+                      min={1}
+                      {...form.register("doctrinal_clarity_self_score", {
+                        valueAsNumber: true,
+                      })}
+                    />
+                    <div className="flex justify-between text-xs text-[#6B8570]">
+                      <span>1 = Not addressed publicly</span>
+                      <span>5 = Clearly stated everywhere</span>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-            {globalError ? (
-              <div className="rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-                {globalError}
-              </div>
-            ) : null}
+              {(readOnly || currentStep === 2) && (
+                <div className="grid gap-5 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      How many board members are independent?
+                    </label>
+                    <TextInput
+                      readOnly={readOnly}
+                      type="number"
+                      {...form.register("independent_board_count", {
+                        valueAsNumber: true,
+                      })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Board Meeting Frequency
+                    </label>
+                    <SelectInput
+                      disabled={readOnly}
+                      {...form.register("board_meeting_frequency")}
+                    >
+                      {[
+                        "Monthly",
+                        "Quarterly",
+                        "Semi-annually",
+                        "Annually",
+                        "Irregularly",
+                      ].map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </SelectInput>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Conflict of Interest Policy
+                    </label>
+                    <RadioGroup
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        form.setValue("conflict_of_interest_policy", value)
+                      }
+                      value={form.watch("conflict_of_interest_policy")}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Whistleblower Policy
+                    </label>
+                    <RadioGroup
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        form.setValue("whistleblower_policy", value)
+                      }
+                      value={form.watch("whistleblower_policy")}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Does the board conduct a formal annual review of the
+                      executive director?
+                    </label>
+                    <RadioGroup
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        form.setValue("annual_ed_review", value)
+                      }
+                      value={form.watch("annual_ed_review")}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Are any family members of the lead leader on the board?
+                    </label>
+                    <RadioGroup
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        form.setValue("family_on_board", value)
+                      }
+                      value={form.watch("family_on_board")}
+                    />
+                  </div>
+                  {(readOnly || familyOnBoard) && (
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-sm font-medium">
+                        Family on Board Relationship
+                      </label>
+                      <TextInput
+                        readOnly={readOnly}
+                        {...form.register("family_on_board_relationship")}
+                      />
+                    </div>
+                  )}
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">
+                      Describe any board member turnover in the last 3 years and
+                      the reason. If none, write &quot;None.&quot;
+                    </label>
+                    <TextArea
+                      maxLength={500}
+                      readOnly={readOnly}
+                      {...form.register("board_turnover_notes")}
+                    />
+                  </div>
+                </div>
+              )}
 
-            <div className="flex flex-col gap-3 border-t border-white/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
-              <button
-                className="rounded-2xl border border-white/10 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-50"
-                disabled={currentStep === 0 || isPending}
-                onClick={handlePrevious}
-                type="button"
-              >
-                Previous
-              </button>
-              {currentStep < vettingStepTitles.length - 1 ? (
-                <button
-                  className="rounded-2xl bg-[#C09A45] px-5 py-3 text-sm font-semibold text-[#0B1622] transition hover:bg-[#d7b35c] disabled:cursor-not-allowed disabled:opacity-70"
-                  disabled={isPending}
-                  onClick={handleNext}
-                  type="button"
-                >
-                  {isPending ? "Saving..." : "Save and continue"}
-                </button>
-              ) : (
-                <button
-                  className="rounded-2xl bg-[#C09A45] px-5 py-3 text-sm font-semibold text-[#0B1622] transition hover:bg-[#d7b35c] disabled:cursor-not-allowed disabled:opacity-50"
-                  disabled={isPending || disqualified}
-                  type="submit"
-                >
-                  {isPending ? "Submitting..." : "Submit vetting"}
-                </button>
+              {(readOnly || currentStep === 3) && (
+                <div className="grid gap-5 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Program Expense Percentage
+                    </label>
+                    <TextInput
+                      readOnly={readOnly}
+                      type="number"
+                      {...form.register("program_expense_pct", {
+                        valueAsNumber: true,
+                      })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Overhead Expense Percentage
+                    </label>
+                    <TextInput
+                      readOnly={readOnly}
+                      type="number"
+                      {...form.register("overhead_expense_pct", {
+                        valueAsNumber: true,
+                      })}
+                    />
+                    <FieldError
+                      message={
+                        form.formState.errors.overhead_expense_pct?.message
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Reserve Fund Level
+                    </label>
+                    <SelectInput
+                      disabled={readOnly}
+                      {...form.register("reserve_fund_level")}
+                    >
+                      {[
+                        "No reserve fund",
+                        "Less than 3 months operating",
+                        "3–6 months",
+                        "6–12 months",
+                        "Over 12 months",
+                      ].map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </SelectInput>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Executive Salary Benchmark
+                    </label>
+                    <SelectInput
+                      disabled={readOnly}
+                      {...form.register("exec_salary_benchmark")}
+                    >
+                      {[
+                        "Significantly below peer benchmark",
+                        "At benchmark",
+                        "Above benchmark",
+                        "Unknown",
+                      ].map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </SelectInput>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Has your organization operated at a deficit in the last 3
+                      years?
+                    </label>
+                    <RadioGroup
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        form.setValue("recent_deficit", value)
+                      }
+                      value={form.watch("recent_deficit")}
+                    />
+                  </div>
+                  {(readOnly || recentDeficit) && (
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Deficit Explanation
+                      </label>
+                      <TextArea
+                        maxLength={250}
+                        readOnly={readOnly}
+                        {...form.register("deficit_explanation")}
+                      />
+                    </div>
+                  )}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Are donor-restricted funds tracked separately?
+                    </label>
+                    <RadioGroup
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        form.setValue("restricted_funds_tracked", value)
+                      }
+                      value={form.watch("restricted_funds_tracked")}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Have restricted funds ever been used for another purpose?
+                    </label>
+                    <RadioGroup
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        form.setValue("restricted_funds_misused", value)
+                      }
+                      value={form.watch("restricted_funds_misused")}
+                    />
+                  </div>
+                  {restrictedFundsMisused ? (
+                    <div className="rounded-2xl border border-[#D98C8C] bg-[#FFF1F1] px-4 py-3 text-sm text-[#9B2C2C] md:col-span-2">
+                      This will be reviewed carefully by our team. Please
+                      explain in the notes field.
+                    </div>
+                  ) : null}
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">
+                      Does your organization accept cryptocurrency or non-cash
+                      asset donations?
+                    </label>
+                    <RadioGroup
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        form.setValue("crypto_policy", value)
+                      }
+                      value={form.watch("crypto_policy")}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {(readOnly || currentStep === 4) && (
+                <div className="grid gap-5 md:grid-cols-2">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Primary Output Count
+                    </label>
+                    <TextInput
+                      readOnly={readOnly}
+                      type="number"
+                      {...form.register("primary_output_count", {
+                        valueAsNumber: true,
+                      })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Primary Output Unit
+                    </label>
+                    <TextInput
+                      readOnly={readOnly}
+                      {...form.register("primary_output_unit")}
+                      placeholder="e.g. people discipled"
+                    />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">
+                      Describe your ministry&apos;s theory of change
+                    </label>
+                    <TextArea
+                      maxLength={750}
+                      readOnly={readOnly}
+                      {...form.register("theory_of_change")}
+                    />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">
+                      How do you measure spiritual transformation?
+                    </label>
+                    <TextArea
+                      maxLength={500}
+                      readOnly={readOnly}
+                      {...form.register("spiritual_measurement_method")}
+                    />
+                  </div>
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="text-sm font-medium">
+                      Share one story of changed life or community impact
+                    </label>
+                    <TextArea
+                      maxLength={1000}
+                      readOnly={readOnly}
+                      {...form.register("case_study_1")}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Has your ministry been evaluated by an independent third
+                      party?
+                    </label>
+                    <RadioGroup
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        form.setValue("third_party_evaluation", value)
+                      }
+                      value={form.watch("third_party_evaluation")}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Fruit self score: {form.watch("fruit_self_score")}
+                    </label>
+                    <SliderInput
+                      disabled={readOnly}
+                      max={5}
+                      min={1}
+                      {...form.register("fruit_self_score", {
+                        valueAsNumber: true,
+                      })}
+                    />
+                    <div className="flex justify-between text-xs text-[#6B8570]">
+                      <span>1 = Outputs unclear or untracked</span>
+                      <span>5 = Documented and externally validated</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {(readOnly || currentStep === 5) && (
+                <div className="space-y-6">
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {REFERENCE_ROWS.map((index) => (
+                      <div
+                        className="space-y-4 rounded-[24px] border border-[#D8D1C3] bg-[#FFFDF8] p-5"
+                        key={index}
+                      >
+                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#6B8570]">
+                          Reference {index}
+                        </p>
+                        <TextInput
+                          readOnly={readOnly}
+                          {...form.register(`ref_${index}_name` as const)}
+                          placeholder="Name"
+                        />
+                        <TextInput
+                          readOnly={readOnly}
+                          {...form.register(`ref_${index}_role` as const)}
+                          placeholder="Role"
+                        />
+                        <TextInput
+                          readOnly={readOnly}
+                          {...form.register(`ref_${index}_email` as const)}
+                          placeholder="Email"
+                        />
+                        <TextInput
+                          readOnly={readOnly}
+                          {...form.register(
+                            `ref_${index}_relationship` as const,
+                          )}
+                          placeholder="Relationship"
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {PARTNER_ROWS.map((index) => (
+                      <div
+                        className="space-y-4 rounded-[24px] border border-[#D8D1C3] bg-[#FFFDF8] p-5"
+                        key={index}
+                      >
+                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-[#6B8570]">
+                          Church Partner {index}
+                        </p>
+                        <TextInput
+                          readOnly={readOnly}
+                          {...form.register(`partner_${index}_name` as const)}
+                          placeholder="Church name"
+                        />
+                        <TextInput
+                          readOnly={readOnly}
+                          {...form.register(`partner_${index}_pastor` as const)}
+                          placeholder="Pastor name"
+                        />
+                        <TextInput
+                          readOnly={readOnly}
+                          {...form.register(
+                            `partner_${index}_contact` as const,
+                          )}
+                          placeholder="Contact"
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Has your organization received significant negative
+                        press in the last 5 years?
+                      </label>
+                      <RadioGroup
+                        disabled={readOnly}
+                        onChange={(value) =>
+                          form.setValue("negative_press", value)
+                        }
+                        value={form.watch("negative_press")}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Are you a current member of ECFA or an equivalent
+                        accountability body?
+                      </label>
+                      <RadioGroup
+                        disabled={readOnly}
+                        onChange={(value) =>
+                          form.setValue("ecfa_member", value)
+                        }
+                        value={form.watch("ecfa_member")}
+                      />
+                    </div>
+                    {(readOnly || negativePress) && (
+                      <div className="space-y-2 md:col-span-2">
+                        <label className="text-sm font-medium">
+                          Negative Press Notes
+                        </label>
+                        <TextArea
+                          readOnly={readOnly}
+                          {...form.register("negative_press_notes")}
+                        />
+                      </div>
+                    )}
+                    {(readOnly || ecfaMember) && (
+                      <>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">
+                            Which body?
+                          </label>
+                          <TextInput
+                            readOnly={readOnly}
+                            {...form.register("ecfa_body")}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-sm font-medium">
+                            Has your membership ever lapsed or been revoked?
+                          </label>
+                          <RadioGroup
+                            disabled={readOnly}
+                            onChange={(value) =>
+                              form.setValue("ecfa_lapsed", value)
+                            }
+                            value={form.watch("ecfa_lapsed")}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {(readOnly || currentStep === 6) && (
+                <div className="space-y-5">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Describe your ministry&apos;s primary strategy in your own
+                      words
+                    </label>
+                    <TextArea
+                      maxLength={750}
+                      readOnly={readOnly}
+                      {...form.register("strategy_description")}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Three Year Plan
+                    </label>
+                    <TextArea
+                      maxLength={500}
+                      readOnly={readOnly}
+                      {...form.register("three_year_plan")}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      How would outside funding change your model?
+                    </label>
+                    <TextArea
+                      maxLength={500}
+                      readOnly={readOnly}
+                      {...form.register("funding_impact")}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      What would you stop doing if funding were reduced by 50%?
+                    </label>
+                    <TextArea
+                      maxLength={500}
+                      readOnly={readOnly}
+                      {...form.register("funding_reduction_response")}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">
+                      Strategic clarity self score:{" "}
+                      {form.watch("strategic_clarity_self_score")}
+                    </label>
+                    <SliderInput
+                      disabled={readOnly}
+                      max={5}
+                      min={1}
+                      {...form.register("strategic_clarity_self_score", {
+                        valueAsNumber: true,
+                      })}
+                    />
+                    <div className="flex justify-between text-xs text-[#6B8570]">
+                      <span>1 = Reactive</span>
+                      <span>
+                        5 = Written plan, board-approved, reviewed annually
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {(readOnly || currentStep === 7) && (
+                <div className="space-y-6">
+                  <div className="grid gap-5 md:grid-cols-2">
+                    {vettingDocumentTypes.map((field) =>
+                      renderDocumentField(field),
+                    )}
+                  </div>
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <CheckboxCard
+                      checked={form.watch("attestation_complete")}
+                      disabled={readOnly}
+                      label="All information provided is accurate and complete to the best of my knowledge."
+                      onToggle={() =>
+                        form.setValue(
+                          "attestation_complete",
+                          !form.watch("attestation_complete"),
+                        )
+                      }
+                    />
+                    <CheckboxCard
+                      checked={form.watch("attestation_research")}
+                      disabled={readOnly}
+                      label="I authorize SAVE to contact the references listed and conduct independent external research."
+                      onToggle={() =>
+                        form.setValue(
+                          "attestation_research",
+                          !form.watch("attestation_research"),
+                        )
+                      }
+                    />
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Signatory Name
+                      </label>
+                      <TextInput
+                        readOnly={readOnly}
+                        {...form.register("signatory_name")}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">
+                        Signatory Title
+                      </label>
+                      <TextInput
+                        readOnly={readOnly}
+                        {...form.register("signatory_title")}
+                      />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-sm font-medium">Signed At</label>
+                      <TextInput readOnly {...form.register("signed_at")} />
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
+
+            {globalError ? (
+              <p className="mt-6 text-sm text-[#9B2C2C]">{globalError}</p>
+            ) : null}
+
+            {!readOnly ? (
+              <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-[#E8E0D3] pt-6">
+                <button
+                  className="rounded-2xl border border-[#D8D1C3] px-5 py-3 text-sm font-semibold text-[#1B4D35] transition hover:bg-[#F4EFE4]"
+                  disabled={currentStep === 0 || isPending}
+                  onClick={() =>
+                    setCurrentStep((step) => Math.max(step - 1, 0))
+                  }
+                  type="button"
+                >
+                  Back
+                </button>
+                {currentStep < vettingStepTitles.length - 1 ? (
+                  <button
+                    className="rounded-2xl bg-[#1B4D35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236645] disabled:cursor-not-allowed disabled:opacity-70"
+                    disabled={isPending}
+                    onClick={handleNext}
+                    type="button"
+                  >
+                    {isPending ? "Saving..." : "Next"}
+                  </button>
+                ) : (
+                  <button
+                    className="rounded-2xl bg-[#1B4D35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236645] disabled:cursor-not-allowed disabled:opacity-70"
+                    disabled={isPending}
+                    type="submit"
+                  >
+                    {isPending ? "Submitting..." : "Submit Vetting"}
+                  </button>
+                )}
+              </div>
+            ) : null}
           </form>
         </section>
       </div>

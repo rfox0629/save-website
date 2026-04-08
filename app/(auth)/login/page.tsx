@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -26,7 +27,7 @@ function FieldError({ message }: { message?: string }) {
     return null;
   }
 
-  return <p className="text-sm text-red-300">{message}</p>;
+  return <p className="text-sm text-[#9B2C2C]">{message}</p>;
 }
 
 export default function LoginPage() {
@@ -36,6 +37,12 @@ export default function LoginPage() {
   const [magicLinkSent, setMagicLinkSent] = useState(false);
   const [isPasswordPending, startPasswordTransition] = useTransition();
   const [isMagicLinkPending, startMagicLinkTransition] = useTransition();
+
+  const redirectTo = searchParams.get("redirectTo") ?? "/portal";
+  const message =
+    searchParams.get("message") === "check-email"
+      ? "Check your inbox for a secure sign-in link."
+      : null;
 
   const passwordForm = useForm<PasswordLoginValues>({
     resolver: zodResolver(passwordLoginSchema),
@@ -52,19 +59,18 @@ export default function LoginPage() {
     },
   });
 
-  const message =
-    searchParams.get("message") === "check-email"
-      ? "Check your inbox for the link we just sent."
-      : null;
-
   const handlePasswordSubmit = passwordForm.handleSubmit((values) => {
     setPasswordError(null);
 
     startPasswordTransition(async () => {
-      const result = await login(values);
+      const result = await login({
+        ...values,
+        redirectTo,
+      });
 
       if (result?.error) {
         setPasswordError(result.error);
+        toast.error(result.error);
       }
     });
   });
@@ -74,178 +80,180 @@ export default function LoginPage() {
     setMagicLinkSent(false);
 
     startMagicLinkTransition(async () => {
-      const result = await sendMagicLink(values);
+      const result = await sendMagicLink({
+        ...values,
+        redirectTo,
+      });
 
       if (result?.error) {
         setMagicLinkError(result.error);
+        toast.error(result.error);
         return;
       }
 
       setMagicLinkSent(true);
+      toast.success("Magic link sent. Check your inbox to continue.");
     });
   });
 
   return (
-    <main className="relative isolate flex min-h-screen items-center justify-center overflow-hidden px-6 py-12">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(192,154,69,0.18),_transparent_28%),linear-gradient(180deg,_rgba(17,28,43,0.92),_#0B1622)]" />
-      <div className="absolute left-10 top-10 h-48 w-48 rounded-full border border-[#C09A45]/15 bg-[#C09A45]/5 blur-3xl" />
-      <div className="absolute bottom-0 right-0 h-72 w-72 rounded-full bg-[#102033] blur-3xl" />
+    <main className="min-h-screen bg-[#F9F6F0] px-6 py-12">
+      <div className="mx-auto grid min-h-[calc(100vh-6rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1fr_460px]">
+        <section className="rounded-[32px] border border-[#D8D1C3] bg-[#FFFDF8] p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)] md:p-12">
+          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
+            SAVE Platform
+          </p>
+          <h1
+            className="mt-6 max-w-[640px] text-5xl leading-[1.05] text-[#1B4D35] md:text-6xl"
+            style={{ fontFamily: "var(--font-auth-serif)" }}
+          >
+            Sign in to continue your ministry application.
+          </h1>
+          <p className="mt-6 max-w-[560px] text-lg leading-8 text-[#4C5E52]">
+            Access your ministry dashboard, continue the inquiry, and move
+            through the SAVE process with a secure account.
+          </p>
 
-      <section className="relative z-10 grid w-full max-w-5xl overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 shadow-[0_40px_120px_rgba(0,0,0,0.45)] backdrop-blur-xl lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="flex flex-col justify-between border-b border-white/10 px-8 py-10 lg:border-b-0 lg:border-r lg:px-12 lg:py-14">
-          <div className="space-y-6">
-            <p className="text-sm uppercase tracking-[0.4em] text-[#C09A45]">
-              Save Website
-            </p>
-            <div className="space-y-4">
-              <h1 className="max-w-md text-4xl font-semibold leading-tight text-white md:text-5xl">
-                Review ministry applications with clarity and trust.
-              </h1>
-              <p className="max-w-lg text-base leading-7 text-slate-300">
-                Sign in to continue your review workflow, manage applications,
-                and publish donor-ready briefs from one secure workspace.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-12 rounded-3xl border border-[#C09A45]/20 bg-[#0F2031]/80 p-6 text-sm text-slate-300">
-            <p className="text-xs uppercase tracking-[0.3em] text-[#C09A45]">
+          <div className="mt-10 rounded-[28px] border border-[#D8D1C3] bg-[#F4EFE4] p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
               Access
             </p>
-            <p className="mt-3 leading-7">
-              Ministry teams can register for an account, while reviewers and
-              admins can sign in with password or request a secure magic link.
+            <p className="mt-3 max-w-[480px] text-base leading-8 text-[#4C5E52]">
+              Ministries can sign in with email and password or request a magic
+              link. New organizations can create an account and begin the SAVE
+              application process in one step.
             </p>
           </div>
-        </div>
+        </section>
 
-        <div className="bg-[#0D1A29]/95 px-8 py-10 lg:px-12 lg:py-14">
-          <div className="space-y-8">
+        <section className="rounded-[32px] border border-[#D8D1C3] bg-white p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)] md:p-10">
+          <div className="space-y-2">
+            <h2
+              className="text-4xl text-[#1B4D35]"
+              style={{ fontFamily: "var(--font-auth-serif)" }}
+            >
+              Welcome back
+            </h2>
+            <p className="text-sm leading-7 text-[#5D7264]">
+              Sign in with your password or request a secure one-time link.
+            </p>
+          </div>
+
+          {message ? (
+            <div className="mt-6 rounded-2xl border border-[#C9BA98] bg-[#F4EFE4] px-4 py-3 text-sm text-[#1B4D35]">
+              {message}
+            </div>
+          ) : null}
+
+          <form className="mt-8 space-y-5" onSubmit={handlePasswordSubmit}>
             <div className="space-y-2">
-              <h2 className="text-2xl font-semibold text-white">
-                Welcome back
-              </h2>
-              <p className="text-sm text-slate-400">
-                Use your password or request a one-time sign-in link.
-              </p>
+              <label
+                className="text-sm font-medium text-[#1B4D35]"
+                htmlFor="email"
+              >
+                Email
+              </label>
+              <input
+                id="email"
+                type="email"
+                autoComplete="email"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                placeholder="name@organization.org"
+                {...passwordForm.register("email")}
+              />
+              <FieldError
+                message={passwordForm.formState.errors.email?.message}
+              />
             </div>
 
-            {message ? (
-              <div className="rounded-2xl border border-[#C09A45]/30 bg-[#C09A45]/10 px-4 py-3 text-sm text-[#F1D9A1]">
-                {message}
+            <div className="space-y-2">
+              <label
+                className="text-sm font-medium text-[#1B4D35]"
+                htmlFor="password"
+              >
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                autoComplete="current-password"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                placeholder="Enter your password"
+                {...passwordForm.register("password")}
+              />
+              <FieldError
+                message={passwordForm.formState.errors.password?.message}
+              />
+            </div>
+
+            <FieldError message={passwordError ?? undefined} />
+
+            <button
+              type="submit"
+              disabled={isPasswordPending}
+              className="w-full rounded-2xl bg-[#1B4D35] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#236645] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isPasswordPending ? "Signing in..." : "Sign in"}
+            </button>
+          </form>
+
+          <div className="my-8 flex items-center gap-3">
+            <div className="h-px flex-1 bg-[#D8D1C3]" />
+            <span className="text-xs uppercase tracking-[0.3em] text-[#8A968F]">
+              Or
+            </span>
+            <div className="h-px flex-1 bg-[#D8D1C3]" />
+          </div>
+
+          <form className="space-y-5" onSubmit={handleMagicLinkSubmit}>
+            <div className="space-y-2">
+              <label
+                className="text-sm font-medium text-[#1B4D35]"
+                htmlFor="magic-email"
+              >
+                Email for magic link
+              </label>
+              <input
+                id="magic-email"
+                type="email"
+                autoComplete="email"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                placeholder="name@organization.org"
+                {...magicLinkForm.register("email")}
+              />
+              <FieldError
+                message={magicLinkForm.formState.errors.email?.message}
+              />
+            </div>
+
+            <FieldError message={magicLinkError ?? undefined} />
+
+            {magicLinkSent ? (
+              <div className="rounded-2xl border border-[#C9BA98] bg-[#F4EFE4] px-4 py-3 text-sm text-[#1B4D35]">
+                Magic link sent. Check your inbox to continue.
               </div>
             ) : null}
 
-            <form className="space-y-4" onSubmit={handlePasswordSubmit}>
-              <div className="space-y-2">
-                <label
-                  className="text-sm font-medium text-slate-200"
-                  htmlFor="email"
-                >
-                  Email
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#C09A45] focus:ring-2 focus:ring-[#C09A45]/30"
-                  placeholder="name@organization.org"
-                  {...passwordForm.register("email")}
-                />
-                <FieldError
-                  message={passwordForm.formState.errors.email?.message}
-                />
-              </div>
+            <button
+              type="submit"
+              disabled={isMagicLinkPending}
+              className="w-full rounded-2xl border border-[#1B4D35] bg-transparent px-4 py-3 text-sm font-semibold text-[#1B4D35] transition hover:bg-[#F4EFE4] disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {isMagicLinkPending ? "Sending..." : "Email me a magic link"}
+            </button>
+          </form>
 
-              <div className="space-y-2">
-                <label
-                  className="text-sm font-medium text-slate-200"
-                  htmlFor="password"
-                >
-                  Password
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#C09A45] focus:ring-2 focus:ring-[#C09A45]/30"
-                  placeholder="Enter your password"
-                  {...passwordForm.register("password")}
-                />
-                <FieldError
-                  message={passwordForm.formState.errors.password?.message}
-                />
-              </div>
-
-              <FieldError message={passwordError ?? undefined} />
-
-              <button
-                type="submit"
-                disabled={isPasswordPending}
-                className="w-full rounded-2xl bg-[#C09A45] px-4 py-3 text-sm font-semibold text-[#0B1622] transition hover:bg-[#d3ac56] disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {isPasswordPending ? "Signing in..." : "Sign in with password"}
-              </button>
-            </form>
-
-            <div className="flex items-center gap-3">
-              <div className="h-px flex-1 bg-white/10" />
-              <span className="text-xs uppercase tracking-[0.3em] text-slate-500">
-                Or
-              </span>
-              <div className="h-px flex-1 bg-white/10" />
-            </div>
-
-            <form className="space-y-4" onSubmit={handleMagicLinkSubmit}>
-              <div className="space-y-2">
-                <label
-                  className="text-sm font-medium text-slate-200"
-                  htmlFor="magic-email"
-                >
-                  Email for magic link
-                </label>
-                <input
-                  id="magic-email"
-                  type="email"
-                  autoComplete="email"
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-[#C09A45] focus:ring-2 focus:ring-[#C09A45]/30"
-                  placeholder="name@organization.org"
-                  {...magicLinkForm.register("email")}
-                />
-                <FieldError
-                  message={magicLinkForm.formState.errors.email?.message}
-                />
-              </div>
-
-              <FieldError message={magicLinkError ?? undefined} />
-
-              {magicLinkSent ? (
-                <div className="rounded-2xl border border-emerald-400/30 bg-emerald-400/10 px-4 py-3 text-sm text-emerald-200">
-                  Magic link sent. Check your inbox to continue.
-                </div>
-              ) : null}
-
-              <button
-                type="submit"
-                disabled={isMagicLinkPending}
-                className="w-full rounded-2xl border border-[#C09A45]/40 bg-transparent px-4 py-3 text-sm font-semibold text-[#F1D9A1] transition hover:bg-[#C09A45]/10 disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {isMagicLinkPending ? "Sending..." : "Email me a magic link"}
-              </button>
-            </form>
-
-            <p className="text-sm text-slate-400">
-              New ministry applicant?{" "}
-              <Link
-                className="text-[#F1D9A1] hover:text-white"
-                href="/register"
-              >
-                Create your account
-              </Link>
-            </p>
-          </div>
-        </div>
-      </section>
+          <p className="mt-8 text-sm text-[#5D7264]">
+            New ministry?{" "}
+            <Link
+              className="font-semibold text-[#1B4D35] underline-offset-4 hover:underline"
+              href="/register"
+            >
+              Create your account
+            </Link>
+          </p>
+        </section>
+      </div>
     </main>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 
 import { AuthProvider } from "@/components/AuthProvider";
+import { AppToaster } from "@/components/ui/app-toaster";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
 
@@ -42,6 +43,7 @@ export default async function RootLayout({
     >
       <body className="min-h-screen bg-background font-sans text-foreground antialiased">
         <AuthProvider initialUser={user}>{children}</AuthProvider>
+        <AppToaster />
       </body>
     </html>
   );
