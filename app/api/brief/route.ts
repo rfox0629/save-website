@@ -103,9 +103,7 @@ export async function POST(request: Request) {
       published: Boolean(body.published),
       published_at: body.published ? now : null,
       recommendation_level: body.recommendation_level ?? null,
-      slug: body.published
-        ? (resolvedExistingBrief?.slug ?? generatedSlug)
-        : null,
+      slug: resolvedExistingBrief?.slug ?? generatedSlug,
     };
 
     const query = resolvedExistingBrief?.id
@@ -126,8 +124,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       ok: true,
+      published: payload.published,
       public_slug: publicSlug,
-      public_url: publicSlug ? `${baseUrl}/donors/${publicSlug}` : null,
+      public_url:
+        payload.published && publicSlug ? `${baseUrl}/donors/${publicSlug}` : null,
     });
   } catch (error) {
     return NextResponse.json(

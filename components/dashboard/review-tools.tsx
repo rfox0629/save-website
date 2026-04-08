@@ -153,6 +153,60 @@ export function OverrideScoreDialog({
   );
 }
 
+export function AiSummaryButton({
+  applicationId,
+  hasSummary,
+}: {
+  applicationId: string;
+  hasSummary: boolean;
+}) {
+  const router = useRouter();
+  const [pending, setPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const label = pending
+    ? "Generating..."
+    : error
+      ? "Try Again"
+      : hasSummary
+        ? "Regenerate"
+        : "Generate AI Summary";
+
+  async function generateSummary() {
+    setPending(true);
+    setError(null);
+
+    try {
+      await postJson(`/api/applications/${applicationId}/ai-summary`, {});
+      startTransition(() => router.refresh());
+    } catch (submissionError) {
+      setError(
+        submissionError instanceof Error
+          ? submissionError.message
+          : "Unable to generate AI summary.",
+      );
+    } finally {
+      setPending(false);
+    }
+  }
+
+  return (
+    <div className="space-y-2">
+      <Button
+        className={cn(
+          "bg-[#C09A45] text-[#0B1622] hover:bg-[#d4ac57]",
+          pending && "opacity-70",
+        )}
+        disabled={pending}
+        onClick={() => void generateSummary()}
+        type="button"
+      >
+        {label}
+      </Button>
+      {error ? <p className="text-sm text-rose-300">{error}</p> : null}
+    </div>
+  );
+}
+
 export function ResolveFlagDialog({
   applicationId,
   flagId,

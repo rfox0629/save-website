@@ -1,6 +1,5 @@
 import "server-only";
 
-import { generateReviewerSummary } from "@/lib/ai/reviewerSummary";
 import { checkCharityNavigator } from "@/lib/external/charityNavigator";
 import { analyzeDocuments } from "@/lib/external/documentAnalysis";
 import { checkIRS } from "@/lib/external/irs";
@@ -53,7 +52,13 @@ export async function runFullVetting(applicationId: string) {
     checks.push(checkWebsite(org.website_url, applicationId));
   }
 
-  await Promise.allSettled(checks);
+  const settledChecks = await Promise.allSettled(checks);
+
+  settledChecks.forEach((result) => {
+    if (result.status === "rejected") {
+      console.error("External check failed", result.reason);
+    }
+  });
   const score = await scoreApplication(applicationId);
 
   const { data: hardStops } = await db
@@ -72,12 +77,6 @@ export async function runFullVetting(applicationId: string) {
       .from("applications")
       .update({ status: "under_review" })
       .eq("id", applicationId);
-  }
-
-  try {
-    await generateReviewerSummary(applicationId);
-  } catch (error) {
-    console.error("generateReviewerSummary failed", error);
   }
 
   return score;

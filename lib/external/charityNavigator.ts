@@ -37,6 +37,8 @@ type CharityNavigatorCheckResult = {
   cn_subject: string | null;
   financial_score: number | null;
   found: boolean;
+  integration_status: "found" | "manual_review" | "not_configured" | "not_found";
+  note: string | null;
   overall_rating: number | null;
   overall_score: number | null;
   score_impact: number | null;
@@ -91,18 +93,11 @@ export async function checkCharityNavigator(
   ein: string,
   applicationId: string,
 ): Promise<CharityNavigatorCheckResult> {
-  const apiKey = process.env.CHARITY_NAVIGATOR_API_KEY;
-
-  if (!apiKey) {
-    throw new Error(
-      "CHARITY_NAVIGATOR_API_KEY is not set. Add it to your environment before running Charity Navigator checks.",
-    );
-  }
-
   const normalizedEin = normalizeEin(ein);
   const admin = createAdminClient();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = admin as any;
+  const apiKey = process.env.CHARITY_NAVIGATOR_API_KEY;
 
   await db
     .from("external_checks")
@@ -110,26 +105,21 @@ export async function checkCharityNavigator(
     .eq("application_id", applicationId)
     .eq("source", "charity_navigator");
 
-  const response = await fetch(
-    `https://api.charitynavigator.org/v4/Organizations/${normalizedEin}?app_key=${encodeURIComponent(
-      apiKey,
-    )}`,
-    {
-      headers: {
-        Accept: "application/json",
-      },
-      cache: "no-store",
-    },
-  );
+  if (!apiKey) {
+    const note =
+      "Charity Navigator API not connected yet. Manual reviewer check required.";
 
-  if (response.status === 404) {
     await db.from("external_checks").insert({
       application_id: applicationId,
-      raw_result: {},
+      raw_result: {
+        note,
+        source: "charity_navigator",
+        status: "not_configured",
+      },
       score_impact: null,
       source: "charity_navigator",
       status: "not_applicable",
-      summary: "Not listed on Charity Navigator",
+      summary: note,
     } satisfies Database["public"]["Tables"]["external_checks"]["Insert"]);
 
     return {
@@ -137,6 +127,8 @@ export async function checkCharityNavigator(
       cn_subject: null,
       financial_score: null,
       found: false,
+      integration_status: "not_configured",
+      note,
       overall_rating: null,
       overall_score: null,
       score_impact: null,
@@ -145,51 +137,136 @@ export async function checkCharityNavigator(
     };
   }
 
-  if (!response.ok) {
-    throw new Error(
-      `Charity Navigator lookup failed with status ${response.status}.`,
+  try {
+    const response = await fetch(
+      `https://api.charitynavigator.org/v4/Organizations/${normalizedEin}?app_key=${encodeURIComponent(
+        apiKey,
+      )}`,
+      {
+        headers: {
+          Accept: "application/json",
+        },
+        cache: "no-store",
+      },
     );
-  }
 
-  const payload = (await response.json()) as CharityNavigatorResponse;
-  const overallScore =
-    asNumber(payload.overallRating?.score) ??
-    asNumber(payload.encompassRating?.score);
-  const overallRating =
-    asNumber(payload.overallRating?.rating) ??
-    asNumber(payload.encompassRating?.rating);
-  const accountabilityScore =
-    asNumber(payload.scores?.accountabilityFinance?.score) ?? null;
-  const financialScore =
-    asNumber(payload.scores?.impactAndMeasurement?.score) ?? null;
-  const transparencyScore =
-    asNumber(payload.scores?.leadershipAndAdaptability?.score) ??
-    asNumber(payload.scores?.cultureAndCommunity?.score) ??
-    null;
-  const cnSubject = payload.cn_subject ?? payload.category?.name ?? null;
-  const { score_impact, status } = getStatusForRating(overallRating);
+    if (response.status === 404) {
+      const note = "Not listed on Charity Navigator";
 
-  await db.from("external_checks").insert({
-    application_id: applicationId,
-    raw_result: payload,
-    score_impact,
-    source: "charity_navigator",
-    status,
-    summary:
+      await db.from("external_checks").insert({
+        application_id: applicationId,
+        raw_result: {
+          note,
+          source: "charity_navigator",
+          status: "not_found",
+        },
+        score_impact: null,
+        source: "charity_navigator",
+        status: "not_applicable",
+        summary: note,
+      } satisfies Database["public"]["Tables"]["external_checks"]["Insert"]);
+
+      return {
+        accountability_score: null,
+        cn_subject: null,
+        financial_score: null,
+        found: false,
+        integration_status: "not_found",
+        note,
+        overall_rating: null,
+        overall_score: null,
+        score_impact: null,
+        status: "not_applicable",
+        transparency_score: null,
+      };
+    }
+
+    if (!response.ok) {
+      throw new Error(
+        `Charity Navigator lookup failed with status ${response.status}.`,
+      );
+    }
+
+    const payload = (await response.json()) as CharityNavigatorResponse;
+    const overallScore =
+      asNumber(payload.overallRating?.score) ??
+      asNumber(payload.encompassRating?.score);
+    const overallRating =
+      asNumber(payload.overallRating?.rating) ??
+      asNumber(payload.encompassRating?.rating);
+    const accountabilityScore =
+      asNumber(payload.scores?.accountabilityFinance?.score) ?? null;
+    const financialScore =
+      asNumber(payload.scores?.impactAndMeasurement?.score) ?? null;
+    const transparencyScore =
+      asNumber(payload.scores?.leadershipAndAdaptability?.score) ??
+      asNumber(payload.scores?.cultureAndCommunity?.score) ??
+      null;
+    const cnSubject = payload.cn_subject ?? payload.category?.name ?? null;
+    const { score_impact, status } = getStatusForRating(overallRating);
+    const note =
       overallRating === null
         ? "Not rated on Charity Navigator"
-        : `${overallRating} stars — Financial: ${financialScore ?? "n/a"}, Accountability: ${accountabilityScore ?? "n/a"}`,
-  } satisfies Database["public"]["Tables"]["external_checks"]["Insert"]);
+        : `${overallRating} stars — Financial: ${financialScore ?? "n/a"}, Accountability: ${accountabilityScore ?? "n/a"}`;
 
-  return {
-    accountability_score: accountabilityScore,
-    cn_subject: cnSubject,
-    financial_score: financialScore,
-    found: true,
-    overall_rating: overallRating,
-    overall_score: overallScore,
-    score_impact,
-    status,
-    transparency_score: transparencyScore,
-  };
+    await db.from("external_checks").insert({
+      application_id: applicationId,
+      raw_result: {
+        ...payload,
+        note,
+        source: "charity_navigator",
+        status: "found",
+      },
+      score_impact,
+      source: "charity_navigator",
+      status,
+      summary: note,
+    } satisfies Database["public"]["Tables"]["external_checks"]["Insert"]);
+
+    return {
+      accountability_score: accountabilityScore,
+      cn_subject: cnSubject,
+      financial_score: financialScore,
+      found: true,
+      integration_status: "found",
+      note,
+      overall_rating: overallRating,
+      overall_score: overallScore,
+      score_impact,
+      status,
+      transparency_score: transparencyScore,
+    };
+  } catch (error) {
+    const note =
+      error instanceof Error
+        ? error.message
+        : "Charity Navigator lookup failed. Manual reviewer check required.";
+
+    await db.from("external_checks").insert({
+      application_id: applicationId,
+      raw_result: {
+        note,
+        source: "charity_navigator",
+        status: "manual_review",
+      },
+      score_impact: null,
+      source: "charity_navigator",
+      status: "flag",
+      summary: "Charity Navigator lookup failed. Manual reviewer check required.",
+    } satisfies Database["public"]["Tables"]["external_checks"]["Insert"]);
+
+    return {
+      accountability_score: null,
+      cn_subject: null,
+      financial_score: null,
+      found: false,
+      integration_status: "manual_review",
+      note,
+      overall_rating: null,
+      overall_score: null,
+      score_impact: null,
+      status: "flag",
+      transparency_score: null,
+    };
+  }
 }

@@ -35,6 +35,7 @@ export default async function ApplicationBriefEditorPage({
           applicationId={params.id}
           initialData={toBriefFormData(data.brief)}
           initialGeneratedAt={data.brief?.generated_at ?? null}
+          initialIsStale={data.isStale}
           initialPublicUrl={data.publicUrl}
           org={data.org}
         />

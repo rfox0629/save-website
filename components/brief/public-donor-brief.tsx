@@ -99,12 +99,12 @@ export function PublicDonorBrief({
     );
 
   return (
-    <article className="mx-auto w-full max-w-4xl rounded-[32px] border border-[#E3DCCF] bg-white px-6 py-8 text-[#23372B] shadow-[0_20px_60px_rgba(27,77,53,0.06)] md:px-10 md:py-10 print:max-w-none print:rounded-none print:border-0 print:px-0 print:py-0 print:shadow-none">
-      <header className="border-b border-[#E8E0D2] pb-8">
+    <article className="mx-auto w-full max-w-4xl rounded-[32px] border border-[#E3DCCF] bg-white px-6 py-8 text-[#23372B] shadow-[0_20px_60px_rgba(27,77,53,0.06)] md:px-10 md:py-10 print:max-w-none print:break-after-page print:rounded-none print:border-0 print:px-0 print:py-0 print:shadow-none">
+      <header className="border-b border-[#E8E0D2] pb-8 print:break-inside-avoid-page">
         <div className="flex items-start justify-between gap-6">
           <SaveMark />
           <span
-            className={`inline-flex rounded-full px-4 py-2 text-sm font-semibold print:hidden ${getRecommendationBadge(
+            className={`inline-flex rounded-full border border-[#D8D1C3] px-4 py-2 text-sm font-semibold ${getRecommendationBadge(
               brief.recommendation_level,
             )}`}
           >
@@ -140,8 +140,8 @@ export function PublicDonorBrief({
         </div>
       </header>
 
-      <div className="space-y-10 py-10">
-        <section>
+      <div className="space-y-10 py-10 print:space-y-8">
+        <section className="print:break-inside-avoid-page">
           <h2 className="text-xl font-semibold text-[#1B4D35]">
             About this Ministry
           </h2>
@@ -151,7 +151,7 @@ export function PublicDonorBrief({
           </p>
         </section>
 
-        <section>
+        <section className="print:break-inside-avoid-page">
           <h2 className="text-xl font-semibold text-[#1B4D35]">
             What We Found Commendable
           </h2>
@@ -163,7 +163,7 @@ export function PublicDonorBrief({
         </section>
 
         {cautions.length > 0 ? (
-          <section>
+          <section className="print:break-inside-avoid-page">
             <h2 className="text-xl font-semibold text-[#1B4D35]">
               Areas for Donor Awareness
             </h2>
@@ -181,7 +181,7 @@ export function PublicDonorBrief({
 
         {application.immersive_discernment_status === "completed" &&
         application.immersive_discernment_notes ? (
-          <section>
+          <section className="print:break-inside-avoid-page">
             <h2 className="text-xl font-semibold text-[#1B4D35]">
               On the Ground Discernment
             </h2>
@@ -191,7 +191,7 @@ export function PublicDonorBrief({
           </section>
         ) : null}
 
-        <section>
+        <section className="print:break-inside-avoid-page">
           <h2 className="text-xl font-semibold text-[#1B4D35]">
             Diligence Completed
           </h2>
@@ -202,7 +202,7 @@ export function PublicDonorBrief({
           </ul>
         </section>
 
-        <section>
+        <section className="print:break-inside-avoid-page">
           <h2 className="text-xl font-semibold text-[#1B4D35]">
             Recommendation
           </h2>
@@ -218,7 +218,7 @@ export function PublicDonorBrief({
         </section>
       </div>
 
-      <footer className="border-t border-[#E8E0D2] pt-6 text-sm leading-7 text-[#6B8570]">
+      <footer className="border-t border-[#E8E0D2] pt-6 text-sm leading-7 text-[#6B8570] print:break-inside-avoid-page">
         This brief is for informational purposes only. SAVE does not guarantee
         outcomes. Donors are encouraged to conduct their own additional due
         diligence.

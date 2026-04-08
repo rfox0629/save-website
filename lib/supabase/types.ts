@@ -68,6 +68,7 @@ export type Database = {
       applications: {
         Row: {
           ai_summary: string | null;
+          ai_summary_generated_at: string | null;
           created_at: string;
           cycle_year: number | null;
           decision: string | null;
@@ -83,6 +84,7 @@ export type Database = {
         };
         Insert: {
           ai_summary?: string | null;
+          ai_summary_generated_at?: string | null;
           created_at?: string;
           cycle_year?: number | null;
           decision?: string | null;
@@ -98,6 +100,7 @@ export type Database = {
         };
         Update: {
           ai_summary?: string | null;
+          ai_summary_generated_at?: string | null;
           created_at?: string;
           cycle_year?: number | null;
           decision?: string | null;
