@@ -497,7 +497,7 @@ export default async function ApplicationDetailPage({
                           Category Assessments
                         </h3>
                         <div className="mt-3 grid gap-3 md:grid-cols-2">
-                          {[
+                          {([
                             [
                               "Leadership Integrity",
                               reviewerSummary.leadership_integrity,
@@ -509,7 +509,15 @@ export default async function ApplicationDetailPage({
                               reviewerSummary.financial_stewardship,
                             ],
                             ["Fruit", reviewerSummary.fruit],
-                          ].map(([label, value]) => (
+                          ] as Array<
+                            [
+                              string,
+                              {
+                                assessment: string;
+                                confidence: "high" | "low" | "medium";
+                              },
+                            ]
+                          >).map(([label, value]) => (
                             <div
                               key={label}
                               className="rounded-2xl border border-emerald-700/15 bg-white/40 p-4"

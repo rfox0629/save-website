@@ -7,6 +7,7 @@ import { requireReviewerMutationAccess } from "@/lib/review";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   Applications,
+  Database,
   Json,
   Organizations,
   VoiceAlignmentRequest,
@@ -448,9 +449,8 @@ export async function createVoiceAlignmentRequest(
     throw new Error("Application not found.");
   }
 
-  const { error, data } = await admin
-    .from("voice_alignment_requests")
-    .insert({
+  const requestPayload: Database["public"]["Tables"]["voice_alignment_requests"]["Insert"] =
+    {
       application_id: resolvedApplication.id,
       invited_by: user.id,
       organization_id: resolvedApplication.organization_id,
@@ -458,7 +458,11 @@ export async function createVoiceAlignmentRequest(
       request_type: parsed.requestType,
       respondent_email: parsed.respondentEmail,
       respondent_name: parsed.respondentName,
-    })
+    };
+
+  const requestQuery = admin.from("voice_alignment_requests");
+  const { error, data } = await requestQuery
+    .insert(requestPayload)
     .select("*")
     .single();
 
@@ -569,7 +573,9 @@ export async function submitVoiceAlignmentResponse(
     years_context_known: parsed.yearsContextKnown,
   };
 
-  const { error } = await admin.from("voice_alignment_responses").insert(payload);
+  const responseQuery = admin.from("voice_alignment_responses");
+  // @ts-expect-error Supabase client inference for generated insert types is incorrect here.
+  const { error } = await responseQuery.insert(payload);
 
   if (error) {
     throw new Error(error.message);

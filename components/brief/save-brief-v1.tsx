@@ -273,13 +273,21 @@ export function SaveBriefV1({
           <section className="print:break-inside-avoid-page">
             <SectionTitle>Key Areas of Assessment</SectionTitle>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
-              {[
+              {([
                 ["Leadership Integrity", summary.leadership_integrity],
                 ["Doctrine", summary.doctrine],
                 ["Governance", summary.governance],
                 ["Financial Stewardship", summary.financial_stewardship],
                 ["Fruit", summary.fruit],
-              ].map(([label, value]) => (
+              ] as Array<
+                [
+                  string,
+                  {
+                    assessment: string;
+                    confidence: "high" | "low" | "medium";
+                  },
+                ]
+              >).map(([label, value]) => (
                 <div
                   className="rounded-[24px] border border-[#E3DCCF] bg-[#FCFAF5] p-5 print:break-inside-avoid-page"
                   key={label}
