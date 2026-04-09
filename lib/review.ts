@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { getVoiceAlignmentSummary, type VoiceAlignmentSummary } from "@/lib/voice-alignment";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type {
@@ -89,6 +90,7 @@ export type ApplicationDetailData = {
       reviewerEmail: string | null;
     }
   >;
+  voiceAlignment: VoiceAlignmentSummary;
 };
 
 const SCORE_SEGMENT_COLORS = [
@@ -544,6 +546,7 @@ export async function getApplicationDetail(
     { data: externalChecks },
     { data: notes },
     { data: brief },
+    voiceAlignment,
   ] = await Promise.all([
     admin
       .from("organizations")
@@ -578,6 +581,7 @@ export async function getApplicationDetail(
       .order("generated_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
+    getVoiceAlignmentSummary(applicationId),
   ]);
 
   const resolvedOrganization = organization as Organizations | null;
@@ -698,6 +702,7 @@ export async function getApplicationDetail(
       { color: SCORE_SEGMENT_COLORS[5], max: 10, score: scoreSummary.external },
     ],
     scoreSummary,
+    voiceAlignment,
   };
 }
 

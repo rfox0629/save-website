@@ -587,6 +587,7 @@ export type Database = {
           generated_by: string | null;
           headline: string | null;
           id: string;
+          include_voice_alignment: boolean;
           ministry_description: string | null;
           pdf_path: string | null;
           published: boolean;
@@ -603,6 +604,7 @@ export type Database = {
           generated_by?: string | null;
           headline?: string | null;
           id?: string;
+          include_voice_alignment?: boolean;
           ministry_description?: string | null;
           pdf_path?: string | null;
           published?: boolean;
@@ -619,6 +621,7 @@ export type Database = {
           generated_by?: string | null;
           headline?: string | null;
           id?: string;
+          include_voice_alignment?: boolean;
           ministry_description?: string | null;
           pdf_path?: string | null;
           published?: boolean;
@@ -683,6 +686,147 @@ export type Database = {
           updated_at?: string;
         };
       };
+      voice_alignment_requests: {
+        Row: {
+          application_id: string;
+          created_at: string;
+          id: string;
+          invite_token: string;
+          invited_by: string | null;
+          organization_id: string;
+          relationship: string | null;
+          request_type: "external" | "internal";
+          respondent_email: string;
+          respondent_name: string;
+          responded_at: string | null;
+          status: "pending" | "responded";
+        };
+        Insert: {
+          application_id: string;
+          created_at?: string;
+          id?: string;
+          invite_token?: string;
+          invited_by?: string | null;
+          organization_id: string;
+          relationship?: string | null;
+          request_type: "external" | "internal";
+          respondent_email: string;
+          respondent_name: string;
+          responded_at?: string | null;
+          status?: "pending" | "responded";
+        };
+        Update: {
+          application_id?: string;
+          created_at?: string;
+          id?: string;
+          invite_token?: string;
+          invited_by?: string | null;
+          organization_id?: string;
+          relationship?: string | null;
+          request_type?: "external" | "internal";
+          respondent_email?: string;
+          respondent_name?: string;
+          responded_at?: string | null;
+          status?: "pending" | "responded";
+        };
+      };
+      voice_alignment_responses: {
+        Row: {
+          additional_comments: string | null;
+          application_id: string;
+          concerns: string | null;
+          concerns_inconsistencies: string | null;
+          growth_areas: string | null;
+          id: string;
+          internal_culture: string | null;
+          leader_character: string | null;
+          org_leader_description: string | null;
+          org_strengths: string | null;
+          organization_id: string;
+          positive_observations: string | null;
+          request_id: string;
+          request_type: "external" | "internal";
+          respondent_email: string;
+          respondent_name: string;
+          role_relationship: string | null;
+          submitted_at: string;
+          support_recommendation: string | null;
+          trust_recommendation: string | null;
+          years_context_known: string | null;
+        };
+        Insert: {
+          additional_comments?: string | null;
+          application_id: string;
+          concerns?: string | null;
+          concerns_inconsistencies?: string | null;
+          growth_areas?: string | null;
+          id?: string;
+          internal_culture?: string | null;
+          leader_character?: string | null;
+          org_leader_description?: string | null;
+          org_strengths?: string | null;
+          organization_id: string;
+          positive_observations?: string | null;
+          request_id: string;
+          request_type: "external" | "internal";
+          respondent_email: string;
+          respondent_name: string;
+          role_relationship?: string | null;
+          submitted_at?: string;
+          support_recommendation?: string | null;
+          trust_recommendation?: string | null;
+          years_context_known?: string | null;
+        };
+        Update: {
+          additional_comments?: string | null;
+          application_id?: string;
+          concerns?: string | null;
+          concerns_inconsistencies?: string | null;
+          growth_areas?: string | null;
+          id?: string;
+          internal_culture?: string | null;
+          leader_character?: string | null;
+          org_leader_description?: string | null;
+          org_strengths?: string | null;
+          organization_id?: string;
+          positive_observations?: string | null;
+          request_id?: string;
+          request_type?: "external" | "internal";
+          respondent_email?: string;
+          respondent_name?: string;
+          role_relationship?: string | null;
+          submitted_at?: string;
+          support_recommendation?: string | null;
+          trust_recommendation?: string | null;
+          years_context_known?: string | null;
+        };
+      };
+      voice_alignment_summaries: {
+        Row: {
+          application_id: string;
+          generated_at: string;
+          id: string;
+          organization_id: string;
+          status: "aligned" | "insufficient_data" | "misaligned" | "partially_aligned";
+          summary: Json;
+        };
+        Insert: {
+          application_id: string;
+          generated_at?: string;
+          id?: string;
+          organization_id: string;
+          status: "aligned" | "insufficient_data" | "misaligned" | "partially_aligned";
+          summary: Json;
+        };
+        Update: {
+          application_id?: string;
+          generated_at?: string;
+          id?: string;
+          organization_id?: string;
+          status?: "aligned" | "insufficient_data" | "misaligned" | "partially_aligned";
+          summary?: Json;
+        };
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -711,3 +855,9 @@ export type DonorBrief = Database["public"]["Tables"]["donor_briefs"]["Row"];
 export type DonorRequest =
   Database["public"]["Tables"]["donor_requests"]["Row"];
 export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+export type VoiceAlignmentRequest =
+  Database["public"]["Tables"]["voice_alignment_requests"]["Row"];
+export type VoiceAlignmentResponse =
+  Database["public"]["Tables"]["voice_alignment_responses"]["Row"];
+export type VoiceAlignmentSummaryRecord =
+  Database["public"]["Tables"]["voice_alignment_summaries"]["Row"];

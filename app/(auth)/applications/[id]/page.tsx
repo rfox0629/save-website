@@ -12,6 +12,7 @@ import {
   OverrideScoreDialog,
   ResolveFlagDialog,
 } from "@/components/dashboard/review-tools";
+import { VoiceAlignmentManager } from "@/components/dashboard/voice-alignment-manager";
 import { ScoreSummaryCard } from "@/components/brief/score-summary-card";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,6 +43,7 @@ const TABS = [
   "external",
   "notes",
   "brief",
+  "voice",
 ] as const;
 
 const CATEGORY_MAX = {
@@ -286,6 +288,12 @@ export default async function ApplicationDetailPage({
             currentTab={activeTab}
             label="Brief"
             tab="brief"
+          />
+          <TabLink
+            applicationId={params.id}
+            currentTab={activeTab}
+            label="Voice Alignment"
+            tab="voice"
           />
         </nav>
 
@@ -694,6 +702,15 @@ export default async function ApplicationDetailPage({
               </div>
             ) : null}
           </section>
+        ) : null}
+
+        {activeTab === "voice" ? (
+          <VoiceAlignmentManager
+            applicationId={params.id}
+            baseUrl={process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}
+            organizationName={data.organization.legal_name}
+            summary={data.voiceAlignment}
+          />
         ) : null}
 
         {activeTab === "documents" ? (

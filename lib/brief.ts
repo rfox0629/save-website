@@ -1,6 +1,10 @@
 import { redirect } from "next/navigation";
 
 import { requireReviewerPageAccess } from "@/lib/review";
+import {
+  parseVoiceAlignmentInsight,
+  type VoiceAlignmentInsight,
+} from "@/lib/voice-alignment";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   Applications,
@@ -8,6 +12,7 @@ import type {
   ExternalCheck,
   Organizations,
   Score,
+  VoiceAlignmentSummaryRecord,
 } from "@/lib/supabase/types";
 
 export type BriefEditorData = {
@@ -16,6 +21,12 @@ export type BriefEditorData = {
   isStale: boolean;
   org: Organizations;
   publicUrl: string | null;
+};
+
+export type PublicVoiceAlignmentData = {
+  generatedAt: string;
+  status: "aligned" | "misaligned" | "partially_aligned";
+  summary: VoiceAlignmentInsight;
 };
 
 export type PublicBriefData = {
@@ -36,6 +47,7 @@ export type PublicBriefData = {
     max: number;
     total: number;
   };
+  voiceAlignment: PublicVoiceAlignmentData | null;
 };
 
 function isBriefStale(
@@ -60,6 +72,31 @@ function isBriefStale(
 }
 
 export type BriefExportData = PublicBriefData;
+
+function resolvePublicVoiceAlignment(
+  brief: DonorBrief | null,
+  summaryRecord: VoiceAlignmentSummaryRecord | null,
+): PublicVoiceAlignmentData | null {
+  if (!brief?.include_voice_alignment || !summaryRecord) {
+    return null;
+  }
+
+  if (summaryRecord.status === "insufficient_data") {
+    return null;
+  }
+
+  const summary = parseVoiceAlignmentInsight(summaryRecord.summary);
+
+  if (!summary) {
+    return null;
+  }
+
+  return {
+    generatedAt: summaryRecord.generated_at,
+    status: summaryRecord.status,
+    summary,
+  };
+}
 
 function getScoreRecommendation(score: Score | null) {
   if (!score) {
@@ -180,6 +217,7 @@ export async function getPublishedBriefBySlug(
     { data: organization },
     { data: externalChecks },
     { data: scores },
+    { data: voiceAlignmentSummary },
   ] = await Promise.all([
     admin
       .from("organizations")
@@ -196,10 +234,17 @@ export async function getPublishedBriefBySlug(
       .select("*")
       .eq("application_id", resolvedApplication.id)
       .order("calculated_at", { ascending: false }),
+    admin
+      .from("voice_alignment_summaries")
+      .select("*")
+      .eq("application_id", resolvedApplication.id)
+      .maybeSingle(),
   ]);
   const resolvedOrganization = organization as Organizations | null;
   const resolvedExternalChecks = (externalChecks ?? []) as ExternalCheck[];
   const latestScore = ((scores ?? []) as Score[])[0] ?? null;
+  const resolvedVoiceAlignmentSummary =
+    (voiceAlignmentSummary as VoiceAlignmentSummaryRecord | null) ?? null;
 
   if (!resolvedOrganization) {
     return null;
@@ -217,6 +262,10 @@ export async function getPublishedBriefBySlug(
     org: resolvedOrganization,
     scoreRecommendation: getScoreRecommendation(latestScore),
     scoreSummary: buildScoreSummary(latestScore),
+    voiceAlignment: resolvePublicVoiceAlignment(
+      resolvedBrief,
+      resolvedVoiceAlignmentSummary,
+    ),
   };
 }
 
@@ -242,6 +291,7 @@ export async function getBriefExportData(
     { data: brief },
     { data: externalChecks },
     { data: scores },
+    { data: voiceAlignmentSummary },
   ] =
     await Promise.all([
       admin
@@ -266,12 +316,19 @@ export async function getBriefExportData(
         .select("*")
         .eq("application_id", applicationId)
         .order("calculated_at", { ascending: false }),
+      admin
+        .from("voice_alignment_summaries")
+        .select("*")
+        .eq("application_id", applicationId)
+        .maybeSingle(),
     ]);
 
   const resolvedOrganization = organization as Organizations | null;
   const resolvedBrief = brief as DonorBrief | null;
   const resolvedExternalChecks = (externalChecks ?? []) as ExternalCheck[];
   const latestScore = ((scores ?? []) as Score[])[0] ?? null;
+  const resolvedVoiceAlignmentSummary =
+    (voiceAlignmentSummary as VoiceAlignmentSummaryRecord | null) ?? null;
 
   if (!resolvedOrganization || !resolvedBrief) {
     redirect(`/applications/${applicationId}/brief`);
@@ -289,5 +346,9 @@ export async function getBriefExportData(
     org: resolvedOrganization,
     scoreRecommendation: getScoreRecommendation(latestScore),
     scoreSummary: buildScoreSummary(latestScore),
+    voiceAlignment: resolvePublicVoiceAlignment(
+      resolvedBrief,
+      resolvedVoiceAlignmentSummary,
+    ),
   };
 }

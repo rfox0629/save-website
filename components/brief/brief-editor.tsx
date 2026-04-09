@@ -247,6 +247,30 @@ export function BriefEditor({
               </span>
             </div>
 
+            <label className="mt-4 flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
+              <input
+                checked={form.include_voice_alignment}
+                className="mt-1 h-4 w-4 rounded border-white/20 bg-[#0B1622] text-[#C09A45]"
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    include_voice_alignment: event.target.checked,
+                  }))
+                }
+                type="checkbox"
+              />
+              <span>
+                <span className="block text-sm font-medium text-white">
+                  Include Voice Alignment in donor brief
+                </span>
+                <span className="mt-1 block text-xs leading-6 text-slate-400">
+                  Off by default. When enabled, the donor/public brief may show a
+                  reviewer-approved summary of internal and external perspective
+                  alignment.
+                </span>
+              </span>
+            </label>
+
             {publicUrl ? (
               <div className="mt-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-200/90">

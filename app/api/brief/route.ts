@@ -25,6 +25,7 @@ export async function POST(request: Request) {
       cautions?: string[];
       commendations?: string[];
       headline?: string;
+      include_voice_alignment?: boolean;
       ministry_description?: string;
       published?: boolean;
       recommendation_level?: string;
@@ -98,6 +99,7 @@ export async function POST(request: Request) {
       generated_at: now,
       generated_by: user.id,
       headline: body.headline ?? null,
+      include_voice_alignment: Boolean(body.include_voice_alignment),
       ministry_description: body.ministry_description ?? null,
       pdf_path: null,
       published: Boolean(body.published),

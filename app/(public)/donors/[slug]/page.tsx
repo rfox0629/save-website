@@ -58,6 +58,7 @@ export default async function PublicDonorBriefPage({
         application={data.application}
         externalChecks={data.externalChecks}
         org={data.org}
+        voiceAlignment={data.voiceAlignment}
       />
     </main>
   );

@@ -13,6 +13,7 @@ export type BriefFormData = {
   cautions: string[];
   commendations: string[];
   headline: string;
+  include_voice_alignment: boolean;
   ministry_description: string;
   published: boolean;
   recommendation_level: RecommendationLevel;
@@ -90,6 +91,7 @@ export function toBriefFormData(brief: DonorBrief | null): BriefFormData {
         ? [...brief.commendations, "", ""].slice(0, 3)
         : ["", "", ""],
     headline: brief?.headline ?? "",
+    include_voice_alignment: brief?.include_voice_alignment ?? false,
     ministry_description: brief?.ministry_description ?? "",
     published: brief?.published ?? false,
     recommendation_level:
