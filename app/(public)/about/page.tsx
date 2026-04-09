@@ -2,15 +2,15 @@ import Link from "next/link";
 
 const values = [
   {
-    body: "We believe donors should not have to guess about doctrine, governance, or stewardship before writing meaningful checks.",
+    body: "Donors should not have to guess about doctrine, governance, or stewardship before writing meaningful checks.",
     title: "Clarity",
   },
   {
-    body: "We use one diligence standard across ministries because trust collapses when standards move with influence or proximity.",
+    body: "One consistent standard applies across ministries because trust collapses when standards move with influence or proximity.",
     title: "Consistency",
   },
   {
-    body: "We aim to tell the truth in ways that serve both donors and ministries rather than flattering either side.",
+    body: "Truth should serve both donors and ministries rather than flatter either side.",
     title: "Courage",
   },
 ];
@@ -24,13 +24,13 @@ export default function AboutPage() {
             About SAVE
           </div>
           <h1 className="font-public-serif mx-auto mt-6 max-w-[820px] text-[38px] font-medium leading-[1.08] text-[#1B4D35] md:text-[62px]">
-            We exist to strengthen Christian generosity with disciplined
-            diligence.
+            Christian generosity deserves disciplined clarity.
           </h1>
           <p className="mx-auto mt-6 max-w-[700px] text-[17px] leading-[1.9] text-[#3D5C47]">
             SAVE was built to help serious donors support serious ministries
-            with more confidence. Our work sits between instinct and blind
-            trust, giving philanthropists a clearer basis for discernment.
+            with clarity and confidence, bringing structure to discernment for
+            over 30 years and helping donors move beyond instinct to give with
+            conviction.
           </p>
         </div>
       </section>
@@ -45,10 +45,10 @@ export default function AboutPage() {
               Build trust where generosity and accountability meet.
             </h2>
             <p className="mt-5 text-[16px] leading-[1.9] text-[#3D5C47]">
-              Our mission is to help donors fund kingdom work with both
-              conviction and care. We want excellent ministries to be easier to
-              recognize and easier to support because their structure, doctrine,
-              and stewardship have been examined honestly.
+              The mission is simple. Help donors fund kingdom work with
+              conviction and care. Excellent ministries should be easier to
+              recognize and support because their structure, doctrine, and
+              stewardship have been clearly evaluated.
             </p>
           </div>
 
@@ -59,11 +59,11 @@ export default function AboutPage() {
             <h2 className="font-public-serif mt-4 text-[34px]">
               A structured model, not a personal hunch.
             </h2>
-            <p className="mt-5 text-[16px] leading-[1.9] text-[rgba(255,255,255,0.76)]">
-              SAVE reviews ministries through a weighted model that examines
-              leadership, doctrine, governance, finances, fruit, and external
-              trust indicators. Documents, narrative responses, reputation
-              checks, and reviewer judgment all contribute to the final picture.
+            <p className="mt-5 max-w-[420px] text-[16px] leading-[1.9] text-[rgba(255,255,255,0.76)]">
+              The SAVE Standard applies a weighted model across leadership,
+              doctrine, governance, finances, fruit, and external trust.
+              Documents, narrative responses, external validation, and human
+              judgment contribute to a clear picture.
             </p>
           </div>
         </div>
@@ -109,8 +109,8 @@ export default function AboutPage() {
                 Explore the process from either side of the table.
               </h2>
               <p className="mt-4 max-w-[620px] text-[16px] leading-[1.85] text-[#3D5C47]">
-                Ministries can begin the inquiry today, and donors can learn how
-                SAVE briefs support more thoughtful giving decisions.
+                Ministries can begin the inquiry today, and donors can explore
+                how SAVE briefs support more thoughtful giving decisions.
               </p>
             </div>
             <div className="flex flex-wrap gap-4">

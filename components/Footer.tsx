@@ -13,7 +13,13 @@ export default function Footer() {
             </div>
           </div>
           <div className="mt-2 text-[13px] text-[rgba(255,255,255,0.5)]">
-            Ministry Vetting for the Serious Donor
+            Clarity for Kingdom Giving
+          </div>
+          <div className="mt-2 text-[13px] text-[rgba(255,255,255,0.5)]">
+            SAVE: System for Assessing &amp; Verifying Effectiveness
+          </div>
+          <div className="mt-2 text-[13px] text-[rgba(255,255,255,0.5)]">
+            Serving ministries and donors for over 30 years.
           </div>
         </div>
 
@@ -44,7 +50,7 @@ export default function Footer() {
                   className="text-[14px] text-[rgba(255,255,255,0.6)] no-underline transition-colors hover:text-white"
                   href="/for-donors"
                 >
-                  Vetted ministries
+                  Verified ministries
                 </Link>
               </li>
             </ul>
@@ -110,7 +116,7 @@ export default function Footer() {
 
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="font-mono text-[12px] text-[rgba(255,255,255,0.35)]">
-          © 2025 SAVE Foundation · All rights reserved
+          © 2026 SAVE Foundation. All rights reserved
         </div>
         <div className="text-[12px] text-[rgba(255,255,255,0.35)]">
           No ministry pays for a recommendation.

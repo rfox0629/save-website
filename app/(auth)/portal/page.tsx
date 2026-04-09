@@ -10,8 +10,8 @@ import {
 const PORTAL_STEPS = [
   "Inquiry Submitted",
   "Inquiry Reviewed",
-  "Vetting In Progress",
-  "Vetting Submitted",
+  "SAVE Standard In Progress",
+  "SAVE Standard Submitted",
   "Under Review",
   "Decision",
 ] as const;
@@ -78,7 +78,7 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
     if (status === "inquiry_submitted") {
       return {
         action: null,
-        body: "Your inquiry is under review. We'll be in touch within 5 business days.",
+        body: "Your inquiry is under review. An update will be sent within 5 business days.",
         title: "Inquiry under review",
       };
     }
@@ -90,10 +90,10 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
             asChild
             className="bg-[#1B4D35] text-white hover:bg-[#236645]"
           >
-            <Link href="/portal/vetting">Open deep vetting form</Link>
+            <Link href="/portal/vetting">Open SAVE Standard form</Link>
           </Button>
         ),
-        body: "Your inquiry has been approved. Your deep vetting form is now available.",
+        body: "Your inquiry has been approved. Your SAVE Standard form is now available.",
         title: "Next step available",
       };
     }
@@ -113,8 +113,8 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
     if (status === "vetting_submitted") {
       return {
         action: null,
-        body: "Your vetting materials are under review. This process typically takes 2–3 weeks.",
-        title: "Vetting submitted",
+        body: "Your evaluation materials are under review. This process typically takes 2–3 weeks.",
+        title: "SAVE Standard submitted",
       };
     }
 
@@ -138,7 +138,7 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
             </Link>
           </Button>
         ) : null,
-        body: "Congratulations — your ministry has been approved.",
+        body: "Congratulations. Your ministry has been approved.",
         title: "Approved",
       };
     }
@@ -150,7 +150,7 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
             {application.decision_notes}
           </p>
         ) : null,
-        body: "After careful review, we are unable to recommend your organization at this time.",
+        body: "After careful review, your organization cannot be recommended at this time.",
         title: "Decision",
       };
     }
@@ -261,7 +261,7 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
                 className="rounded-2xl border border-[#D8D1C3] px-5 py-4 text-sm font-semibold text-[#1B4D35] transition hover:bg-[#F4EFE4]"
                 href="/portal/vetting"
               >
-                Vetting
+                SAVE Standard
               </Link>
               <Link
                 className="rounded-2xl border border-[#D8D1C3] px-5 py-4 text-sm font-semibold text-[#1B4D35] transition hover:bg-[#F4EFE4]"

@@ -11,41 +11,41 @@ const requirements = [
 const faqs = [
   {
     answer:
-      "Most ministries complete the initial inquiry in about 10 to 15 minutes. Deep vetting takes longer because it includes documents, references, and narrative answers, but it is designed to be completed in sections and saved as a draft.",
+      "Most ministries complete the initial inquiry in about 10 to 15 minutes. The SAVE Standard takes longer because it includes documents, references, and narrative answers. It is designed to be completed in sections and saved as a draft.",
     question: "How long does the process take?",
   },
   {
     answer:
-      "No. SAVE is not a pay-to-play directory. We do not sell recommendations, and every approved brief reflects the same diligence standard regardless of ministry size or visibility.",
+      "No. SAVE is not a pay-to-play directory. Recommendations are not sold, and every approved brief reflects the same diligence standard regardless of ministry size or visibility.",
     question: "Do ministries pay to receive a recommendation?",
   },
   {
     answer:
-      "We review leadership, doctrine, governance, finances, external reputation, and measurable ministry fruit. We also note caution areas directly when they matter for donor trust.",
+      "SAVE reviews leadership, doctrine, governance, finances, external reputation, and measurable ministry fruit. Caution areas are noted directly when they matter for donor trust.",
     question: "What does SAVE evaluate?",
   },
   {
     answer:
-      "No. Not every ministry will move from inquiry into deep vetting. We prioritize organizations that appear aligned, transparent, and ready for donor-facing diligence.",
-    question: "Does every inquiry move into full vetting?",
+      "No. Not every ministry will move from inquiry into the SAVE Standard. Priority goes to organizations that appear aligned, transparent, and ready for donor-facing diligence.",
+    question: "Does every inquiry move into the full SAVE Standard?",
   },
 ];
 
 const process = [
   {
-    copy: "Submit your organization identity, leadership, theological, and financial basics so we can understand fit.",
+    copy: "Submit your organization identity, leadership, theological, and financial basics for an initial fit review.",
     title: "1. Initial inquiry",
   },
   {
-    copy: "Our team reviews the inquiry for doctrinal alignment, governance readiness, and baseline donor suitability.",
+    copy: "Each inquiry is reviewed for doctrinal alignment, governance readiness, and baseline donor suitability.",
     title: "2. Inquiry review",
   },
   {
-    copy: "Approved ministries unlock the full vetting form with document uploads, narrative responses, and references.",
+    copy: "Approved ministries unlock the full SAVE Standard form with document uploads, narrative responses, and references.",
     title: "3. Deep diligence",
   },
   {
-    copy: "We generate a donor-facing brief only when the ministry clears our review process with appropriate confidence.",
+    copy: "A donor-facing brief is published only when the ministry clears review with appropriate confidence.",
     title: "4. Published brief",
   },
 ];
@@ -63,9 +63,9 @@ export default function ForMinistriesPage() {
               A clear diligence process for ministries that welcome scrutiny.
             </h1>
             <p className="mt-6 max-w-[600px] text-[17px] leading-[1.85] text-[#3D5C47]">
-              SAVE helps serious ministries tell the truth well. We gather the
-              leadership, doctrinal, governance, and financial context donors
-              actually need so your supporters can give with confidence.
+              SAVE helps serious ministries tell the truth well. Leadership,
+              doctrinal, governance, and financial context is gathered so
+              supporters can give with confidence.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
@@ -87,7 +87,7 @@ export default function ForMinistriesPage() {
             <div className="grid gap-5 sm:grid-cols-2">
               {[
                 ["Inquiry", "10-15 min"],
-                ["Deep vetting", "8 sections"],
+                ["SAVE Standard", "8 sections"],
                 ["Review model", "100 points"],
                 ["Outcome", "Donor brief"],
               ].map(([label, value]) => (
@@ -148,7 +148,7 @@ export default function ForMinistriesPage() {
               Application Requirements
             </div>
             <h2 className="font-public-serif mt-5 text-[34px] text-[#1B4D35] md:text-[46px]">
-              We ask for real substance, not polished marketing.
+              Real substance matters more than polished marketing.
             </h2>
             <p className="mt-5 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5C47]">
               The ministries that benefit most from SAVE are ready to show their

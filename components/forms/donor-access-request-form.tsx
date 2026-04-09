@@ -74,7 +74,7 @@ export function DonorAccessRequestForm() {
           Thank you.
         </h2>
         <p className="mt-4 max-w-2xl text-base leading-8 text-[#365342]">
-          We&apos;ll review your request and be in touch within 3 business days.
+          Your request will be reviewed within 3 business days.
         </p>
       </section>
     );

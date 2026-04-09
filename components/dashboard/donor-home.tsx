@@ -119,11 +119,10 @@ export function DonorHome({ briefs }: DonorHomeProps) {
           className="mt-4 text-4xl leading-tight text-[#1B4D35] md:text-5xl"
           style={{ fontFamily: "var(--font-auth-serif)" }}
         >
-          Vetted Ministries
+          Verified Ministries
         </h1>
         <p className="mt-4 max-w-3xl text-base leading-8 text-[#4F6357]">
-          Every ministry listed has completed SAVE&apos;s full diligence
-          process.
+          Every ministry listed has completed the full SAVE Standard.
         </p>
       </section>
 
@@ -213,7 +212,7 @@ export function DonorHome({ briefs }: DonorHomeProps) {
             className="text-3xl text-[#1B4D35]"
             style={{ fontFamily: "var(--font-auth-serif)" }}
           >
-            Our first vetted ministries will be listed here soon.
+            The first verified ministries will be listed here soon.
           </p>
         </section>
       ) : (

@@ -1,17 +1,17 @@
 import Link from "next/link";
 
 const inclusions = [
-  "Leadership, doctrine, governance, and financial stewardship analysis",
-  "External reputation and reference review",
+  "Leadership, doctrine, governance, and financial stewardship",
+  "External reputation and reference validation",
   "Clear commendations and donor awareness notes",
   "A recommendation level with concise rationale",
 ];
 
 const trustSignals = [
-  "Structured 100-point diligence model",
+  "Structured 100-point evaluation model",
   "No pay-to-play recommendations",
-  "Document-backed review process",
-  "Public-facing briefs written for decision-makers",
+  "Documented evaluation process",
+  "Public-facing briefs designed for decision-makers",
 ];
 
 export default function ForDonorsPage() {
@@ -27,8 +27,8 @@ export default function ForDonorsPage() {
               Serious giving deserves more than a glossy pitch deck.
             </h1>
             <p className="mt-6 max-w-[600px] text-[17px] leading-[1.85] text-[#3D5C47]">
-              SAVE briefs help donors move faster with better information. We
-              translate diligence work into a concise, donor-ready document that
+              SAVE briefs help donors move faster with better information. Each
+              brief turns evaluation into a concise, donor-ready document that
               surfaces what matters without burying you in noise.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
@@ -53,7 +53,7 @@ export default function ForDonorsPage() {
                 SAVE Brief
               </div>
               <h2 className="font-public-serif mt-3 text-[30px] text-[#1B4D35]">
-                A one-page diligence snapshot.
+                A one-page ministry snapshot.
               </h2>
             </div>
             <div className="space-y-4 py-6">
@@ -73,7 +73,7 @@ export default function ForDonorsPage() {
                 Outcome
               </div>
               <p className="mt-3 text-[15px] leading-[1.8] text-[rgba(255,255,255,0.76)]">
-                You get a fast read on whether a ministry appears trustworthy,
+                You get a fast read on whether a ministry is trustworthy,
                 well governed, and strategically compelling before deeper
                 philanthropic conversations begin.
               </p>
@@ -89,23 +89,23 @@ export default function ForDonorsPage() {
               How Briefs Work
             </div>
             <h2 className="font-public-serif mt-5 text-[34px] text-[#1B4D35] md:text-[48px]">
-              We do the slow diligence work so you can make sharper decisions.
+              Structured evaluation. Sharper decisions.
             </h2>
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">
             {[
               [
-                "1. Ministry enters review",
-                "An organization completes inquiry, shares documents, and provides detailed vetting information.",
+                "1. Ministry submits information",
+                "An organization completes inquiry, shares documents, and provides the information needed for evaluation.",
               ],
               [
-                "2. SAVE scores and reviews",
-                "We evaluate the ministry across leadership, doctrine, governance, financial stewardship, fruit, and external trust.",
+                "2. The SAVE Standard evaluates",
+                "Each ministry is evaluated across leadership, doctrine, governance, financial stewardship, fruit, and external trust.",
               ],
               [
-                "3. Donor brief is published",
-                "Approved organizations receive a concise brief built for donors, advisors, and family office decision-makers.",
+                "3. Ministry brief is published",
+                "Approved organizations receive a concise brief designed for donors, advisors, and family office decision-makers.",
               ],
             ].map(([title, body]) => (
               <div
@@ -177,9 +177,8 @@ export default function ForDonorsPage() {
             Want donor access to published SAVE briefs?
           </h2>
           <p className="mx-auto mt-5 max-w-[640px] text-[16px] leading-[1.85] text-[rgba(255,255,255,0.74)]">
-            Request access to the donor portal and we&apos;ll connect you with
-            current briefs, published diligence summaries, and the ministries we
-            believe merit serious attention.
+            Request access to the donor portal for current briefs, evaluation
+            summaries, and ministries aligned with serious giving.
           </p>
           <div className="mt-9">
             <Link

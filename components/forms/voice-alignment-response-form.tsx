@@ -158,7 +158,7 @@ export function VoiceAlignmentResponseForm({
           and helps ensure integrity, alignment, and trust.
         </p>
         <p className="mt-3 text-base leading-8 text-[#365342]">
-          We’re grateful for your time.
+          Thank you for your time.
         </p>
       </section>
     );
@@ -180,7 +180,7 @@ export function VoiceAlignmentResponseForm({
         <div className="mt-5 rounded-[24px] border border-[#E3DCCF] bg-[#FCFAF5] px-5 py-4">
           <p className="text-sm leading-7 text-[#475A4F]">
             Your responses are confidential and will be used to identify
-            patterns and themes. We do not publish individual responses or
+            patterns and themes. Individual responses are not published or
             attribute feedback to specific individuals.
           </p>
         </div>

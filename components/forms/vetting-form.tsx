@@ -138,7 +138,7 @@ function StepHeader({ currentStep }: { currentStep: number }) {
     <div className="rounded-[28px] border border-[#D8D1C3] bg-white px-6 py-5 shadow-[0_18px_40px_rgba(27,77,53,0.06)]">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
-          Step {currentStep + 1} of 8 — {vettingStepTitles[currentStep]}
+          Step {currentStep + 1} of 8. {vettingStepTitles[currentStep]}
         </p>
         <p className="text-sm text-[#617367]">
           Draft saves on every Next click
@@ -238,8 +238,8 @@ function ReadOnlyBanner({ submittedAt }: { submittedAt: string | null }) {
         Submitted
       </p>
       <p className="mt-2 text-base leading-7">
-        Submitted on {new Date(submittedAt).toLocaleDateString()}. This vetting
-        form is now read-only while our team completes review.
+        Submitted on {new Date(submittedAt).toLocaleDateString()}. This SAVE
+        Standard form is now read-only while review is completed.
       </p>
     </div>
   );
@@ -459,7 +459,7 @@ export function VettingForm({
         return;
       }
 
-      toast.success("Vetting draft saved.");
+      toast.success("SAVE Standard draft saved.");
       setCurrentStep((step) =>
         Math.min(step + 1, vettingStepTitles.length - 1),
       );
@@ -493,7 +493,9 @@ export function VettingForm({
         return;
       }
 
-      toast.success("Vetting materials submitted. Processing your submission...");
+      toast.success(
+        "SAVE Standard materials submitted. Processing your submission...",
+      );
       setProcessingStatus("vetting_submitted");
       setProcessingVisible(true);
     });
@@ -512,7 +514,7 @@ export function VettingForm({
               className="mt-6 text-5xl leading-tight text-[#1B4D35]"
               style={{ fontFamily: "var(--font-auth-serif)" }}
             >
-              We’re processing your vetting materials.
+              Your SAVE Standard materials are being processed.
             </h1>
             <p className="mt-6 text-lg leading-8 text-[#4F6357]">
               This can take up to a minute while SAVE runs your external checks
@@ -537,13 +539,13 @@ export function VettingForm({
           <MinistryNav active="vetting" />
           <div className="mx-auto max-w-3xl rounded-[32px] border border-[#D8D1C3] bg-white px-8 py-12 text-center shadow-[0_25px_80px_rgba(27,77,53,0.08)]">
             <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
-              Vetting Submitted
+              SAVE Standard Submitted
             </p>
             <h1
               className="mt-6 text-5xl leading-tight text-[#1B4D35]"
               style={{ fontFamily: "var(--font-auth-serif)" }}
             >
-              Your vetting materials have been submitted.
+              Your SAVE Standard materials have been submitted.
             </h1>
             <p className="mt-6 text-lg leading-8 text-[#4F6357]">
               Our team will be in touch within 2–3 weeks.
@@ -600,11 +602,11 @@ export function VettingForm({
               className="mt-4 text-4xl leading-tight"
               style={{ fontFamily: "var(--font-auth-serif)" }}
             >
-              {readOnly ? "Vetting Submitted" : vettingStepTitles[currentStep]}
+              {readOnly ? "SAVE Standard Submitted" : vettingStepTitles[currentStep]}
             </h1>
             <p className="mt-4 text-base leading-8 text-[#4F6357]">
               {readOnly
-                ? "Your submitted vetting responses are shown below for reference."
+                ? "Your submitted SAVE Standard responses are shown below for reference."
                 : "Complete each section carefully. Every Next click saves your draft and keeps your progress intact."}
             </p>
 
@@ -652,8 +654,8 @@ export function VettingForm({
                         "Married and stable",
                         "Single",
                         "Widowed",
-                        "Divorced — prior to ministry",
-                        "Divorced — during ministry",
+                        "Divorced, prior to ministry",
+                        "Divorced, during ministry",
                       ].map((option) => (
                         <option key={option} value={option}>
                           {option}
@@ -669,7 +671,7 @@ export function VettingForm({
                       disabled={readOnly}
                       {...form.register("leader_accountability")}
                     >
-                      {["Yes — formal structure", "Yes — informal", "No"].map(
+                      {["Yes, formal structure", "Yes, informal", "No"].map(
                         (option) => (
                           <option key={option} value={option}>
                             {option}
@@ -781,7 +783,7 @@ export function VettingForm({
                       {[
                         "Never",
                         "Occasionally for relational purposes",
-                        "Yes — as part of our model",
+                        "Yes, as part of our model",
                       ].map((option) => (
                         <option key={option} value={option}>
                           {option}

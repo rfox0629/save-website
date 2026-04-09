@@ -75,7 +75,7 @@ export function AdminDonorRequestsTable({
                   <td className="px-5 py-4 text-white">{request.full_name}</td>
                   <td className="px-5 py-4 text-slate-300">{request.email}</td>
                   <td className="px-5 py-4 text-slate-300">
-                    {request.organization ?? "—"}
+                    {request.organization ?? "Not provided"}
                   </td>
                   <td className="px-5 py-4 text-slate-300">
                     {request.referral_source}

@@ -114,6 +114,15 @@ export default async function PublicHomePage() {
   const donorExploreHref =
     role === "donor" ? "/donors" : "/donors/request-access";
   const donorRequestHref = "/donors/request-access";
+  const leadershipAlignment = {
+    alignmentInsight:
+      "Internal and external perspectives reflect a consistent view of leadership character, communication, and organizational posture.",
+    externalPerspective:
+      "Outside perspectives describe leadership as credible, steady, and broadly consistent with the ministry's public posture.",
+    internalPerspective:
+      "Internal perspectives describe leadership as clear, relational, and consistent in day-to-day culture and direction.",
+    status: "Aligned" as const,
+  };
 
   return (
     <main className="overflow-hidden bg-[#F9F6F0] pt-[68px]">
@@ -124,7 +133,7 @@ export default async function PublicHomePage() {
         <div className="relative z-10">
           <div className="mb-7 inline-flex items-center gap-[10px] text-[12px] font-semibold uppercase tracking-[0.18em] text-[#236645]">
             <div className="h-1.5 w-1.5 rounded-full bg-[#E8A020]" />
-            Ministry Diligence Platform
+            Trusted Kingdom Giving
           </div>
 
           <h1 className="font-public-serif max-w-[720px] text-[40px] font-medium leading-[1.1] text-[#1B4D35] md:text-[72px]">
@@ -138,9 +147,9 @@ export default async function PublicHomePage() {
           </h1>
 
           <p className="mt-7 max-w-[520px] text-[18px] leading-[1.75] text-[#3D5C47]">
-            SAVE deeply vets Christian ministries so that business leaders and
-            major donors can fund kingdom work with confidence, accountability,
-            and joy.
+            The SAVE Standard brings clarity to Kingdom giving so business
+            leaders and major donors can support Christian ministries with
+            confidence, accountability, and joy.
           </p>
 
           <div className="mt-11 flex flex-wrap gap-[14px]">
@@ -182,7 +191,7 @@ export default async function PublicHomePage() {
 
       <div className="flex gap-12 overflow-x-auto bg-[#1B4D35] px-6 py-5 md:px-[52px]">
         <span className="shrink-0 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.2em] text-[#F5C842]">
-          Diligence includes
+          The SAVE Standard includes
         </span>
         <div className="h-5 w-px shrink-0 bg-[rgba(255,255,255,0.2)]" />
         {[
@@ -216,25 +225,26 @@ export default async function PublicHomePage() {
           Four steps. <em>No shortcuts.</em>
         </h2>
         <p className="mt-5 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5C47]">
-          Every ministry that carries a SAVE brief has gone through the same
-          rigorous process. No exceptions. No shortcuts. No pay-to-play.
+          Every ministry presented through the SAVE Standard has gone through
+          the same clear and consistent evaluation. No exceptions. No
+          shortcuts. No pay-to-play.
         </p>
 
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           <HowStep
-            body="Ministries submit a detailed application covering leadership, doctrine, governance, and finances. Not a contact form — a real accountability process that surfaces what actually matters."
+            body="Ministries submit a detailed application covering leadership, doctrine, governance, and finances. Not a contact form. A clear evaluation that surfaces what matters."
             tag="10–15 minutes"
             title="Structured Inquiry"
             value="01"
           />
           <HowStep
-            body="Financial records, governance documents, doctrinal statements, external reputation, and reference verification — reviewed against a 100-point model across six weighted categories."
+            body="Financial records, governance documents, doctrinal statements, external reputation, and references are reviewed against a structured model across six weighted categories."
             tag="30–45 minutes"
-            title="Deep Diligence"
+            title="Comprehensive Evaluation"
             value="02"
           />
           <HowStep
-            body="Every approved ministry receives a published diligence brief. Concise, honest, specific. You read it. You decide. We give you what you need to give with confidence."
+            body="Every approved ministry receives a published ministry brief. Concise. Honest. Specific. Read it. Decide with confidence."
             tag="Published report"
             title="Donor-Ready Brief"
             value="03"
@@ -258,27 +268,79 @@ export default async function PublicHomePage() {
                 Relational Discernment
               </h3>
               <p className="mb-4 mt-2 text-[16px] font-medium leading-[1.5] text-[#236645]">
-                We don&apos;t just evaluate ministries. We spend time with the
-                people who lead them.
+                Evaluation goes beyond documents. Leadership is seen up close.
               </p>
               <p className="mb-5 text-[14px] leading-[1.8] text-[#3D5C47]">
                 Documents reveal structure. Conversations reveal intention.
                 Proximity reveals character. The most important things about a
                 leader cannot be captured in a form or an interview. For select
-                organizations, our team spends real time in proximity with
-                ministry leadership — observing the consistency between what is
-                presented and what is lived.
+                organizations, the SAVE Standard includes time in proximity
+                with ministry leadership, observing the consistency between
+                what is presented and what is lived.
               </p>
               <div className="mb-5 rounded-[8px] border-l-[3px] border-l-[#1B4D35] bg-[#EBF5EF] px-[18px] py-[14px] text-[13px] leading-[1.7] text-[#6B8570]">
                 This step is mutual and invitational. It is never entered
                 without the ministry&apos;s full knowledge and consent. It is
                 reserved for organizations being considered for significant
-                giving relationships — a mark of trust, not suspicion.
+                giving relationships. It is a mark of trust, not suspicion.
               </div>
+              {leadershipAlignment ? (
+                <div className="mb-5 rounded-[18px] border border-[rgba(27,77,53,0.1)] bg-[#FCFAF5] px-5 py-5">
+                  <div className="mb-4 flex flex-wrap items-center gap-2.5">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#236645]">
+                      Leadership Alignment
+                    </p>
+                    <span className="rounded-[20px] border border-[rgba(27,77,53,0.12)] bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6B8570]">
+                      {leadershipAlignment.status}
+                    </span>
+                  </div>
+                  <p className="mb-5 text-[13px] leading-[1.7] text-[#6B8570]">
+                    Clarity is strengthened when internal and external
+                    perspectives align.
+                  </p>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="rounded-[14px] border border-[rgba(27,77,53,0.08)] bg-white px-4 py-4">
+                      <p className="text-[12px] font-semibold text-[#1B4D35]">
+                        Internal Perspective
+                      </p>
+                      <p className="mt-1.5 text-[13px] leading-[1.7] text-[#6B8570]">
+                        Insights gathered from those within the organization.
+                      </p>
+                      <p className="mt-3 text-[13px] leading-[1.7] text-[#3D5C47]">
+                        {leadershipAlignment.internalPerspective}
+                      </p>
+                    </div>
+                    <div className="rounded-[14px] border border-[rgba(27,77,53,0.08)] bg-white px-4 py-4">
+                      <p className="text-[12px] font-semibold text-[#1B4D35]">
+                        External Perspective
+                      </p>
+                      <p className="mt-1.5 text-[13px] leading-[1.7] text-[#6B8570]">
+                        Insights gathered from partners and those outside the
+                        organization.
+                      </p>
+                      <p className="mt-3 text-[13px] leading-[1.7] text-[#3D5C47]">
+                        {leadershipAlignment.externalPerspective}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-4 rounded-[14px] border border-[rgba(27,77,53,0.08)] bg-white px-4 py-4">
+                    <p className="text-[12px] font-semibold text-[#1B4D35]">
+                      Alignment Insight
+                    </p>
+                    <p className="mt-1.5 text-[13px] leading-[1.7] text-[#6B8570]">
+                      A summarized view of how closely internal and external
+                      perspectives align.
+                    </p>
+                    <p className="mt-3 text-[13px] leading-[1.7] text-[#3D5C47]">
+                      {leadershipAlignment.alignmentInsight}
+                    </p>
+                  </div>
+                </div>
+              ) : null}
               <p className="text-[14px] leading-[1.6] text-[#3D5C47]">
                 <em>
                   Integrity is not proven in presentation. It is confirmed in
-                  consistency — over time, in proximity, in the ordinary.
+                  consistency, over time, in proximity, in the ordinary.
                 </em>
               </p>
             </div>
@@ -324,7 +386,8 @@ export default async function PublicHomePage() {
           </h2>
           <p className="mt-5 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5C47]">
             Billions of dollars flow to Christian ministries every year. Very
-            little of it is vetted. Most donors give based on relationship,
+            little of it is clearly understood. Most donors give based on
+            relationship,
             reputation, or a compelling story.
           </p>
           <p className="mt-4 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5C47]">
@@ -335,15 +398,15 @@ export default async function PublicHomePage() {
             {[
               [
                 "Asking hard questions is an act of love.",
-                "The organizations you fund represent your values. Vetting strengthens the bond between donor and mission.",
+                "The organizations you fund represent your values. The SAVE Standard strengthens alignment between donor and mission.",
               ],
               [
                 "Accountability protects the mission.",
-                "Healthy ministries welcome scrutiny. The vetting process itself is a spiritual discipline.",
+                "Healthy ministries welcome accountability. The SAVE Standard is a spiritual discipline in practice.",
               ],
               [
                 "Fruit requires roots.",
-                "We look at governance, doctrine, and character — not just outputs — because unsustainable ministries waste generosity.",
+                "Governance, doctrine, and character matter as much as outcomes. Unsustainable ministries waste generosity.",
               ],
             ].map(([title, body]) => (
               <div
@@ -366,12 +429,12 @@ export default async function PublicHomePage() {
 
         <div className="border-t border-[rgba(27,77,53,0.2)] pt-10 md:border-l md:border-t-0 md:pl-[60px] md:pt-0">
           <blockquote className="font-public-serif mb-4 border-l-[3px] border-l-[#E8A020] pl-5 text-[22px] italic leading-[1.5] text-[#1B4D35]">
-            &quot;Faithful stewardship starts with honest information — about
+            &quot;Faithful stewardship starts with honest information, about
             the mission, the leadership, and the evidence of lasting
             fruit.&quot;
           </blockquote>
           <p className="mb-11 pl-5 text-[12px] font-semibold uppercase tracking-[0.1em] text-[#6B8570]">
-            — SAVE Foundation
+            SAVE Foundation
           </p>
 
           <div className="rounded-2xl border border-[rgba(232,160,32,0.25)] bg-[#FDF5E0] p-7">
@@ -381,7 +444,7 @@ export default async function PublicHomePage() {
             </div>
             <p className="text-[14px] leading-[1.7] text-[#3D5C47]">
               No ministry pays to be recommended. No brief is issued without
-              human reviewer sign-off. Every recommendation reflects the data —
+              human review. Every recommendation reflects the data,
               nothing else.
             </p>
           </div>
@@ -399,8 +462,8 @@ export default async function PublicHomePage() {
           A 100-point framework built on <em>what actually matters.</em>
         </h2>
         <p className="mt-5 max-w-[540px] text-[16px] leading-[1.8] text-[rgba(255,255,255,0.65)]">
-          Six weighted categories. Explicit subcriteria. Automatic flag
-          triggers. Hard stop disqualifiers. Nothing arbitrary.
+          Six weighted categories. Clear subcriteria. Defined flag triggers.
+          Consistent disqualifiers. Nothing arbitrary.
         </p>
 
         <div className="mt-14 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -420,17 +483,17 @@ export default async function PublicHomePage() {
             title="Governance"
           />
           <ModelCell
-            body="Audit level, program expense ratio, reserve fund, restricted fund compliance and transparency."
+            body="Financial review level, program expense ratio, reserve fund, restricted fund clarity and transparency."
             points="20 pts"
             title="Financial Stewardship"
           />
           <ModelCell
-            body="Scale of impact, theory of change, spiritual measurement method, third-party validation."
+            body="Scale of impact, clarity of mission, spiritual fruit, and external validation where applicable."
             points="20 pts"
             title="Fruit"
           />
           <ModelCell
-            body="ECFA membership, reference quality, IRS record, news and reputation review."
+            body="ECFA membership, reference quality, IRS standing, and public reputation."
             points="10 pts"
             title="External Trust"
           />
@@ -468,18 +531,17 @@ export default async function PublicHomePage() {
             you have nothing to <em>fear.</em>
           </h2>
           <p className="mb-8 mt-4 max-w-[400px] text-[15px] leading-[1.8] text-[#3D5C47]">
-            A SAVE vetting gives you credibility with serious donors who ask
-            serious questions. It signals that you welcome accountability — and
-            connects you to givers who are looking for exactly what you&apos;ve
-            built.
+            The SAVE Standard gives your ministry credibility with serious
+            donors. It signals accountability. It connects you to givers
+            aligned with what you have built.
           </p>
           <ul className="mb-10 space-y-2.5">
             {[
               "Inquiry reviewed within 5 business days",
-              "Deep vetting form unlocked after approval",
+              "SAVE Standard form unlocked after approval",
               "Secure document upload portal",
-              "Published donor brief upon approval",
-              "Annual re-vetting to maintain active status",
+              "Published ministry brief upon approval",
+              "Annual evaluation required to maintain active status",
             ].map((item) => (
               <li
                 className="flex items-start gap-2.5 rounded-[10px] border border-[rgba(27,77,53,0.1)] bg-white px-4 py-3 text-[14px] leading-[1.5] text-[#3D5C47]"
@@ -511,14 +573,14 @@ export default async function PublicHomePage() {
           </h2>
           <p className="mb-8 mt-4 max-w-[400px] text-[15px] leading-[1.8] text-[#3D5C47]">
             You&apos;ve built something. You want it to matter beyond your
-            lifetime. SAVE is your diligence partner — we do the work you
-            don&apos;t have time to do, and we document every step.
+            lifetime. The SAVE Standard brings clarity and documents every
+            step.
           </p>
           <ul className="mb-10 space-y-2.5">
             {[
               "Access to all published ministry briefs",
               "Honest commendations and cautions",
-              "Full diligence checklist — what we reviewed",
+              "Full evaluation summary, what was included",
               "Recommendation level in plain language",
               "Direct connection to ministry leadership",
             ].map((item) => (
@@ -537,7 +599,7 @@ export default async function PublicHomePage() {
             className="inline-block rounded-[8px] border border-[#1B4D35] bg-transparent px-[34px] py-[15px] text-[15px] font-semibold tracking-[0.01em] text-[#1B4D35] transition duration-200 hover:-translate-y-0.5 hover:bg-[#EBF5EF]"
             href={donorExploreHref}
           >
-            Explore Vetted Ministries →
+            Explore Verified Ministries →
           </Link>
         </div>
       </section>
@@ -556,7 +618,7 @@ export default async function PublicHomePage() {
         <div className="relative mt-14 max-w-[680px]">
           <div className="absolute bottom-12 left-[23px] top-12 w-0.5 rounded-[2px] bg-[linear-gradient(to_bottom,#1B4D35_0%,#EBF5EF_100%)]" />
           <ProcessStep
-            description="Structured 10–15 minute application. Leadership, doctrine, financials — at a surface level."
+            description="Structured 10–15 minute application. Leadership, doctrine, and financials at a surface level."
             label="Ministry submits inquiry"
             status="Submitted"
             statusTone="green"
@@ -571,7 +633,7 @@ export default async function PublicHomePage() {
           />
           <ProcessStep
             description="30–45 minute deep dive with document upload. Six full categories of structured review."
-            label="Deep vetting form unlocked"
+            label="SAVE Standard form unlocked"
             status="Vetting in progress"
             statusTone="green"
             value="03"
@@ -615,9 +677,8 @@ export default async function PublicHomePage() {
             <em>honest information.</em>
           </h2>
           <p className="mx-auto mt-4 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5C47]">
-            Whether you&apos;re a ministry ready to be held accountable, or a
-            donor ready to give with confidence — SAVE is where that process
-            begins.
+            Ministries ready for accountability and donors ready to give with
+            confidence begin here.
           </p>
           <div className="relative mb-9 mt-11 flex flex-wrap justify-center gap-4">
             <Link
@@ -634,8 +695,8 @@ export default async function PublicHomePage() {
             </Link>
           </div>
           <p className="relative text-[12px] font-medium tracking-[0.06em] text-[#6B8570]">
-            No ministry pays to be recommended · All briefs include human review
-            · Annual re-vetting required
+            No ministry pays to be recommended. All briefs include human
+            review. Annual evaluation required.
           </p>
         </div>
       </section>

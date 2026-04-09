@@ -15,8 +15,8 @@ export default function DonorRequestAccessPage() {
             Request Donor Access
           </h1>
           <p className="mt-4 max-w-3xl text-base leading-8 text-[#4F6357]">
-            SAVE&apos;s vetted ministry briefs are available to serious donors
-            by request.
+            SAVE&apos;s verified ministry briefs are available to serious
+            donors by request.
           </p>
         </section>
 

@@ -90,30 +90,30 @@ function buildInviteCopy({
   if (requestType === "internal") {
     return `Hi ${firstName},
 
-We’re currently walking closely with ${organizationName} to better understand their leadership, culture, and impact.
+SAVE is walking closely with ${organizationName} to better understand leadership, culture, and impact.
 
-As part of this process, we’re inviting a small number of individuals who know the organization well to share their perspective.
+As part of this process, a small number of people who know the organization well are being invited to share their perspective.
 
-Your input helps us ensure that what is seen publicly aligns with what is experienced internally.
+Your input helps confirm that what is seen publicly aligns with what is experienced internally.
 
 This is a relational and reflective process intended to bring clarity and strengthen trust.
 
 Your responses will be handled with care and will not be shared in a way that identifies you personally.
 
-If you’re willing, please take a few minutes to complete this short form:
+If you are willing, please take a few minutes to complete this short form:
 
 ${inviteUrl}
 
 Thank you for your time and for the role you play in supporting this work.
 
-— SAVE Team`;
+SAVE Team`;
   }
 
   return `Hi ${firstName},
 
-We’re currently working with ${organizationName} to better understand their leadership and overall impact.
+SAVE is working with ${organizationName} to better understand leadership and overall impact.
 
-As part of this process, we’re gathering perspective from individuals outside the organization who have interacted with or observed their work.
+As part of this process, perspective is being gathered from individuals outside the organization who have interacted with or observed their work.
 
 Your input helps us assess whether the organization’s public reputation reflects its lived reality.
 
@@ -121,13 +121,13 @@ This is a private and thoughtful process designed to support clarity and trust.
 
 Your responses will be handled with care and will not be shared in a way that identifies you personally.
 
-If you’re open to it, we’d greatly value your perspective:
+If you are open to it, your perspective would be greatly valued:
 
 ${inviteUrl}
 
 Thank you for your time.
 
-— SAVE Team`;
+SAVE Team`;
 }
 
 function getRequestStatusMeta(status: string) {

@@ -16,7 +16,7 @@ export const leadershipCharacterSchema = z.object({
     { error: "Select a decision-making model." },
   ),
   leader_accountability: z.enum(
-    ["Yes — formal structure", "Yes — informal", "No"],
+    ["Yes, formal structure", "Yes, informal", "No"],
     { error: "Select an accountability structure." },
   ),
   leader_conversion_narrative: z
@@ -28,8 +28,8 @@ export const leadershipCharacterSchema = z.object({
       "Married and stable",
       "Single",
       "Widowed",
-      "Divorced — prior to ministry",
-      "Divorced — during ministry",
+      "Divorced, prior to ministry",
+      "Divorced, during ministry",
     ],
     { error: "Select marital status." },
   ),
@@ -52,7 +52,7 @@ export const doctrinalDepthSchema = z.object({
     [
       "Never",
       "Occasionally for relational purposes",
-      "Yes — as part of our model",
+      "Yes, as part of our model",
     ],
     { error: "Select a syncretism response." },
   ),
@@ -281,7 +281,7 @@ export const vettingDefaultValues: VettingFormValues = {
   funding_reduction_response: "",
   gospel_presentation: "",
   independent_board_count: 0,
-  leader_accountability: "Yes — formal structure",
+  leader_accountability: "Yes, formal structure",
   leader_conversion_narrative: "",
   leader_marital_status: "Married and stable",
   leadership_conflict_notes: "None.",

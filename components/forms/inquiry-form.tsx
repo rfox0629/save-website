@@ -111,7 +111,7 @@ function StepHeader({ currentStep }: { currentStep: number }) {
     <div className="rounded-[28px] border border-[#D8D1C3] bg-white px-6 py-5 shadow-[0_18px_40px_rgba(27,77,53,0.06)]">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
-          Step {currentStep + 1} of 6 — {inquiryStepTitles[currentStep]}
+          Step {currentStep + 1} of 6. {inquiryStepTitles[currentStep]}
         </p>
         <p className="text-sm text-[#617367]">
           Draft saves on every Next click
@@ -229,7 +229,7 @@ function ReadOnlyBanner({ submittedAt }: { submittedAt: string | null }) {
       </p>
       <p className="mt-2 text-base leading-7">
         Submitted on {new Date(submittedAt).toLocaleDateString()}. This inquiry
-        is now read-only while our team reviews it.
+        is now read-only while review is completed.
       </p>
     </div>
   );
@@ -333,7 +333,7 @@ export function InquiryForm({
 
       if (values.moral_failure || values.financial_investigation) {
         setGlobalError(
-          "Based on your response, we are unable to proceed with this application at this time.",
+          "Based on your response, this application cannot move forward at this time.",
         );
         return;
       }
@@ -353,10 +353,10 @@ export function InquiryForm({
 
   const introBody = useMemo(() => {
     if (readOnly) {
-      return "Your submitted inquiry is shown below for reference. Editing is disabled while the SAVE team completes review.";
+      return "Your submitted inquiry is shown below for reference. Editing is disabled while review is completed.";
     }
 
-    return "Complete each section carefully. Every time you move to the next step, we save your draft automatically.";
+    return "Complete each section carefully. Every move to the next step saves your draft automatically.";
   }, [readOnly]);
 
   if (confirmationVisible) {
@@ -375,7 +375,7 @@ export function InquiryForm({
               Your inquiry has been submitted.
             </h1>
             <p className="mt-6 text-lg leading-8 text-[#4F6357]">
-              We&apos;ll review it within 5 business days.
+              Review will be completed within 5 business days.
             </p>
           </div>
         </div>
@@ -416,8 +416,8 @@ export function InquiryForm({
 
               {isDisqualified ? (
                 <div className="mt-4 rounded-2xl border border-[#D98C8C] bg-[#FFF1F1] px-4 py-3 text-[#9B2C2C]">
-                  Based on your response, we are unable to proceed with this
-                  application at this time.
+                  Based on your response, this application cannot move forward
+                  at this time.
                 </div>
               ) : null}
             </div>
@@ -1012,8 +1012,8 @@ export function InquiryForm({
 
                   {isDisqualified ? (
                     <div className="rounded-2xl border border-[#D98C8C] bg-[#FFF1F1] px-4 py-3 text-sm text-[#9B2C2C]">
-                      Based on your response, we are unable to proceed with this
-                      application at this time.
+                      Based on your response, this application cannot move
+                      forward at this time.
                     </div>
                   ) : null}
 

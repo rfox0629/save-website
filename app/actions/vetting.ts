@@ -233,9 +233,9 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
         resolvedVetting?.independent_board_count ?? undefined,
       leader_accountability: asFormValue(
         (resolvedVetting?.leader_accountability === "Yes formal"
-          ? "Yes — formal structure"
+          ? "Yes, formal structure"
           : resolvedVetting?.leader_accountability === "Yes informal"
-            ? "Yes — informal"
+            ? "Yes, informal"
             : resolvedVetting?.leader_accountability) as
           | VettingFormValues["leader_accountability"]
           | null
@@ -246,10 +246,10 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
       ),
       leader_marital_status: asFormValue(
         (resolvedVetting?.leader_marital_status === "Divorced prior to ministry"
-          ? "Divorced — prior to ministry"
+          ? "Divorced, prior to ministry"
           : resolvedVetting?.leader_marital_status ===
               "Divorced during ministry"
-            ? "Divorced — during ministry"
+            ? "Divorced, during ministry"
             : resolvedVetting?.leader_marital_status) as
           | VettingFormValues["leader_marital_status"]
           | null
@@ -387,16 +387,16 @@ function mapVettingToPersistence(values: VettingFormValues) {
       family_on_board: values.family_on_board,
       independent_board_count: values.independent_board_count,
       leader_accountability:
-        values.leader_accountability === "Yes — formal structure"
+        values.leader_accountability === "Yes, formal structure"
           ? "Yes formal"
-          : values.leader_accountability === "Yes — informal"
+          : values.leader_accountability === "Yes, informal"
             ? "Yes informal"
             : values.leader_accountability,
       leader_conversion_narrative: values.leader_conversion_narrative,
       leader_marital_status:
-        values.leader_marital_status === "Divorced — prior to ministry"
+        values.leader_marital_status === "Divorced, prior to ministry"
           ? "Divorced prior to ministry"
-          : values.leader_marital_status === "Divorced — during ministry"
+          : values.leader_marital_status === "Divorced, during ministry"
             ? "Divorced during ministry"
             : values.leader_marital_status,
       leadership_conflict_notes: values.leadership_conflict_notes,
@@ -490,7 +490,7 @@ export async function saveVettingDraft(
   const resolvedApplicationId = applicationId ?? context.applicationId;
 
   if (!resolvedApplicationId) {
-    return { error: "No application is available for vetting." };
+    return { error: "No application is available for the SAVE Standard." };
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -579,7 +579,7 @@ export async function submitVetting(
       | { error?: string }
       | null;
     return {
-      error: body?.error ?? "Unable to start background vetting checks.",
+      error: body?.error ?? "Unable to start background evaluation checks.",
     };
   }
 
