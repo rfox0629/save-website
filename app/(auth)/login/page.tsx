@@ -100,6 +100,12 @@ export default function LoginPage() {
     <main className="min-h-screen bg-[#F9F6F0] px-6 py-12">
       <div className="mx-auto grid min-h-[calc(100vh-6rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1fr_460px]">
         <section className="rounded-[32px] border border-[#D8D1C3] bg-[#FFFDF8] p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)] md:p-12">
+          <Link
+            className="mb-6 inline-flex items-center text-sm font-medium text-[#3D5C47] transition-colors hover:text-[#1B4D35]"
+            href="/"
+          >
+            Return home
+          </Link>
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
             SAVE Platform
           </p>
