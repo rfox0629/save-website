@@ -9,6 +9,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { login, sendMagicLink } from "@/app/actions/auth";
+import { SaveBrand } from "@/components/Nav";
 
 const passwordLoginSchema = z.object({
   email: z.string().email("Enter a valid email address."),
@@ -97,8 +98,14 @@ export default function LoginPage() {
   });
 
   return (
-    <main className="min-h-screen bg-[#F9F6F0] px-6 py-12">
-      <div className="mx-auto grid min-h-[calc(100vh-6rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1fr_460px]">
+    <main className="min-h-screen bg-[#F9F6F0] px-6 py-8 md:px-[52px]">
+      <header className="mx-auto flex max-w-6xl items-center py-4">
+        <Link className="no-underline" href="/">
+          <SaveBrand />
+        </Link>
+      </header>
+
+      <div className="mx-auto grid min-h-[calc(100vh-8rem)] max-w-6xl items-center gap-10 py-6 lg:grid-cols-[1fr_460px]">
         <section className="rounded-[32px] border border-[#D8D1C3] bg-[#FFFDF8] p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)] md:p-12">
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
             SAVE Platform
