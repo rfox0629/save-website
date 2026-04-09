@@ -236,7 +236,11 @@ function extractJsonObject(text: string) {
   return raw.slice(start, end + 1);
 }
 
-function buildOrganizationPayload(organization: Organizations) {
+function buildOrganizationPayload(organization: Organizations | null) {
+  if (!organization) {
+    return undefined;
+  }
+
   return compactRecord({
     dba_name: organization.dba_name,
     geographic_scope: organization.geographic_scope,
@@ -574,7 +578,6 @@ export async function submitVoiceAlignmentResponse(
   };
 
   const responseQuery = admin.from("voice_alignment_responses");
-  // @ts-expect-error Supabase client inference for generated insert types is incorrect here.
   const { error } = await responseQuery.insert(payload);
 
   if (error) {

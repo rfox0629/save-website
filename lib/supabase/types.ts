@@ -64,6 +64,7 @@ export type Database = {
           website_url?: string | null;
           year_founded?: number | null;
         };
+        Relationships: [];
       };
       applications: {
         Row: {
@@ -114,6 +115,7 @@ export type Database = {
           status?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       inquiry_responses: {
         Row: {
@@ -212,6 +214,7 @@ export type Database = {
           updated_at?: string;
           years_in_role?: number | null;
         };
+        Relationships: [];
       };
       vetting_responses: {
         Row: {
@@ -343,6 +346,7 @@ export type Database = {
           updated_at?: string;
           whistleblower_policy?: boolean | null;
         };
+        Relationships: [];
       };
       scores: {
         Row: {
@@ -396,6 +400,7 @@ export type Database = {
           override_notes?: string | null;
           total_score?: number | null;
         };
+        Relationships: [];
       };
       score_components: {
         Row: {
@@ -425,6 +430,7 @@ export type Database = {
           rationale?: string | null;
           score_id?: string;
         };
+        Relationships: [];
       };
       risk_flags: {
         Row: {
@@ -469,6 +475,7 @@ export type Database = {
           resolved_by?: string | null;
           severity?: "high" | "hard_stop" | "low" | "medium";
         };
+        Relationships: [];
       };
       reviewer_notes: {
         Row: {
@@ -501,6 +508,7 @@ export type Database = {
           section?: string | null;
           updated_at?: string;
         };
+        Relationships: [];
       };
       documents: {
         Row: {
@@ -542,6 +550,7 @@ export type Database = {
           uploaded_at?: string;
           uploaded_by?: string | null;
         };
+        Relationships: [];
       };
       external_checks: {
         Row: {
@@ -577,6 +586,7 @@ export type Database = {
           status?: string;
           summary?: string | null;
         };
+        Relationships: [];
       };
       donor_briefs: {
         Row: {
@@ -630,6 +640,7 @@ export type Database = {
           recommendation_level?: string | null;
           slug?: string | null;
         };
+        Relationships: [];
       };
       donor_requests: {
         Row: {
@@ -662,6 +673,7 @@ export type Database = {
           referral_source?: string;
           status?: "approved" | "declined" | "pending";
         };
+        Relationships: [];
       };
       profiles: {
         Row: {
@@ -685,6 +697,7 @@ export type Database = {
           role?: "admin" | "analyst" | "donor" | "ministry" | "reviewer";
           updated_at?: string;
         };
+        Relationships: [];
       };
       voice_alignment_requests: {
         Row: {
@@ -729,6 +742,29 @@ export type Database = {
           responded_at?: string | null;
           status?: "pending" | "responded";
         };
+        Relationships: [
+          {
+            foreignKeyName: "voice_alignment_requests_application_id_fkey";
+            columns: ["application_id"];
+            isOneToOne: false;
+            referencedRelation: "applications";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "voice_alignment_requests_invited_by_fkey";
+            columns: ["invited_by"];
+            isOneToOne: false;
+            referencedRelation: "users";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "voice_alignment_requests_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       voice_alignment_responses: {
         Row: {
@@ -800,6 +836,29 @@ export type Database = {
           trust_recommendation?: string | null;
           years_context_known?: string | null;
         };
+        Relationships: [
+          {
+            foreignKeyName: "voice_alignment_responses_application_id_fkey";
+            columns: ["application_id"];
+            isOneToOne: false;
+            referencedRelation: "applications";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "voice_alignment_responses_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "voice_alignment_responses_request_id_fkey";
+            columns: ["request_id"];
+            isOneToOne: true;
+            referencedRelation: "voice_alignment_requests";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       voice_alignment_summaries: {
         Row: {
@@ -826,6 +885,22 @@ export type Database = {
           status?: "aligned" | "insufficient_data" | "misaligned" | "partially_aligned";
           summary?: Json;
         };
+        Relationships: [
+          {
+            foreignKeyName: "voice_alignment_summaries_application_id_fkey";
+            columns: ["application_id"];
+            isOneToOne: true;
+            referencedRelation: "applications";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "voice_alignment_summaries_organization_id_fkey";
+            columns: ["organization_id"];
+            isOneToOne: false;
+            referencedRelation: "organizations";
+            referencedColumns: ["id"];
+          },
+        ];
       };
     };
     Views: Record<string, never>;
