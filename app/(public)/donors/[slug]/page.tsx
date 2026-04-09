@@ -1,10 +1,8 @@
 import { Lora } from "next/font/google";
 import { notFound } from "next/navigation";
 
-import { PublicAiSummary } from "@/components/brief/public-ai-summary";
-import { PublicDonorBrief } from "@/components/brief/public-donor-brief";
 import { PrintButton } from "@/components/brief/print-button";
-import { ScoreSummaryCard } from "@/components/brief/score-summary-card";
+import { SaveBriefV1 } from "@/components/brief/save-brief-v1";
 import { getPublishedBriefBySlug } from "@/lib/brief";
 
 const lora = Lora({
@@ -41,23 +39,12 @@ export default async function PublicDonorBriefPage({
         </div>
       ) : null}
 
-      <PublicDonorBrief
+      <SaveBriefV1
         application={data.application}
         brief={data.brief}
-        org={data.org}
-        titleClassName={lora.className}
-      />
-      <div className="mx-auto mt-8 w-full max-w-4xl">
-        <ScoreSummaryCard
-          recommendation={data.brief.recommendation_level ?? data.scoreRecommendation}
-          scoreSummary={data.scoreSummary}
-          variant="light"
-        />
-      </div>
-      <PublicAiSummary
-        application={data.application}
         externalChecks={data.externalChecks}
         org={data.org}
+        titleClassName={lora.className}
         voiceAlignment={data.voiceAlignment}
       />
     </main>

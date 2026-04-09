@@ -1,8 +1,7 @@
 import { Lora } from "next/font/google";
 
 import { AutoPrint } from "@/components/brief/auto-print";
-import { PublicAiSummary } from "@/components/brief/public-ai-summary";
-import { PublicDonorBrief } from "@/components/brief/public-donor-brief";
+import { SaveBriefV1 } from "@/components/brief/save-brief-v1";
 import { getBriefExportData } from "@/lib/brief";
 
 const lora = Lora({
@@ -37,16 +36,12 @@ export default async function BriefExportPage({
           Note: This brief may not reflect the most recent updates.
         </div>
       ) : null}
-      <PublicDonorBrief
+      <SaveBriefV1
         application={data.application}
         brief={data.brief}
-        org={data.org}
-        titleClassName={lora.className}
-      />
-      <PublicAiSummary
-        application={data.application}
         externalChecks={data.externalChecks}
         org={data.org}
+        titleClassName={lora.className}
         voiceAlignment={data.voiceAlignment}
       />
     </main>
