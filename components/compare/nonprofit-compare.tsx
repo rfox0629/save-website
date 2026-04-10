@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 
 import type { CompareOption, CompareRecord } from "@/lib/compare";
+import { getSaveTierClass, type SaveTier } from "@/lib/save-tier";
 
 function formatRecommendation(value: string) {
   return value
@@ -181,9 +182,19 @@ export function NonprofitCompare({
               <div className="space-y-4">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <h2 className="text-2xl font-semibold">{left.organizationName}</h2>
-                  <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${pillClass}`}>
-                    {formatRecommendation(left.recommendation)}
-                  </span>
+                  <div className="flex flex-col items-end gap-2">
+                    <span
+                      className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${getSaveTierClass(
+                        left.saveTier as SaveTier,
+                        theme,
+                      )}`}
+                    >
+                      {left.saveTier}
+                    </span>
+                    <span className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${pillClass}`}>
+                      {formatRecommendation(left.recommendation)}
+                    </span>
+                  </div>
                 </div>
                 <p className={`text-sm leading-7 ${bodyTextClass}`}>
                   {left.executiveSummary}
@@ -198,9 +209,19 @@ export function NonprofitCompare({
               <div className="space-y-4">
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <h2 className="text-2xl font-semibold">{right.organizationName}</h2>
-                  <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${pillClass}`}>
-                    {formatRecommendation(right.recommendation)}
-                  </span>
+                  <div className="flex flex-col items-end gap-2">
+                    <span
+                      className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${getSaveTierClass(
+                        right.saveTier as SaveTier,
+                        theme,
+                      )}`}
+                    >
+                      {right.saveTier}
+                    </span>
+                    <span className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${pillClass}`}>
+                      {formatRecommendation(right.recommendation)}
+                    </span>
+                  </div>
                 </div>
                 <p className={`text-sm leading-7 ${bodyTextClass}`}>
                   {right.executiveSummary}

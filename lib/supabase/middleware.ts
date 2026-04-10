@@ -9,6 +9,7 @@ const PROTECTED_PATHS = [
   "/admin",
   "/portal",
   "/donors",
+  "/map",
 ];
 
 function isProtectedPath(pathname: string) {

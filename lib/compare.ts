@@ -3,9 +3,16 @@ import "server-only";
 import { parseReviewerSummary } from "@/lib/ai/reviewerSummary";
 import { requireDonorBriefs } from "@/lib/donors";
 import { getPublishedBriefBySlug } from "@/lib/brief";
+import { getSaveTier, type SaveTier } from "@/lib/save-tier";
 import { getRecommendationLevel, requireReviewerPageAccess } from "@/lib/review";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { Applications, ExternalCheck, Organizations, Score } from "@/lib/supabase/types";
+import type {
+  Applications,
+  ExternalCheck,
+  Organizations,
+  Score,
+  VoiceAlignmentSummaryRecord,
+} from "@/lib/supabase/types";
 
 export type CompareOption = {
   label: string;
@@ -28,6 +35,7 @@ export type CompareRecord = {
   id: string;
   organizationName: string;
   recommendation: string;
+  saveTier: SaveTier;
   topRisks: string[];
   topStrengths: string[];
 };
@@ -75,13 +83,33 @@ function buildCompareRecord({
   checks,
   fallbackRecommendation,
   org,
+  voiceAlignmentStatus,
 }: {
   application: Applications;
   checks: ExternalCheck[];
   fallbackRecommendation: string;
   org: Organizations;
+  voiceAlignmentStatus?: VoiceAlignmentSummaryRecord["status"] | null;
 }): CompareRecord {
   const summary = parseReviewerSummary(application.ai_summary);
+  const topRisks = summary?.top_risks ?? [];
+  const topStrengths = summary?.top_strengths ?? [];
+  const recommendation = summary?.recommendation ?? fallbackRecommendation;
+  const saveTier = getSaveTier({
+    categoryConfidences: summary
+      ? [
+          summary.leadership_integrity.confidence,
+          summary.doctrine.confidence,
+          summary.governance.confidence,
+          summary.financial_stewardship.confidence,
+          summary.fruit.confidence,
+        ]
+      : [],
+    recommendation,
+    risks: topRisks,
+    strengths: topStrengths,
+    voiceAlignmentStatus,
+  });
 
   return {
     categoryAssessments: summary
@@ -124,9 +152,10 @@ function buildCompareRecord({
     followUpQuestions: summary?.follow_up_questions ?? [],
     id: application.id,
     organizationName: org.legal_name,
-    recommendation: summary?.recommendation ?? fallbackRecommendation,
-    topRisks: summary?.top_risks ?? [],
-    topStrengths: summary?.top_strengths ?? [],
+    recommendation,
+    saveTier,
+    topRisks,
+    topStrengths,
   };
 }
 
@@ -144,11 +173,17 @@ export async function getReviewerComparisonPageData(
   await requireReviewerPageAccess();
 
   const admin = createAdminClient();
-  const [{ data: applications }, { data: organizations }, { data: scores }] =
+  const [
+    { data: applications },
+    { data: organizations },
+    { data: scores },
+    { data: voiceAlignmentSummaries },
+  ] =
     await Promise.all([
       admin.from("applications").select("*").order("created_at", { ascending: false }),
       admin.from("organizations").select("*"),
       admin.from("scores").select("*").order("calculated_at", { ascending: false }),
+      admin.from("voice_alignment_summaries").select("*"),
     ]);
 
   const applicationRows = (applications ?? []) as Applications[];
@@ -158,10 +193,17 @@ export async function getReviewerComparisonPageData(
     organizationRows.map((organization) => [organization.id, organization]),
   );
   const latestScoreMap = new Map<string, Score>();
+  const voiceAlignmentMap = new Map<string, VoiceAlignmentSummaryRecord>();
 
   for (const score of scoreRows) {
     if (!latestScoreMap.has(score.application_id)) {
       latestScoreMap.set(score.application_id, score);
+    }
+  }
+
+  for (const summary of (voiceAlignmentSummaries ?? []) as VoiceAlignmentSummaryRecord[]) {
+    if (!voiceAlignmentMap.has(summary.application_id)) {
+      voiceAlignmentMap.set(summary.application_id, summary);
     }
   }
 
@@ -226,6 +268,8 @@ export async function getReviewerComparisonPageData(
         getRecommendationLevel(latestScoreMap.get(applicationId) ?? null),
       ),
       org: match.organization,
+      voiceAlignmentStatus:
+        voiceAlignmentMap.get(applicationId)?.status ?? null,
     });
   }
 
@@ -267,6 +311,7 @@ export async function getDonorComparisonPageData(
       checks: data.externalChecks,
       fallbackRecommendation: data.brief.recommendation_level ?? data.scoreRecommendation,
       org: data.org,
+      voiceAlignmentStatus: data.voiceAlignment?.status ?? null,
     });
   }
 

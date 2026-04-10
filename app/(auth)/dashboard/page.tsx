@@ -3,11 +3,9 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   getDashboardData,
-  getScoreTone,
-  getSeverityClass,
   getStatusLabel,
-  getStatusPillClass,
 } from "@/lib/review";
+import type { Applications, RiskFlag } from "@/lib/supabase/types";
 
 type DashboardPageProps = {
   searchParams?: {
@@ -17,13 +15,65 @@ type DashboardPageProps = {
   };
 };
 
+function getDashboardStatusPillClass(status: Applications["status"]) {
+  if (status === "approved") {
+    return "border-emerald-200 bg-emerald-50 text-emerald-800";
+  }
+
+  if (status === "under_review" || status === "inquiry_approved") {
+    return "border-sky-200 bg-sky-50 text-sky-800";
+  }
+
+  if (status === "declined" || status === "hard_stop") {
+    return "border-rose-200 bg-rose-50 text-rose-800";
+  }
+
+  if (status === "more_info_requested") {
+    return "border-amber-200 bg-amber-50 text-amber-800";
+  }
+
+  return "border-stone-200 bg-stone-50 text-stone-700";
+}
+
+function getDashboardScoreTone(score: number | null) {
+  if (score === null) {
+    return "text-[#7A867D]";
+  }
+
+  if (score >= 80) {
+    return "text-emerald-700";
+  }
+
+  if (score >= 60) {
+    return "text-amber-700";
+  }
+
+  return "text-rose-700";
+}
+
+function getDashboardSeverityClass(severity: RiskFlag["severity"]) {
+  if (severity === "hard_stop") {
+    return "border-rose-200 bg-rose-50 text-rose-800";
+  }
+
+  if (severity === "high") {
+    return "border-orange-200 bg-orange-50 text-orange-800";
+  }
+
+  if (severity === "medium") {
+    return "border-amber-200 bg-amber-50 text-amber-800";
+  }
+
+  return "border-stone-200 bg-stone-50 text-stone-700";
+}
+
 function SummaryCard({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5">
-      <p className="text-xs uppercase tracking-[0.28em] text-[#C09A45]">
+    <div className="rounded-3xl border border-[#E5DED0] bg-white p-5 shadow-[0_16px_40px_rgba(27,77,53,0.05)]">
+      <p className="text-xs uppercase tracking-[0.28em] text-[#8B7A57]">
         {label}
       </p>
-      <p className="mt-3 text-3xl font-semibold text-white">{value}</p>
+      <p className="mt-3 text-3xl font-semibold text-[#1B4D35]">{value}</p>
     </div>
   );
 }
@@ -34,16 +84,18 @@ export default async function InternalDashboardPage({
   const data = await getDashboardData(searchParams ?? {});
 
   return (
-    <main className="min-h-screen bg-[#0B1622] px-6 py-10 text-white">
+    <main className="min-h-screen bg-[#F7F6F2] px-6 py-10 text-[#1B4D35]">
       <div className="mx-auto max-w-7xl space-y-8">
-        <section className="rounded-[2rem] border border-white/10 bg-[linear-gradient(135deg,rgba(192,154,69,0.18),rgba(11,22,34,0.2)_35%,rgba(76,125,155,0.16))] p-8">
-          <p className="text-xs uppercase tracking-[0.35em] text-[#C09A45]">
+        <section className="rounded-[2rem] border border-[#E5DED0] bg-[#FFFDF8] p-8 shadow-[0_24px_60px_rgba(27,77,53,0.06)]">
+          <p className="text-xs uppercase tracking-[0.35em] text-[#8B7A57]">
             Internal Review
           </p>
           <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <h1 className="text-3xl font-semibold">Application dashboard</h1>
-              <p className="mt-2 max-w-3xl text-sm text-slate-300">
+              <h1 className="text-3xl font-semibold text-[#1B4D35]">
+                Application dashboard
+              </h1>
+              <p className="mt-2 max-w-3xl text-sm text-[#5E6C62]">
                 Review applications, triage flags, and move ministries through
                 inquiry, vetting, and final decisions.
               </p>
@@ -51,7 +103,7 @@ export default async function InternalDashboardPage({
             <div className="flex flex-wrap gap-3">
               <Button
                 asChild
-                className="bg-[#C09A45] text-[#0B1622] hover:bg-[#d4ac57]"
+                className="border border-[#D9C8A4] bg-[#F4EFE4] text-[#6F5D34] hover:bg-[#EEE5D4]"
               >
                 <Link href="/dashboard">Reset filters</Link>
               </Button>
@@ -69,12 +121,12 @@ export default async function InternalDashboardPage({
           />
         </section>
 
-        <section className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
+        <section className="rounded-[2rem] border border-[#E5DED0] bg-white p-6 shadow-[0_16px_40px_rgba(27,77,53,0.05)]">
           <form className="grid gap-4 md:grid-cols-4">
             <div className="space-y-2">
-              <label className="text-sm text-slate-300">Status</label>
+              <label className="text-sm text-[#5E6C62]">Status</label>
               <select
-                className="w-full rounded-2xl border border-white/10 bg-[#0B1622] px-4 py-3 text-white"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
                 defaultValue={data.filters.status ?? "all"}
                 name="status"
               >
@@ -97,9 +149,9 @@ export default async function InternalDashboardPage({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm text-slate-300">Score range</label>
+              <label className="text-sm text-[#5E6C62]">Score range</label>
               <select
-                className="w-full rounded-2xl border border-white/10 bg-[#0B1622] px-4 py-3 text-white"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
                 defaultValue={data.filters.scoreRange ?? "all"}
                 name="scoreRange"
               >
@@ -118,9 +170,9 @@ export default async function InternalDashboardPage({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm text-slate-300">Flag severity</label>
+              <label className="text-sm text-[#5E6C62]">Flag severity</label>
               <select
-                className="w-full rounded-2xl border border-white/10 bg-[#0B1622] px-4 py-3 text-white"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
                 defaultValue={data.filters.flagSeverity ?? "all"}
                 name="flagSeverity"
               >
@@ -141,7 +193,7 @@ export default async function InternalDashboardPage({
 
             <div className="flex items-end">
               <Button
-                className="w-full bg-[#C09A45] text-[#0B1622] hover:bg-[#d4ac57]"
+                className="w-full bg-[#1B4D35] text-white hover:bg-[#236645]"
                 type="submit"
               >
                 Apply filters
@@ -150,38 +202,41 @@ export default async function InternalDashboardPage({
           </form>
         </section>
 
-        <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03]">
+        <section className="overflow-hidden rounded-[2rem] border border-[#E5DED0] bg-white shadow-[0_16px_40px_rgba(27,77,53,0.05)]">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-white/10 text-left text-sm">
-              <thead className="bg-white/[0.04] text-slate-300">
+            <table className="min-w-full divide-y divide-[#ECE4D7] text-left text-sm">
+              <thead className="bg-[#FBF8F2] text-[#5E6C62]">
                 <tr>
-                  <th className="px-5 py-4">Organization name</th>
-                  <th className="px-5 py-4">EIN</th>
-                  <th className="px-5 py-4">Status</th>
-                  <th className="px-5 py-4">Score</th>
-                  <th className="px-5 py-4">Flags</th>
-                  <th className="px-5 py-4">Submitted date</th>
-                  <th className="px-5 py-4">Assigned reviewer</th>
-                  <th className="px-5 py-4">Actions</th>
+                  <th className="px-5 py-4 font-medium">Organization name</th>
+                  <th className="px-5 py-4 font-medium">EIN</th>
+                  <th className="px-5 py-4 font-medium">Status</th>
+                  <th className="px-5 py-4 font-medium">Score</th>
+                  <th className="px-5 py-4 font-medium">Flags</th>
+                  <th className="px-5 py-4 font-medium">Submitted date</th>
+                  <th className="px-5 py-4 font-medium">Assigned reviewer</th>
+                  <th className="px-5 py-4 font-medium">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/10">
+              <tbody className="divide-y divide-[#ECE4D7] bg-white">
                 {data.rows.map((row) => (
-                  <tr key={row.application.id} className="bg-[#102133]/50">
+                  <tr
+                    key={row.application.id}
+                    className="transition-colors hover:bg-[#FBF8F2]"
+                  >
                     <td className="px-5 py-4">
                       <Link
-                        className="font-medium text-white transition hover:text-[#F4E3B2]"
+                        className="font-medium text-[#1B4D35] transition hover:text-[#2B6B4A]"
                         href={`/applications/${row.application.id}`}
                       >
                         {row.organization.legal_name}
                       </Link>
                     </td>
-                    <td className="px-5 py-4 text-slate-300">
+                    <td className="px-5 py-4 text-[#617367]">
                       {row.organization.ein ?? "Not provided"}
                     </td>
                     <td className="px-5 py-4">
                       <span
-                        className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getStatusPillClass(
+                        className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getDashboardStatusPillClass(
                           row.application.status,
                         )}`}
                       >
@@ -190,7 +245,7 @@ export default async function InternalDashboardPage({
                     </td>
                     <td className="px-5 py-4">
                       <span
-                        className={`font-semibold ${getScoreTone(
+                        className={`font-semibold ${getDashboardScoreTone(
                           row.latestScore?.total_score ?? null,
                         )}`}
                       >
@@ -200,28 +255,32 @@ export default async function InternalDashboardPage({
                     <td className="px-5 py-4">
                       {row.flagCount > 0 ? (
                         <span
-                          className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getSeverityClass(
+                          className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getDashboardSeverityClass(
                             row.highestSeverity ?? "low",
                           )}`}
                         >
                           {row.flagCount}
                         </span>
                       ) : (
-                        <span className="inline-flex rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
+                        <span className="inline-flex rounded-full border border-[#E5DED0] bg-[#FBF8F2] px-3 py-1 text-xs text-[#617367]">
                           0
                         </span>
                       )}
                     </td>
-                    <td className="px-5 py-4 text-slate-300">
+                    <td className="px-5 py-4 text-[#617367]">
                       {new Date(
                         row.application.created_at,
                       ).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-4 text-slate-300">
+                    <td className="px-5 py-4 text-[#617367]">
                       {row.assignedReviewer ?? "Unassigned"}
                     </td>
                     <td className="px-5 py-4">
-                      <Button asChild size="sm">
+                      <Button
+                        asChild
+                        size="sm"
+                        className="bg-[#1B4D35] text-white hover:bg-[#236645]"
+                      >
                         <Link href={`/applications/${row.application.id}`}>
                           Open
                         </Link>
@@ -232,7 +291,7 @@ export default async function InternalDashboardPage({
                 {data.rows.length === 0 ? (
                   <tr>
                     <td
-                      className="px-5 py-10 text-center text-slate-400"
+                      className="px-5 py-10 text-center text-[#7A867D]"
                       colSpan={8}
                     >
                       No applications matched the current filters.

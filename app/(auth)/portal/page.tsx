@@ -90,10 +90,10 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
             asChild
             className="bg-[#1B4D35] text-white hover:bg-[#236645]"
           >
-            <Link href="/portal/vetting">Open SAVE Standard form</Link>
+            <Link href="/portal/application">Open Complete Application</Link>
           </Button>
         ),
-        body: "Your inquiry has been approved. Your SAVE Standard form is now available.",
+        body: "Your inquiry has been approved. Your complete application is now available.",
         title: "Next step available",
       };
     }
@@ -259,9 +259,9 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
               </Link>
               <Link
                 className="rounded-2xl border border-[#D8D1C3] px-5 py-4 text-sm font-semibold text-[#1B4D35] transition hover:bg-[#F4EFE4]"
-                href="/portal/vetting"
+                href="/portal/application"
               >
-                SAVE Standard
+                Complete Application
               </Link>
               <Link
                 className="rounded-2xl border border-[#D8D1C3] px-5 py-4 text-sm font-semibold text-[#1B4D35] transition hover:bg-[#F4EFE4]"

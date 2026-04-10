@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { register } from "@/app/actions/auth";
+import { SaveBrand } from "@/components/Nav";
 
 const registerSchema = z
   .object({
@@ -39,6 +41,8 @@ function FieldError({ message }: { message?: string }) {
 
 export default function RegisterPage() {
   const [formError, setFormError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<RegisterValues>({
@@ -71,38 +75,45 @@ export default function RegisterPage() {
   });
 
   return (
-    <main className="min-h-screen bg-[#F9F6F0] px-6 py-12">
-      <div className="mx-auto grid min-h-[calc(100vh-6rem)] max-w-6xl items-center gap-10 lg:grid-cols-[1fr_480px]">
+    <main className="min-h-screen bg-[#F9F6F0] px-6 py-8 md:px-[52px]">
+      <header className="mx-auto flex max-w-6xl items-center justify-between py-4">
+        <Link className="no-underline" href="/">
+          <SaveBrand />
+        </Link>
+
+        <Link
+          className="text-sm font-medium text-[#5D7264] transition-colors hover:text-[#1B4D35]"
+          href="/"
+        >
+          Back to home
+        </Link>
+      </header>
+
+      <div className="mx-auto grid min-h-[calc(100vh-8rem)] max-w-6xl items-center gap-10 py-6 lg:grid-cols-[1fr_460px]">
         <section className="rounded-[32px] border border-[#D8D1C3] bg-[#FFFDF8] p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)] md:p-12">
-          <Link
-            className="mb-6 inline-flex items-center text-sm font-medium text-[#3D5C47] transition-colors hover:text-[#1B4D35]"
-            href="/"
-          >
-            Return home
-          </Link>
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
-            Ministry Registration
+            SAVE Platform
           </p>
           <h1
-            className="mt-6 max-w-[680px] text-5xl leading-[1.05] text-[#1B4D35] md:text-6xl"
+            className="mt-6 max-w-[640px] text-5xl leading-[1.05] text-[#1B4D35] md:text-6xl"
             style={{ fontFamily: "var(--font-auth-serif)" }}
           >
-            Create your ministry account and start the SAVE application.
+            Create your ministry account and begin the SAVE process.
           </h1>
           <p className="mt-6 max-w-[560px] text-lg leading-8 text-[#4C5E52]">
-            We&apos;ll create your ministry account, organization record, and
-            initial application so you can head straight into the portal.
+            We&apos;ll set up your ministry login, organization profile, and
+            initial application so you can move directly into the portal.
           </p>
 
           <div className="mt-10 rounded-[28px] border border-[#D8D1C3] bg-[#F4EFE4] p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
-              What you&apos;ll need
+              Before you start
             </p>
-            <ul className="mt-3 space-y-2 text-base leading-8 text-[#4C5E52]">
-              <li>Your ministry email address</li>
-              <li>Your organization legal name</li>
-              <li>Your EIN in the format XX-XXXXXXX</li>
-            </ul>
+            <p className="mt-3 max-w-[480px] text-base leading-8 text-[#4C5E52]">
+              Use your ministry email, your organization&apos;s legal name, and
+              your EIN in the format XX-XXXXXXX. We&apos;ll provision your
+              account with the ministry role automatically.
+            </p>
           </div>
         </section>
 
@@ -147,14 +158,29 @@ export default function RegisterPage() {
               >
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete="new-password"
-                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
-                placeholder="Choose a secure password"
-                {...form.register("password")}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 pr-14 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                  placeholder="Choose a secure password"
+                  {...form.register("password")}
+                />
+                <button
+                  type="button"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showPassword}
+                  className="absolute inset-y-0 right-0 inline-flex items-center justify-center rounded-r-2xl px-4 text-[#5D7264] transition hover:text-[#1B4D35] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B4D35]/20"
+                  onClick={() => setShowPassword((current) => !current)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" aria-hidden="true" />
+                  ) : (
+                    <Eye className="h-5 w-5" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
               <FieldError message={form.formState.errors.password?.message} />
             </div>
 
@@ -165,14 +191,35 @@ export default function RegisterPage() {
               >
                 Confirm Password
               </label>
-              <input
-                id="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
-                placeholder="Re-enter your password"
-                {...form.register("confirmPassword")}
-              />
+              <div className="relative">
+                <input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  autoComplete="new-password"
+                  className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 pr-14 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                  placeholder="Re-enter your password"
+                  {...form.register("confirmPassword")}
+                />
+                <button
+                  type="button"
+                  aria-label={
+                    showConfirmPassword
+                      ? "Hide confirm password"
+                      : "Show confirm password"
+                  }
+                  aria-pressed={showConfirmPassword}
+                  className="absolute inset-y-0 right-0 inline-flex items-center justify-center rounded-r-2xl px-4 text-[#5D7264] transition hover:text-[#1B4D35] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B4D35]/20"
+                  onClick={() =>
+                    setShowConfirmPassword((current) => !current)
+                  }
+                >
+                  {showConfirmPassword ? (
+                    <EyeOff className="h-5 w-5" aria-hidden="true" />
+                  ) : (
+                    <Eye className="h-5 w-5" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
               <FieldError
                 message={form.formState.errors.confirmPassword?.message}
               />

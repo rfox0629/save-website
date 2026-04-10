@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -36,14 +37,18 @@ export default function LoginPage() {
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [magicLinkError, setMagicLinkError] = useState<string | null>(null);
   const [magicLinkSent, setMagicLinkSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [isPasswordPending, startPasswordTransition] = useTransition();
   const [isMagicLinkPending, startMagicLinkTransition] = useTransition();
 
   const redirectTo = searchParams.get("redirectTo") ?? "/portal";
+  const messageKey = searchParams.get("message");
   const message =
-    searchParams.get("message") === "check-email"
+    messageKey === "check-email"
       ? "Check your inbox for a secure sign-in link."
-      : null;
+      : messageKey === "invalid-link"
+        ? "This sign-in link is invalid or has expired. Please request a new one."
+        : null;
 
   const passwordForm = useForm<PasswordLoginValues>({
     resolver: zodResolver(passwordLoginSchema),
@@ -180,14 +185,29 @@ export default function LoginPage() {
               >
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete="current-password"
-                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
-                placeholder="Enter your password"
-                {...passwordForm.register("password")}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
+                  className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 pr-14 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                  placeholder="Enter your password"
+                  {...passwordForm.register("password")}
+                />
+                <button
+                  type="button"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  aria-pressed={showPassword}
+                  className="absolute inset-y-0 right-0 inline-flex items-center justify-center rounded-r-2xl px-4 text-[#5D7264] transition hover:text-[#1B4D35] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B4D35]/20"
+                  onClick={() => setShowPassword((current) => !current)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" aria-hidden="true" />
+                  ) : (
+                    <Eye className="h-5 w-5" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
               <FieldError
                 message={passwordForm.formState.errors.password?.message}
               />

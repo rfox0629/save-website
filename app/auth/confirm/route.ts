@@ -11,7 +11,17 @@ export async function GET(request: NextRequest) {
 
   if (code) {
     const supabase = createClient();
-    await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("message", "invalid-link");
+      if (next) {
+        loginUrl.searchParams.set("redirectTo", next);
+      }
+
+      return NextResponse.redirect(loginUrl);
+    }
 
     if (!next || next === "/auth/confirm") {
       const {

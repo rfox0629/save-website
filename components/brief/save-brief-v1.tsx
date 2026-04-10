@@ -4,6 +4,7 @@ import {
   type RecommendationLevel,
 } from "@/lib/brief-shared";
 import type { PublicVoiceAlignmentData } from "@/lib/brief";
+import { getSaveTier, getSaveTierClass } from "@/lib/save-tier";
 import type {
   Applications,
   DonorBrief,
@@ -25,22 +26,6 @@ function SaveMark() {
       </div>
     </div>
   );
-}
-
-function getRecommendationBadge(level: string | null) {
-  if (level === "Strongly Recommended") {
-    return "border-emerald-200 bg-[#EAF5EE] text-[#1B4D35]";
-  }
-
-  if (level === "Recommended") {
-    return "border-emerald-200 bg-[#EDF6EF] text-[#2F7A53]";
-  }
-
-  if (level === "Recommended with Conditions") {
-    return "border-amber-200 bg-[#FFF4DA] text-[#8A6720]";
-  }
-
-  return "border-[#D8D1C3] bg-[#F1ECE1] text-[#4F6357]";
 }
 
 function getExternalSignal(checks: ExternalCheck[], source: string, label: string) {
@@ -200,6 +185,21 @@ export function SaveBriefV1({
   const followUpQuestions = summary?.follow_up_questions.filter((item) =>
     item.trim(),
   ) ?? [];
+  const saveTier = getSaveTier({
+    categoryConfidences: summary
+      ? [
+          summary.leadership_integrity.confidence,
+          summary.doctrine.confidence,
+          summary.governance.confidence,
+          summary.financial_stewardship.confidence,
+          summary.fruit.confidence,
+        ]
+      : [],
+    recommendation: summary?.recommendation ?? brief.recommendation_level,
+    risks,
+    strengths,
+    voiceAlignmentStatus: voiceAlignment?.status ?? null,
+  });
   const signals = [
     getExternalSignal(externalChecks, "irs_teos", "IRS"),
     getCharityNavigatorSignal(externalChecks),
@@ -213,11 +213,11 @@ export function SaveBriefV1({
         <div className="flex items-start justify-between gap-6">
           <SaveMark />
           <span
-            className={`inline-flex rounded-full border px-4 py-2 text-sm font-semibold ${getRecommendationBadge(
-              brief.recommendation_level,
+            className={`inline-flex rounded-full border px-4 py-2 text-sm font-semibold ${getSaveTierClass(
+              saveTier,
             )}`}
           >
-            {brief.recommendation_level ?? "Recommendation pending"}
+            {saveTier}
           </span>
         </div>
 
@@ -250,6 +250,9 @@ export function SaveBriefV1({
             </p>
             <p className="mt-3 text-[15px] leading-8 text-[#475A4F]">
               {rationale}
+            </p>
+            <p className="mt-3 text-sm font-medium text-[#6B8570]">
+              SAVE Tier: {saveTier}
             </p>
           </div>
         </section>

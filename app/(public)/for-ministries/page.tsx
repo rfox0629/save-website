@@ -11,7 +11,7 @@ const requirements = [
 const faqs = [
   {
     answer:
-      "Most ministries complete the initial inquiry in about 10 to 15 minutes. The SAVE Standard takes longer because it includes documents, references, and narrative answers. It is designed to be completed in sections and saved as a draft.",
+      "Most ministries complete the initial inquiry in about 10 to 15 minutes. The Complete Application takes longer because it includes documents, references, and narrative answers. It is designed to be completed in sections and saved as a draft.",
     question: "How long does the process take?",
   },
   {
@@ -26,8 +26,8 @@ const faqs = [
   },
   {
     answer:
-      "No. Not every ministry will move from inquiry into the SAVE Standard. Priority goes to organizations that appear aligned, transparent, and ready for donor-facing diligence.",
-    question: "Does every inquiry move into the full SAVE Standard?",
+      "No. Not every ministry will move from inquiry into the Complete Application. Priority goes to organizations that appear aligned, transparent, and ready for donor-facing diligence.",
+    question: "Does every inquiry move into the full application?",
   },
 ];
 
@@ -41,7 +41,7 @@ const process = [
     title: "2. Inquiry review",
   },
   {
-    copy: "Approved ministries unlock the full SAVE Standard form with document uploads, narrative responses, and references.",
+    copy: "Approved ministries unlock the full Complete Application with document uploads, narrative responses, and references.",
     title: "3. Deep diligence",
   },
   {
@@ -87,7 +87,7 @@ export default function ForMinistriesPage() {
             <div className="grid gap-5 sm:grid-cols-2">
               {[
                 ["Inquiry", "10-15 min"],
-                ["SAVE Standard", "8 sections"],
+                ["Application", "8 sections"],
                 ["Review model", "100 points"],
                 ["Outcome", "Donor brief"],
               ].map(([label, value]) => (

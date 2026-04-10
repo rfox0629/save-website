@@ -538,7 +538,7 @@ export default async function PublicHomePage() {
           <ul className="mb-10 space-y-2.5">
             {[
               "Inquiry reviewed within 5 business days",
-              "SAVE Standard form unlocked after approval",
+              "Complete Application unlocked after approval",
               "Secure document upload portal",
               "Published ministry brief upon approval",
               "Annual evaluation required to maintain active status",
@@ -633,7 +633,7 @@ export default async function PublicHomePage() {
           />
           <ProcessStep
             description="30–45 minute deep dive with document upload. Six full categories of structured review."
-            label="SAVE Standard form unlocked"
+            label="Complete Application unlocked"
             status="Vetting in progress"
             statusTone="green"
             value="03"

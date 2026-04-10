@@ -36,6 +36,19 @@ type AuthActionResult = {
   error?: string;
 };
 
+const EMAIL_RATE_LIMIT_MESSAGE =
+  "Too many email requests. Please wait a few minutes and try again.";
+const INVALID_CREDENTIALS_MESSAGE =
+  "We couldn't sign you in with those credentials. Please check your email and password and try again.";
+const EMAIL_IN_USE_MESSAGE =
+  "An account already exists for this email. Try signing in instead.";
+const INVALID_MAGIC_LINK_MESSAGE =
+  "This sign-in link is invalid or has expired. Please request a new one.";
+const PASSWORD_TOO_SHORT_MESSAGE =
+  "Password must be at least 8 characters.";
+const GENERIC_AUTH_FAILURE_MESSAGE =
+  "We couldn't complete that sign-in request. Please try again.";
+
 async function getRoleRedirect(userId: string) {
   const supabase = createClient();
   const { data: profile } = await supabase
@@ -78,6 +91,64 @@ function getServiceRoleClient() {
   );
 }
 
+function normalizeAuthErrorMessage(message: string) {
+  const normalized = message.trim().toLowerCase();
+
+  if (
+    normalized.includes("email rate limit exceeded") ||
+    (normalized.includes("rate limit") && normalized.includes("email")) ||
+    normalized.includes("security purposes, you can only request this after")
+  ) {
+    return EMAIL_RATE_LIMIT_MESSAGE;
+  }
+
+  if (
+    normalized.includes("invalid login credentials") ||
+    normalized.includes("invalid credentials")
+  ) {
+    return INVALID_CREDENTIALS_MESSAGE;
+  }
+
+  if (
+    normalized.includes("user already registered") ||
+    normalized.includes("already registered") ||
+    normalized.includes("already exists")
+  ) {
+    return EMAIL_IN_USE_MESSAGE;
+  }
+
+  if (
+    normalized.includes("otp expired") ||
+    normalized.includes("expired") ||
+    normalized.includes("invalid or expired") ||
+    normalized.includes("token has expired") ||
+    normalized.includes("token is invalid")
+  ) {
+    return INVALID_MAGIC_LINK_MESSAGE;
+  }
+
+  if (
+    normalized.includes("password should be at least") ||
+    normalized.includes("password must be at least")
+  ) {
+    return PASSWORD_TOO_SHORT_MESSAGE;
+  }
+
+  if (
+    normalized.includes("auth") ||
+    normalized.includes("signup") ||
+    normalized.includes("sign up") ||
+    normalized.includes("sign in") ||
+    normalized.includes("otp") ||
+    normalized.includes("magic link") ||
+    normalized.includes("email")
+  ) {
+    return GENERIC_AUTH_FAILURE_MESSAGE;
+  }
+
+  return message;
+}
+
 export async function login(values: {
   email: string;
   password: string;
@@ -93,7 +164,7 @@ export async function login(values: {
   const { data, error } = await supabase.auth.signInWithPassword(parsed.data);
 
   if (error) {
-    return { error: error.message };
+    return { error: normalizeAuthErrorMessage(error.message) };
   }
 
   const userId = data.user?.id;
@@ -126,7 +197,7 @@ export async function sendMagicLink(values: {
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: normalizeAuthErrorMessage(error.message) };
   }
 
   return {};
@@ -151,7 +222,7 @@ export async function register(values: {
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: normalizeAuthErrorMessage(error.message) };
   }
 
   const userId = data.user?.id;

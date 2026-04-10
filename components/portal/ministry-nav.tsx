@@ -46,8 +46,8 @@ export function MinistryNav({
           />
           <PortalNavLink
             active={active === "vetting"}
-            href="/portal/vetting"
-            label="Vetting"
+            href="/portal/application"
+            label="Complete Application"
           />
           <PortalNavLink
             active={active === "documents"}
