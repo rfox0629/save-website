@@ -1,11 +1,13 @@
 import Link from "next/link";
 
+import { ViewModeSwitcher } from "@/components/app/view-mode-switcher";
 import { Button } from "@/components/ui/button";
 import {
   getDashboardData,
   getStatusLabel,
 } from "@/lib/review";
 import type { Applications, RiskFlag } from "@/lib/supabase/types";
+import { getViewerContext } from "@/lib/view-mode";
 
 type DashboardPageProps = {
   searchParams?: {
@@ -81,7 +83,10 @@ function SummaryCard({ label, value }: { label: string; value: number }) {
 export default async function InternalDashboardPage({
   searchParams,
 }: DashboardPageProps) {
-  const data = await getDashboardData(searchParams ?? {});
+  const [data, viewer] = await Promise.all([
+    getDashboardData(searchParams ?? {}),
+    getViewerContext(),
+  ]);
 
   return (
     <main className="min-h-screen bg-[#F7F6F2] px-6 py-10 text-[#1B4D35]">
@@ -101,6 +106,10 @@ export default async function InternalDashboardPage({
               </p>
             </div>
             <div className="flex flex-wrap gap-3">
+              <ViewModeSwitcher
+                canPreview={viewer.canPreview}
+                currentViewMode={viewer.currentViewMode}
+              />
               <Button
                 asChild
                 className="border border-[#D9C8A4] bg-[#F4EFE4] text-[#6F5D34] hover:bg-[#EEE5D4]"

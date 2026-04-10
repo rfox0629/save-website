@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { getViewerContext } from "@/lib/view-mode";
 import type {
   Applications,
   Document,
@@ -12,6 +12,8 @@ import type {
 
 export type MinistryPortalContext = {
   application: Applications | null;
+  canPreview: boolean;
+  currentViewMode: "admin" | "donor" | "ministry";
   documents: Array<
     Document & {
       signedUrl: string | null;
@@ -20,33 +22,28 @@ export type MinistryPortalContext = {
   >;
   organization: Organizations;
   publishedBrief: DonorBrief | null;
+  realRole: Profile["role"] | null;
   userId: string;
 };
 
-export async function requireMinistryContext(): Promise<MinistryPortalContext> {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export const PREVIEW_ORGANIZATION_ID = "11111111-1111-4111-8111-111111111111";
+export const PREVIEW_APPLICATION_ID = "22222222-2222-4222-8222-222222222222";
 
-  if (!user) {
+export async function requireMinistryContext(): Promise<MinistryPortalContext> {
+  const viewer = await getViewerContext();
+
+  if (!viewer.userId) {
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("organization_id, role")
-    .eq("id", user.id)
-    .maybeSingle();
-  const resolvedProfile = profile as Pick<
-    Profile,
-    "organization_id" | "role"
-  > | null;
+  const isPreviewMinistry =
+    viewer.canPreview && viewer.currentViewMode === "ministry";
 
   if (
-    !resolvedProfile ||
-    resolvedProfile.role !== "ministry" ||
-    !resolvedProfile.organization_id
+    !isPreviewMinistry &&
+    (!viewer.realRole ||
+      viewer.realRole !== "ministry" ||
+      !viewer.organizationId)
   ) {
     redirect("/dashboard");
   }
@@ -60,15 +57,24 @@ export async function requireMinistryContext(): Promise<MinistryPortalContext> {
     admin
       .from("organizations")
       .select("*")
-      .eq("id", resolvedProfile.organization_id)
+      .eq(
+        "id",
+        isPreviewMinistry ? PREVIEW_ORGANIZATION_ID : viewer.organizationId!,
+      )
       .maybeSingle(),
-    admin
-      .from("applications")
-      .select("*")
-      .eq("organization_id", resolvedProfile.organization_id)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle(),
+    isPreviewMinistry
+      ? admin
+          .from("applications")
+          .select("*")
+          .eq("id", PREVIEW_APPLICATION_ID)
+          .maybeSingle()
+      : admin
+          .from("applications")
+          .select("*")
+          .eq("organization_id", viewer.organizationId!)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
     admin
       .from("donor_briefs")
       .select("*")
@@ -93,10 +99,13 @@ export async function requireMinistryContext(): Promise<MinistryPortalContext> {
   if (!resolvedApplication) {
     return {
       application: null,
+      canPreview: viewer.canPreview,
+      currentViewMode: viewer.currentViewMode,
       documents: [],
       organization: resolvedOrganization,
       publishedBrief: null,
-      userId: user.id,
+      realRole: viewer.realRole,
+      userId: viewer.userId,
     };
   }
 
@@ -123,10 +132,13 @@ export async function requireMinistryContext(): Promise<MinistryPortalContext> {
 
   return {
     application: resolvedApplication,
+    canPreview: viewer.canPreview,
+    currentViewMode: viewer.currentViewMode,
     documents: signedDocuments,
     organization: resolvedOrganization,
     publishedBrief: briefForApplication,
-    userId: user.id,
+    realRole: viewer.realRole,
+    userId: viewer.userId,
   };
 }
 

@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { saveVettingDraft, submitVetting } from "@/app/actions/vetting";
 import { MinistryNav } from "@/components/portal/ministry-nav";
 import { createClient } from "@/lib/supabase/client";
+import type { ViewMode } from "@/lib/view-mode-shared";
 import {
   type VettingDocumentType,
   vettingDefaultValues,
@@ -31,6 +32,8 @@ type UploadedDoc = {
 type VettingFormProps = {
   applicationId: string | null;
   applicationStatus: string | null;
+  canPreview: boolean;
+  currentViewMode: ViewMode;
   initialValues: Partial<VettingFormValues>;
   organizationId: string | null;
   readOnly: boolean;
@@ -252,6 +255,8 @@ function sanitizeFilename(fileName: string) {
 export function VettingForm({
   applicationId,
   applicationStatus,
+  canPreview,
+  currentViewMode,
   initialValues,
   organizationId,
   readOnly,
@@ -505,7 +510,11 @@ export function VettingForm({
     return (
       <main className="min-h-screen bg-[#F9F6F0] px-6 py-10">
         <div className="mx-auto max-w-6xl space-y-8">
-          <MinistryNav active="vetting" />
+          <MinistryNav
+            active="vetting"
+            canPreview={canPreview}
+            currentViewMode={currentViewMode}
+          />
           <div className="mx-auto max-w-3xl rounded-[32px] border border-[#D8D1C3] bg-white px-8 py-12 text-center shadow-[0_25px_80px_rgba(27,77,53,0.08)]">
             <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
               Processing Submission
@@ -536,7 +545,11 @@ export function VettingForm({
     return (
       <main className="min-h-screen bg-[#F9F6F0] px-6 py-10">
         <div className="mx-auto max-w-6xl space-y-8">
-          <MinistryNav active="vetting" />
+          <MinistryNav
+            active="vetting"
+            canPreview={canPreview}
+            currentViewMode={currentViewMode}
+          />
           <div className="mx-auto max-w-3xl rounded-[32px] border border-[#D8D1C3] bg-white px-8 py-12 text-center shadow-[0_25px_80px_rgba(27,77,53,0.08)]">
             <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
               SAVE Standard Submitted
@@ -589,7 +602,11 @@ export function VettingForm({
   return (
     <main className="min-h-screen bg-[#F9F6F0] px-6 py-10 text-[#1B4D35]">
       <div className="mx-auto max-w-6xl space-y-8">
-        <MinistryNav active="vetting" />
+        <MinistryNav
+          active="vetting"
+          canPreview={canPreview}
+          currentViewMode={currentViewMode}
+        />
         <ReadOnlyBanner submittedAt={submittedAt} />
         {!readOnly ? <StepHeader currentStep={currentStep} /> : null}
 

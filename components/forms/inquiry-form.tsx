@@ -30,10 +30,13 @@ import {
   inquiryStepTitles,
   type InquiryFormValues,
 } from "@/lib/inquiry";
+import type { ViewMode } from "@/lib/view-mode-shared";
 
 type InquiryFormProps = {
   applicationId: string | null;
   applicationStatus: string | null;
+  canPreview: boolean;
+  currentViewMode: ViewMode;
   initialValues: Partial<InquiryFormValues>;
   readOnly: boolean;
   submittedAt: string | null;
@@ -237,6 +240,8 @@ function ReadOnlyBanner({ submittedAt }: { submittedAt: string | null }) {
 
 export function InquiryForm({
   applicationId: initialApplicationId,
+  canPreview,
+  currentViewMode,
   initialValues,
   readOnly,
   submittedAt,
@@ -363,7 +368,11 @@ export function InquiryForm({
     return (
       <main className="min-h-screen bg-[#F9F6F0] px-6 py-10">
         <div className="mx-auto max-w-6xl space-y-8">
-          <MinistryNav active="inquiry" />
+          <MinistryNav
+            active="inquiry"
+            canPreview={canPreview}
+            currentViewMode={currentViewMode}
+          />
           <div className="mx-auto max-w-3xl rounded-[32px] border border-[#D8D1C3] bg-white px-8 py-12 text-center shadow-[0_25px_80px_rgba(27,77,53,0.08)]">
             <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
               Inquiry Submitted
@@ -386,7 +395,11 @@ export function InquiryForm({
   return (
     <main className="min-h-screen bg-[#F9F6F0] px-6 py-10 text-[#1B4D35]">
       <div className="mx-auto max-w-6xl space-y-8">
-        <MinistryNav active="inquiry" />
+        <MinistryNav
+          active="inquiry"
+          canPreview={canPreview}
+          currentViewMode={currentViewMode}
+        />
         <ReadOnlyBanner submittedAt={submittedAt} />
         {!readOnly ? <StepHeader currentStep={currentStep} /> : null}
 

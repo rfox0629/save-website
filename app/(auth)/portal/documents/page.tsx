@@ -10,7 +10,11 @@ export default async function PortalDocumentsPage() {
   return (
     <main className="min-h-screen bg-[#F9F6F0] px-6 py-10 text-[#1B4D35]">
       <div className="mx-auto max-w-6xl space-y-8">
-        <MinistryNav active="documents" />
+        <MinistryNav
+          active="documents"
+          canPreview={context.canPreview}
+          currentViewMode={context.currentViewMode}
+        />
 
         <section className="rounded-[32px] border border-[#D8D1C3] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EFE4_100%)] p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)] md:p-10">
           <Link
@@ -38,6 +42,7 @@ export default async function PortalDocumentsPage() {
           applicationId={context.application?.id ?? null}
           documents={context.documents}
           organizationId={context.organization.id}
+          readOnly={context.canPreview && context.currentViewMode === "ministry"}
           userId={context.userId}
         />
       </div>

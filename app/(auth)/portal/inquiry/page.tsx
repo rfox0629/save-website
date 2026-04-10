@@ -8,6 +8,8 @@ export default async function InquiryPage() {
     <InquiryForm
       applicationId={draft.applicationId}
       applicationStatus={draft.applicationStatus}
+      canPreview={draft.canPreview}
+      currentViewMode={draft.currentViewMode}
       initialValues={draft.initialValues}
       readOnly={draft.readOnly}
       submittedAt={draft.submittedAt}

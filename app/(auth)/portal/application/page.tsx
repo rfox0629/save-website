@@ -12,7 +12,11 @@ export default async function ApplicationPage() {
     return (
       <main className="min-h-screen bg-[#F9F6F0] px-6 py-10">
         <div className="mx-auto max-w-6xl space-y-8">
-          <MinistryNav active="vetting" />
+          <MinistryNav
+            active="vetting"
+            canPreview={draft.canPreview}
+            currentViewMode={draft.currentViewMode}
+          />
           <div className="mx-auto max-w-3xl rounded-[32px] border border-[#D8D1C3] bg-white px-8 py-12 text-center shadow-[0_25px_80px_rgba(27,77,53,0.08)]">
             <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
               Complete Application
@@ -44,6 +48,8 @@ export default async function ApplicationPage() {
     <VettingForm
       applicationId={draft.applicationId}
       applicationStatus={draft.applicationStatus}
+      canPreview={draft.canPreview}
+      currentViewMode={draft.currentViewMode}
       initialValues={draft.initialValues}
       organizationId={draft.organizationId}
       readOnly={draft.readOnly}

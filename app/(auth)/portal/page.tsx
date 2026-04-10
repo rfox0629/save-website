@@ -68,8 +68,14 @@ function TimelineStep({
 }
 
 export default async function PortalPage({ searchParams }: PortalPageProps) {
-  const { application, documents, organization, publishedBrief } =
-    await requireMinistryContext();
+  const {
+    application,
+    canPreview,
+    currentViewMode,
+    documents,
+    organization,
+    publishedBrief,
+  } = await requireMinistryContext();
   const currentStep = getPortalTimelineStatus(application?.status ?? null);
   const status = application?.status ?? "inquiry_submitted";
   const showWelcome = searchParams?.welcome === "1";
@@ -165,7 +171,11 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
   return (
     <main className="min-h-screen bg-[#F9F6F0] px-6 py-10 text-[#1B4D35]">
       <div className="mx-auto max-w-6xl space-y-8">
-        <MinistryNav active="overview" />
+        <MinistryNav
+          active="overview"
+          canPreview={canPreview}
+          currentViewMode={currentViewMode}
+        />
 
         {showWelcome ? (
           <section className="rounded-[28px] border border-[#B7D7C4] bg-[#EAF5EE] px-6 py-5 text-[#1B4D35]">

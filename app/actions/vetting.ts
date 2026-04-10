@@ -3,17 +3,26 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
+import {
+  PREVIEW_APPLICATION_ID,
+  PREVIEW_ORGANIZATION_ID,
+} from "@/lib/ministry";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type {
   Applications,
   Document as DocumentRow,
   VettingResponse,
 } from "@/lib/supabase/types";
+import { getViewerContext } from "@/lib/view-mode";
+import type { ViewMode } from "@/lib/view-mode-shared";
 import { vettingFormSchema, type VettingFormValues } from "@/lib/vetting";
 
 type VettingLoadResult = {
   applicationId: string | null;
   applicationStatus: string | null;
+  canPreview: boolean;
+  currentViewMode: ViewMode;
   initialValues: Partial<VettingFormValues>;
   organizationId: string | null;
   readOnly: boolean;
@@ -43,40 +52,33 @@ function getBaseUrl() {
 }
 
 async function getMinistryApplicationContext() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const viewer = await getViewerContext();
 
-  if (!user) {
+  if (!viewer.userId) {
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("organization_id, role")
-    .eq("id", user.id)
-    .single();
-  const resolvedProfile = profile as {
-    organization_id: string | null;
-    role: string;
-  } | null;
+  const isPreviewMinistry =
+    viewer.canPreview && viewer.currentViewMode === "ministry";
 
-  if (
-    !resolvedProfile ||
-    resolvedProfile.role !== "ministry" ||
-    !resolvedProfile.organization_id
-  ) {
+  if (!isPreviewMinistry && (!viewer.organizationId || viewer.realRole !== "ministry")) {
     redirect("/portal");
   }
 
-  const { data: application } = await supabase
-    .from("applications")
-    .select("id, status")
-    .eq("organization_id", resolvedProfile.organization_id)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const supabase = isPreviewMinistry ? createAdminClient() : createClient();
+  const { data: application } = isPreviewMinistry
+    ? await supabase
+        .from("applications")
+        .select("id, status")
+        .eq("id", PREVIEW_APPLICATION_ID)
+        .maybeSingle()
+    : await supabase
+        .from("applications")
+        .select("id, status")
+        .eq("organization_id", viewer.organizationId!)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
   const resolvedApplication = application as Pick<
     Applications,
     "id" | "status"
@@ -85,9 +87,13 @@ async function getMinistryApplicationContext() {
   return {
     applicationId: resolvedApplication?.id ?? null,
     applicationStatus: resolvedApplication?.status ?? null,
-    organizationId: resolvedProfile.organization_id,
+    canPreview: viewer.canPreview,
+    currentViewMode: viewer.currentViewMode,
+    organizationId: isPreviewMinistry
+      ? PREVIEW_ORGANIZATION_ID
+      : viewer.organizationId!,
     supabase,
-    user,
+    userId: viewer.userId,
   };
 }
 
@@ -111,13 +117,21 @@ function isReadOnlyStatus(status: string | null, submittedAt: string | null) {
 }
 
 export async function loadVettingDraft(): Promise<VettingLoadResult> {
-  const { applicationId, applicationStatus, organizationId, supabase } =
-    await getMinistryApplicationContext();
+  const {
+    applicationId,
+    applicationStatus,
+    canPreview,
+    currentViewMode,
+    organizationId,
+    supabase,
+  } = await getMinistryApplicationContext();
 
   if (!applicationId) {
     return {
       applicationId: null,
       applicationStatus,
+      canPreview,
+      currentViewMode,
       initialValues: {},
       organizationId,
       readOnly: false,
@@ -162,6 +176,8 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
   return {
     applicationId,
     applicationStatus,
+    canPreview,
+    currentViewMode,
     initialValues: {
       annual_ed_review: resolvedVetting?.annual_ed_review ?? undefined,
       attestation_complete: asFormValue(
@@ -358,10 +374,10 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
       whistleblower_policy: resolvedVetting?.whistleblower_policy ?? undefined,
     },
     organizationId,
-    readOnly: isReadOnlyStatus(
-      applicationStatus,
-      resolvedVetting?.submitted_at ?? null,
-    ),
+    readOnly:
+      currentViewMode === "ministry" && canPreview
+        ? true
+        : isReadOnlyStatus(applicationStatus, resolvedVetting?.submitted_at ?? null),
     submittedAt: resolvedVetting?.submitted_at ?? null,
     uploadedDocuments,
   };

@@ -3,14 +3,13 @@ import { redirect } from "next/navigation";
 import { parseReviewerSummary, type ReviewerSummary } from "@/lib/ai/reviewerSummary";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getPathForRole } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
 import { getSaveTier, type SaveTier } from "@/lib/save-tier";
+import { getViewerContext } from "@/lib/view-mode";
 import { parseVoiceAlignmentInsight, type VoiceAlignmentInsight } from "@/lib/voice-alignment";
 import type {
   Applications,
   DonorBrief,
   Organizations,
-  Profile,
   RiskFlag,
   Score,
   VoiceAlignmentSummaryRecord,
@@ -83,59 +82,70 @@ function buildCategorySummary(summary: ReviewerSummary | null) {
   }
 
   const categories = [
-    ["leadership integrity", summary.leadership_integrity.confidence],
-    ["doctrine", summary.doctrine.confidence],
-    ["governance", summary.governance.confidence],
-    ["financial stewardship", summary.financial_stewardship.confidence],
-    ["fruit", summary.fruit.confidence],
+    [
+      "Leadership",
+      summary.leadership_integrity.confidence,
+      summary.leadership_integrity.confidence === "high"
+        ? "strong"
+        : "solid",
+    ],
+    [
+      "Doctrine",
+      summary.doctrine.confidence,
+      summary.doctrine.confidence === "high" ? "clear" : "steady",
+    ],
+    [
+      "Governance",
+      summary.governance.confidence,
+      summary.governance.confidence === "high" ? "strong" : "solid",
+    ],
+    [
+      "Financials",
+      summary.financial_stewardship.confidence,
+      summary.financial_stewardship.confidence === "high" ? "clean" : "stable",
+    ],
+    [
+      "Fruit",
+      summary.fruit.confidence,
+      summary.fruit.confidence === "high" ? "evident" : "visible",
+    ],
   ] as const;
 
-  const strongest = categories
+  const highSignals = categories
     .filter(([, confidence]) => confidence === "high")
-    .map(([label]) => label);
+    .map(([label, , descriptor]) => `${label} ${descriptor}`);
 
-  if (strongest.length >= 3) {
-    return `${strongest.slice(0, 3).join(", ")} show the strongest clarity.`;
+  if (highSignals.length > 0) {
+    return highSignals.slice(0, 3).join(" • ");
   }
 
-  if (strongest.length > 0) {
-    return `${strongest.join(", ")} stand out most clearly in the current review.`;
-  }
-
-  const moderate = categories
+  const moderateSignals = categories
     .filter(([, confidence]) => confidence === "medium")
-    .map(([label]) => label);
+    .map(([label, , descriptor]) => `${label} ${descriptor}`);
 
-  if (moderate.length > 0) {
-    return `${moderate.slice(0, 3).join(", ")} show the clearest support so far.`;
+  if (moderateSignals.length > 0) {
+    return moderateSignals.slice(0, 3).join(" • ");
   }
 
-  return "Further reviewer discernment is needed across the main assessment areas.";
+  return "Mixed signals • Further diligence needed";
 }
 
 export async function requireDonorBriefs() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const viewer = await getViewerContext();
 
-  if (!user) {
+  if (!viewer.userId) {
     redirect("/login");
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-  const resolvedProfile = profile as Pick<Profile, "role"> | null;
-
-  if (!resolvedProfile) {
+  if (!viewer.realRole) {
     redirect("/login");
   }
 
-  if (resolvedProfile.role !== "donor") {
-    redirect(getPathForRole(resolvedProfile.role));
+  if (
+    viewer.realRole !== "donor" &&
+    !(viewer.canPreview && viewer.currentViewMode === "donor")
+  ) {
+    redirect(getPathForRole(viewer.realRole));
   }
 
   const admin = createAdminClient();
@@ -155,7 +165,9 @@ export async function requireDonorBriefs() {
   if (organizationIds.length === 0) {
     return {
       briefs: [] as PublishedBriefCard[],
-      userEmail: user.email ?? null,
+      canPreview: viewer.canPreview,
+      currentViewMode: viewer.currentViewMode,
+      userEmail: viewer.userEmail,
     };
   }
 
@@ -230,6 +242,9 @@ export async function requireDonorBriefs() {
   );
 
   return {
+    canPreview: viewer.canPreview,
+    currentViewMode: viewer.currentViewMode,
+    userEmail: viewer.userEmail,
     briefs: resolvedBriefs
       .map((brief) => {
         const application = applicationMap.get(brief.application_id);
@@ -295,6 +310,5 @@ export async function requireDonorBriefs() {
         };
       })
       .filter((brief): brief is PublishedBriefCard => brief !== null),
-    userEmail: user.email ?? null,
   };
 }

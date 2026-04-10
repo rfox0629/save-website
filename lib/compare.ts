@@ -285,8 +285,15 @@ export async function getReviewerComparisonPageData(
 export async function getDonorComparisonPageData(
   leftValue?: string,
   rightValue?: string,
-): Promise<ComparisonPageData & { userEmail: string | null }> {
-  const { briefs, userEmail } = await requireDonorBriefs();
+): Promise<
+  ComparisonPageData & {
+    canPreview: boolean;
+    currentViewMode: "admin" | "donor" | "ministry";
+    userEmail: string | null;
+  }
+> {
+  const { briefs, canPreview, currentViewMode, userEmail } =
+    await requireDonorBriefs();
   const options = briefs.map((brief) => ({
     label: brief.organization.legal_name,
     value: brief.slug ?? brief.id,
@@ -316,6 +323,8 @@ export async function getDonorComparisonPageData(
   }
 
   return {
+    canPreview,
+    currentViewMode,
     left: await loadRecord(resolvedLeftValue),
     leftValue: resolvedLeftValue,
     options,

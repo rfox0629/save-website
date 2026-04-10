@@ -319,6 +319,10 @@ export function SaveBriefV1({
               Internal and external perspectives were gathered to assess
               alignment between lived culture and public reputation.
             </p>
+            <p className="mt-4 max-w-4xl text-[15px] leading-8 text-[#475A4F]">
+              This includes in-person time with leadership, often around the
+              table, where culture and character become clear.
+            </p>
 
             <div className="mt-5 grid gap-6 lg:grid-cols-[1fr,1fr,1.15fr]">
               <div className="rounded-[28px] border border-[#DCE8DF] bg-[#F7FBF8] p-6">

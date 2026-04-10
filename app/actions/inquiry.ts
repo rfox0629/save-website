@@ -3,20 +3,28 @@
 import { redirect } from "next/navigation";
 
 import { inquiryFormSchema, type InquiryFormValues } from "@/lib/inquiry";
+import {
+  PREVIEW_APPLICATION_ID,
+  PREVIEW_ORGANIZATION_ID,
+} from "@/lib/ministry";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type {
   Applications,
   InquiryResponse,
   Organizations,
-  Profile,
 } from "@/lib/supabase/types";
+import { getViewerContext } from "@/lib/view-mode";
+import type { ViewMode } from "@/lib/view-mode-shared";
 
 type InquiryLoadResult = {
   applicationId: string | null;
   applicationStatus: string | null;
+  currentViewMode: ViewMode;
   initialValues: Partial<InquiryFormValues>;
   readOnly: boolean;
   submittedAt: string | null;
+  canPreview: boolean;
 };
 
 type InquiryDraftResult = {
@@ -25,38 +33,27 @@ type InquiryDraftResult = {
 };
 
 async function getMinistryContext() {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const viewer = await getViewerContext();
 
-  if (!user) {
+  if (!viewer.userId) {
     redirect("/login");
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from("profiles")
-    .select("organization_id, role")
-    .eq("id", user.id)
-    .single();
-  const resolvedProfile = profile as Pick<
-    Profile,
-    "organization_id" | "role"
-  > | null;
+  const isPreviewMinistry =
+    viewer.canPreview && viewer.currentViewMode === "ministry";
 
-  if (
-    profileError ||
-    !resolvedProfile ||
-    resolvedProfile.role !== "ministry" ||
-    !resolvedProfile.organization_id
-  ) {
+  if (!isPreviewMinistry && (!viewer.organizationId || viewer.realRole !== "ministry")) {
     redirect("/dashboard");
   }
 
   return {
-    organizationId: resolvedProfile.organization_id,
-    supabase,
-    user,
+    canPreview: viewer.canPreview,
+    currentViewMode: viewer.currentViewMode,
+    organizationId: isPreviewMinistry
+      ? PREVIEW_ORGANIZATION_ID
+      : viewer.organizationId!,
+    supabase: isPreviewMinistry ? createAdminClient() : createClient(),
+    userId: viewer.userId,
   };
 }
 
@@ -189,15 +186,23 @@ function isReadOnlyStatus(status: string | null, submittedAt: string | null) {
 }
 
 export async function loadInquiryDraft(): Promise<InquiryLoadResult> {
-  const { organizationId, supabase } = await getMinistryContext();
+  const { canPreview, currentViewMode, organizationId, supabase } =
+    await getMinistryContext();
 
-  const { data: application } = await supabase
-    .from("applications")
-    .select("id, status")
-    .eq("organization_id", organizationId)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  const { data: application } =
+    currentViewMode === "ministry" && canPreview
+      ? await supabase
+          .from("applications")
+          .select("id, status")
+          .eq("id", PREVIEW_APPLICATION_ID)
+          .maybeSingle()
+      : await supabase
+          .from("applications")
+          .select("id, status")
+          .eq("organization_id", organizationId)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
   const resolvedApplication = application as Pick<
     Applications,
     "id" | "status"
@@ -276,6 +281,8 @@ export async function loadInquiryDraft(): Promise<InquiryLoadResult> {
   return {
     applicationId: resolvedApplication?.id ?? null,
     applicationStatus: resolvedApplication?.status ?? null,
+    canPreview,
+    currentViewMode,
     initialValues: {
       annual_reach: resolvedInquiry?.annual_reach ?? undefined,
       annual_revenue_range: asFormValue(
@@ -405,10 +412,13 @@ export async function loadInquiryDraft(): Promise<InquiryLoadResult> {
       year_founded: resolvedOrganization?.year_founded ?? undefined,
       years_in_role: resolvedInquiry?.years_in_role ?? undefined,
     },
-    readOnly: isReadOnlyStatus(
-      resolvedApplication?.status ?? null,
-      resolvedInquiry?.submitted_at ?? null,
-    ),
+    readOnly:
+      currentViewMode === "ministry" && canPreview
+        ? true
+        : isReadOnlyStatus(
+            resolvedApplication?.status ?? null,
+            resolvedInquiry?.submitted_at ?? null,
+          ),
     submittedAt: resolvedInquiry?.submitted_at ?? null,
   };
 }

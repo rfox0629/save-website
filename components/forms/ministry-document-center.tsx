@@ -36,11 +36,13 @@ export function MinistryDocumentCenter({
   applicationId,
   documents,
   organizationId,
+  readOnly = false,
   userId,
 }: {
   applicationId: string | null;
   documents: ExistingDocument[];
   organizationId: string;
+  readOnly?: boolean;
   userId: string;
 }) {
   const router = useRouter();
@@ -67,6 +69,11 @@ export function MinistryDocumentCenter({
   async function handleUpload() {
     if (!applicationId) {
       setMessage("No application is available yet.");
+      return;
+    }
+
+    if (readOnly) {
+      setMessage("Document uploads are disabled in preview mode.");
       return;
     }
 
@@ -241,15 +248,17 @@ export function MinistryDocumentCenter({
           Upload New Document
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-7 text-[#4F6357]">
-          Upload PDF documents up to 10MB. New files are added to your review
-          record immediately and appear above once saved.
+          {readOnly
+            ? "Preview mode keeps this document center read-only. Uploads are disabled while you preview the ministry experience."
+            : "Upload PDF documents up to 10MB. New files are added to your review record immediately and appear above once saved."}
         </p>
 
         <div className="mt-8 grid gap-5 md:grid-cols-[220px,1fr]">
           <label className="space-y-2 text-sm font-medium text-[#1B4D35]">
             <span>Document type</span>
             <select
-              className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/20"
+              className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/20 disabled:cursor-not-allowed disabled:bg-[#F4EFE4] disabled:text-[#617367]"
+              disabled={readOnly}
               onChange={(event) =>
                 setSelectedType(
                   event.target.value as (typeof DOCUMENT_TYPE_OPTIONS)[number],
@@ -269,7 +278,8 @@ export function MinistryDocumentCenter({
             <span>Choose file</span>
             <input
               accept=".pdf,application/pdf"
-              className="w-full rounded-2xl border border-dashed border-[#CDBFA3] bg-[#FFFDF8] px-4 py-3 text-sm text-[#4F6357] file:mr-4 file:rounded-full file:border-0 file:bg-[#1B4D35] file:px-4 file:py-2 file:font-medium file:text-white"
+              className="w-full rounded-2xl border border-dashed border-[#CDBFA3] bg-[#FFFDF8] px-4 py-3 text-sm text-[#4F6357] file:mr-4 file:rounded-full file:border-0 file:bg-[#1B4D35] file:px-4 file:py-2 file:font-medium file:text-white disabled:cursor-not-allowed disabled:bg-[#F4EFE4] disabled:text-[#617367]"
+              disabled={readOnly}
               onChange={(event) => setFile(event.target.files?.[0] ?? null)}
               type="file"
             />
@@ -299,11 +309,11 @@ export function MinistryDocumentCenter({
         <div className="mt-8">
           <Button
             className="min-w-[180px] bg-[#1B4D35] text-white hover:bg-[#236645]"
-            disabled={pending}
+            disabled={pending || readOnly}
             onClick={() => void handleUpload()}
             type="button"
           >
-            {pending ? "Uploading..." : "Upload document"}
+            {pending ? "Uploading..." : readOnly ? "Preview only" : "Upload document"}
           </Button>
         </div>
       </section>
