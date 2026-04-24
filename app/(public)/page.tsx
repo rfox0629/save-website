@@ -2,6 +2,165 @@ import Link from "next/link";
 
 import { getCurrentUserRole } from "@/lib/auth";
 
+function HeroWheatBackground() {
+  return (
+    <svg
+      aria-hidden="true"
+      className="pointer-events-none absolute right-[-40px] top-[34px] h-[980px] w-[760px] opacity-70"
+      fill="none"
+      viewBox="0 0 760 980"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path
+        d="M296 976C310 851 341 741 396 635C453 525 530 432 647 332"
+        stroke="#FDF5E0"
+        strokeLinecap="round"
+        strokeWidth="18"
+      />
+      <path
+        d="M425 760C385 737 346 727 297 725"
+        stroke="#FDF5E0"
+        strokeLinecap="round"
+        strokeWidth="12"
+      />
+      <path
+        d="M487 636C439 617 394 611 344 615"
+        stroke="#FDF5E0"
+        strokeLinecap="round"
+        strokeWidth="12"
+      />
+      <path
+        d="M548 524C494 506 449 503 393 507"
+        stroke="#FDF5E0"
+        strokeLinecap="round"
+        strokeWidth="12"
+      />
+      <path
+        d="M607 424C554 411 510 411 455 418"
+        stroke="#FDF5E0"
+        strokeLinecap="round"
+        strokeWidth="12"
+      />
+      <path
+        d="M657 347C618 337 587 336 547 343"
+        stroke="#FDF5E0"
+        strokeLinecap="round"
+        strokeWidth="10"
+      />
+      <path
+        d="M365 628C349 572 346 514 358 440"
+        stroke="#FDF5E0"
+        strokeLinecap="round"
+        strokeWidth="12"
+      />
+      <path
+        d="M441 514C424 450 423 391 437 319"
+        stroke="#FDF5E0"
+        strokeLinecap="round"
+        strokeWidth="12"
+      />
+      <path
+        d="M523 412C508 351 511 285 530 215"
+        stroke="#FDF5E0"
+        strokeLinecap="round"
+        strokeWidth="12"
+      />
+      <path
+        d="M593 329C584 271 592 211 621 159"
+        stroke="#FDF5E0"
+        strokeLinecap="round"
+        strokeWidth="12"
+      />
+      <path
+        d="M688 210C711 184 734 169 760 163"
+        stroke="#FDF5E0"
+        strokeLinecap="round"
+        strokeWidth="10"
+      />
+      <ellipse
+        cx="356"
+        cy="791"
+        fill="#FDF5E0"
+        rx="44"
+        ry="136"
+        transform="rotate(11 356 791)"
+      />
+      <ellipse
+        cx="453"
+        cy="642"
+        fill="#FDF5E0"
+        rx="38"
+        ry="118"
+        transform="rotate(-59 453 642)"
+      />
+      <ellipse
+        cx="524"
+        cy="540"
+        fill="#FDF5E0"
+        rx="35"
+        ry="110"
+        transform="rotate(-58 524 540)"
+      />
+      <ellipse
+        cx="595"
+        cy="439"
+        fill="#FDF5E0"
+        rx="33"
+        ry="102"
+        transform="rotate(-57 595 439)"
+      />
+      <ellipse
+        cx="658"
+        cy="354"
+        fill="#FDF5E0"
+        rx="23"
+        ry="70"
+        transform="rotate(-56 658 354)"
+      />
+      <ellipse
+        cx="717"
+        cy="279"
+        fill="#FDF5E0"
+        rx="16"
+        ry="47"
+        transform="rotate(-54 717 279)"
+      />
+      <ellipse
+        cx="370"
+        cy="581"
+        fill="#FDF5E0"
+        rx="40"
+        ry="120"
+        transform="rotate(5 370 581)"
+      />
+      <ellipse
+        cx="458"
+        cy="456"
+        fill="#FDF5E0"
+        rx="38"
+        ry="116"
+        transform="rotate(8 458 456)"
+      />
+      <ellipse
+        cx="538"
+        cy="313"
+        fill="#FDF5E0"
+        rx="34"
+        ry="108"
+        transform="rotate(18 538 313)"
+      />
+      <ellipse
+        cx="620"
+        cy="222"
+        fill="#FDF5E0"
+        rx="30"
+        ry="95"
+        transform="rotate(28 620 222)"
+      />
+    </svg>
+  );
+}
+
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div className="mb-6 inline-flex items-center gap-2 rounded-[20px] bg-[#E8F0FA] px-[14px] py-[6px] text-[11px] font-semibold uppercase tracking-[0.18em] text-[#2A5FA0]">
@@ -127,8 +286,7 @@ export default async function PublicHomePage() {
   return (
     <main className="overflow-hidden bg-[#F9F6F0] pt-[68px]">
       <section className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-[#FEFCF8] px-6 pb-20 pt-[130px] md:px-[52px] md:pb-20">
-        <div className="pointer-events-none absolute right-[-120px] top-[-80px] h-[600px] w-[600px] rounded-full bg-[#E8F0FA] opacity-60" />
-        <div className="pointer-events-none absolute right-[180px] top-[120px] h-80 w-80 rounded-full bg-[#FDF5E0] opacity-50" />
+        <HeroWheatBackground />
 
         <div className="relative z-10">
           <div className="mb-7 inline-flex items-center gap-[10px] text-[12px] font-semibold uppercase tracking-[0.18em] text-[#2A5FA0]">
