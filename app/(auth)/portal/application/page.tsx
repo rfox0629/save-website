@@ -17,12 +17,12 @@ export default async function ApplicationPage() {
             canPreview={draft.canPreview}
             currentViewMode={draft.currentViewMode}
           />
-          <div className="mx-auto max-w-3xl rounded-[32px] border border-[#D8D1C3] bg-white px-8 py-12 text-center shadow-[0_25px_80px_rgba(27,77,53,0.08)]">
-            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
+          <div className="mx-auto max-w-3xl rounded-[32px] border border-[#D8D1C3] bg-white px-8 py-12 text-center shadow-[0_25px_80px_rgba(26,68,128,0.08)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#7088A5]">
               Complete Application
             </p>
             <h1
-              className="mt-6 text-5xl leading-tight text-[#1B4D35]"
+              className="mt-6 text-5xl leading-tight text-[#1A4480]"
               style={{ fontFamily: "var(--font-auth-serif)" }}
             >
               This form is locked.
@@ -33,7 +33,7 @@ export default async function ApplicationPage() {
             <div className="mt-8">
               <Button
                 asChild
-                className="bg-[#1B4D35] text-white hover:bg-[#236645]"
+                className="bg-[#1A4480] text-white hover:bg-[#2A5FA0]"
               >
                 <Link href="/portal">Back to portal</Link>
               </Button>

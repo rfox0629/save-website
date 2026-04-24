@@ -17,8 +17,8 @@ function PortalNavLink({
     <Link
       className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
         active
-          ? "bg-[#1B4D35] text-white"
-          : "text-[#4F6357] hover:bg-[#EBE4D5] hover:text-[#1B4D35]"
+          ? "bg-[#1A4480] text-white"
+          : "text-[#4F6357] hover:bg-[#EBE4D5] hover:text-[#1A4480]"
       }`}
       href={href}
     >
@@ -37,7 +37,7 @@ export function MinistryNav({
   currentViewMode?: ViewMode;
 }) {
   return (
-    <nav className="rounded-[28px] border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 shadow-[0_18px_40px_rgba(27,77,53,0.06)]">
+    <nav className="rounded-[28px] border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 shadow-[0_18px_40px_rgba(26,68,128,0.06)]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-2">
           <PortalNavLink
@@ -67,7 +67,7 @@ export function MinistryNav({
             canPreview={canPreview}
             currentViewMode={currentViewMode}
           />
-          <SignOutButton className="rounded-full border border-[#D8D1C3] px-4 py-2 text-sm font-semibold text-[#4F6357] transition hover:bg-[#EBE4D5] hover:text-[#1B4D35]" />
+          <SignOutButton className="rounded-full border border-[#D8D1C3] px-4 py-2 text-sm font-semibold text-[#4F6357] transition hover:bg-[#EBE4D5] hover:text-[#1A4480]" />
         </div>
       </div>
     </nav>

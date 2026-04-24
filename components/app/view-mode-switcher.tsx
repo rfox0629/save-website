@@ -31,11 +31,11 @@ export function ViewModeSwitcher({
 
   return (
     <div className="flex items-center">
-      <label className="flex items-center gap-2 text-sm text-[#5E6C62]">
+      <label className="flex items-center gap-2 text-sm text-[#7088A5]">
         <span>Viewing as:</span>
         <select
           aria-label="Select preview mode"
-          className="rounded-full border border-[#D8D1C3] bg-[#FFFDF8] px-3 py-2 text-sm font-semibold text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+          className="rounded-full border border-[#D8D1C3] bg-[#FFFDF8] px-3 py-2 text-sm font-semibold text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10"
           onChange={(event) => setViewMode(event.target.value as ViewMode)}
           value={currentViewMode}
         >

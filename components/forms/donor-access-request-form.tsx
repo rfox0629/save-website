@@ -66,14 +66,14 @@ export function DonorAccessRequestForm() {
 
   if (submitted) {
     return (
-      <section className="rounded-[32px] border border-[#B7D7C4] bg-[#EAF5EE] px-8 py-10">
+      <section className="rounded-[32px] border border-[#B8D2EE] bg-[#E8F0FA] px-8 py-10">
         <h2
-          className="text-3xl text-[#1B4D35]"
+          className="text-3xl text-[#1A4480]"
           style={{ fontFamily: "var(--font-public-serif)" }}
         >
           Thank you.
         </h2>
-        <p className="mt-4 max-w-2xl text-base leading-8 text-[#365342]">
+        <p className="mt-4 max-w-2xl text-base leading-8 text-[#3D5576]">
           Your request will be reviewed within 3 business days.
         </p>
       </section>
@@ -82,44 +82,44 @@ export function DonorAccessRequestForm() {
 
   return (
     <form
-      className="rounded-[32px] border border-[#D8D1C3] bg-white p-8 shadow-[0_20px_60px_rgba(27,77,53,0.07)]"
+      className="rounded-[32px] border border-[#D8D1C3] bg-white p-8 shadow-[0_20px_60px_rgba(26,68,128,0.07)]"
       onSubmit={onSubmit}
     >
       <div className="grid gap-5 md:grid-cols-2">
-        <label className="space-y-2 text-sm font-medium text-[#1B4D35]">
+        <label className="space-y-2 text-sm font-medium text-[#1A4480]">
           <span>Full name</span>
           <input
-            className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/20"
+            className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/20"
             {...form.register("fullName")}
             type="text"
           />
           <FieldError message={form.formState.errors.fullName?.message} />
         </label>
 
-        <label className="space-y-2 text-sm font-medium text-[#1B4D35]">
+        <label className="space-y-2 text-sm font-medium text-[#1A4480]">
           <span>Email</span>
           <input
-            className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/20"
+            className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/20"
             {...form.register("email")}
             type="email"
           />
           <FieldError message={form.formState.errors.email?.message} />
         </label>
 
-        <label className="space-y-2 text-sm font-medium text-[#1B4D35]">
+        <label className="space-y-2 text-sm font-medium text-[#1A4480]">
           <span>Organization or fund name</span>
           <input
-            className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/20"
+            className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/20"
             {...form.register("organization")}
             type="text"
           />
           <FieldError message={form.formState.errors.organization?.message} />
         </label>
 
-        <label className="space-y-2 text-sm font-medium text-[#1B4D35]">
+        <label className="space-y-2 text-sm font-medium text-[#1A4480]">
           <span>How did you hear about SAVE?</span>
           <select
-            className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/20"
+            className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/20"
             {...form.register("referralSource")}
           >
             <option value="Ministry referral">Ministry referral</option>
@@ -131,14 +131,14 @@ export function DonorAccessRequestForm() {
         </label>
       </div>
 
-      <label className="mt-5 block space-y-2 text-sm font-medium text-[#1B4D35]">
+      <label className="mt-5 block space-y-2 text-sm font-medium text-[#1A4480]">
         <span>Brief description of your giving focus</span>
         <textarea
-          className="min-h-[140px] w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/20"
+          className="min-h-[140px] w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/20"
           maxLength={300}
           {...form.register("givingFocus")}
         />
-        <div className="flex items-center justify-between text-xs text-[#6B8570]">
+        <div className="flex items-center justify-between text-xs text-[#7088A5]">
           <FieldError message={form.formState.errors.givingFocus?.message} />
           <span>{form.watch("givingFocus")?.length ?? 0}/300</span>
         </div>
@@ -151,7 +151,7 @@ export function DonorAccessRequestForm() {
       ) : null}
 
       <button
-        className="mt-8 w-full rounded-2xl bg-[#1B4D35] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#236645] disabled:cursor-not-allowed disabled:opacity-70"
+        className="mt-8 w-full rounded-2xl bg-[#1A4480] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#2A5FA0] disabled:cursor-not-allowed disabled:opacity-70"
         disabled={isPending}
         type="submit"
       >

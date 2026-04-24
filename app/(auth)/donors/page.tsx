@@ -7,7 +7,7 @@ export default async function DonorsPage() {
     await requireDonorBriefs();
 
   return (
-    <main className="min-h-screen bg-[#F9F6F0] px-6 py-10 text-[#1B4D35]">
+    <main className="min-h-screen bg-[#F9F6F0] px-6 py-10 text-[#1A4480]">
       <div className="mx-auto max-w-6xl space-y-8">
         <DonorNav
           canPreview={canPreview}

@@ -4,7 +4,7 @@ import { getCurrentUserRole } from "@/lib/auth";
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mb-6 inline-flex items-center gap-2 rounded-[20px] bg-[#EBF5EF] px-[14px] py-[6px] text-[11px] font-semibold uppercase tracking-[0.18em] text-[#236645]">
+    <div className="mb-6 inline-flex items-center gap-2 rounded-[20px] bg-[#E8F0FA] px-[14px] py-[6px] text-[11px] font-semibold uppercase tracking-[0.18em] text-[#2A5FA0]">
       {children}
     </div>
   );
@@ -22,17 +22,17 @@ function HowStep({
   value: string;
 }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-[rgba(27,77,53,0.1)] bg-white px-9 py-10 transition duration-200 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(27,77,53,0.1)]">
-      <div className="absolute inset-x-0 top-0 h-1 bg-[#1B4D35]" />
-      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-[#EBF5EF]">
-        <span className="font-public-serif text-[22px] font-semibold leading-none text-[#1B4D35]">
+    <div className="relative overflow-hidden rounded-2xl border border-[rgba(26,68,128,0.1)] bg-white px-9 py-10 transition duration-200 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(26,68,128,0.1)]">
+      <div className="absolute inset-x-0 top-0 h-1 bg-[#1A4480]" />
+      <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-[#E8F0FA]">
+        <span className="font-public-serif text-[22px] font-semibold leading-none text-[#1A4480]">
           {value}
         </span>
       </div>
-      <h3 className="font-public-serif text-[20px] font-medium text-[#1B4D35]">
+      <h3 className="font-public-serif text-[20px] font-medium text-[#1A4480]">
         {title}
       </h3>
-      <p className="mt-3 text-[15px] leading-[1.75] text-[#3D5C47]">{body}</p>
+      <p className="mt-3 text-[15px] leading-[1.75] text-[#3D5576]">{body}</p>
       <div className="mt-6 inline-flex items-center gap-1.5 rounded-[20px] bg-[#FDF5E0] px-3 py-[5px] text-[11px] font-semibold uppercase tracking-[0.1em] text-[#E8A020]">
         {tag}
       </div>
@@ -83,15 +83,15 @@ function ProcessStep({
       <div
         className={`relative z-10 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border-2 font-mono text-[13px] font-medium transition-colors ${
           statusTone === "green"
-            ? "border-[#1B4D35] bg-white text-[#1B4D35]"
-            : "border-[#1B4D35] bg-white text-[#1B4D35]"
+            ? "border-[#1A4480] bg-white text-[#1A4480]"
+            : "border-[#1A4480] bg-white text-[#1A4480]"
         }`}
       >
         {value}
       </div>
-      <div className="flex-1 rounded-[14px] border border-[rgba(27,77,53,0.1)] bg-white px-6 py-5 transition duration-200 hover:translate-x-1 hover:shadow-[0_4px_24px_rgba(27,77,53,0.08)]">
-        <h4 className="text-[16px] font-semibold text-[#1B4D35]">{label}</h4>
-        <p className="mt-1.5 text-[14px] leading-[1.65] text-[#6B8570]">
+      <div className="flex-1 rounded-[14px] border border-[rgba(26,68,128,0.1)] bg-white px-6 py-5 transition duration-200 hover:translate-x-1 hover:shadow-[0_4px_24px_rgba(26,68,128,0.08)]">
+        <h4 className="text-[16px] font-semibold text-[#1A4480]">{label}</h4>
+        <p className="mt-1.5 text-[14px] leading-[1.65] text-[#7088A5]">
           {description}
         </p>
         <span
@@ -127,26 +127,26 @@ export default async function PublicHomePage() {
   return (
     <main className="overflow-hidden bg-[#F9F6F0] pt-[68px]">
       <section className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-[#FEFCF8] px-6 pb-20 pt-[130px] md:px-[52px] md:pb-20">
-        <div className="pointer-events-none absolute right-[-120px] top-[-80px] h-[600px] w-[600px] rounded-full bg-[#EBF5EF] opacity-60" />
+        <div className="pointer-events-none absolute right-[-120px] top-[-80px] h-[600px] w-[600px] rounded-full bg-[#E8F0FA] opacity-60" />
         <div className="pointer-events-none absolute right-[180px] top-[120px] h-80 w-80 rounded-full bg-[#FDF5E0] opacity-50" />
 
         <div className="relative z-10">
-          <div className="mb-7 inline-flex items-center gap-[10px] text-[12px] font-semibold uppercase tracking-[0.18em] text-[#236645]">
+          <div className="mb-7 inline-flex items-center gap-[10px] text-[12px] font-semibold uppercase tracking-[0.18em] text-[#2A5FA0]">
             <div className="h-1.5 w-1.5 rounded-full bg-[#E8A020]" />
             Trusted Kingdom Giving
           </div>
 
-          <h1 className="font-public-serif max-w-[720px] text-[40px] font-medium leading-[1.1] text-[#1B4D35] md:text-[72px]">
+          <h1 className="font-public-serif max-w-[720px] text-[40px] font-medium leading-[1.1] text-[#1A4480] md:text-[72px]">
             Give with clarity.
             <br />
             Give with{" "}
-            <span className="relative inline-block italic text-[#2D7A52]">
+            <span className="relative inline-block italic text-[#3B7AC2]">
               conviction.
               <span className="absolute inset-x-0 bottom-1 h-[3px] rounded-[2px] bg-[#F5C842]" />
             </span>
           </h1>
 
-          <p className="mt-7 max-w-[520px] text-[18px] leading-[1.75] text-[#3D5C47]">
+          <p className="mt-7 max-w-[520px] text-[18px] leading-[1.75] text-[#3D5576]">
             The SAVE Standard brings clarity to Kingdom giving so business
             leaders and major donors can support Christian ministries with
             confidence, accountability, and joy.
@@ -154,13 +154,13 @@ export default async function PublicHomePage() {
 
           <div className="mt-11 flex flex-wrap gap-[14px]">
             <Link
-              className="inline-block rounded-[8px] bg-[#1B4D35] px-[34px] py-[15px] text-[15px] font-semibold tracking-[0.01em] text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[#236645]"
+              className="inline-block rounded-[8px] bg-[#1A4480] px-[34px] py-[15px] text-[15px] font-semibold tracking-[0.01em] text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[#2A5FA0]"
               href={ministryHref}
             >
               Apply as a Ministry
             </Link>
             <Link
-              className="inline-block rounded-[8px] border border-[#1B4D35] bg-transparent px-[34px] py-[15px] text-[15px] font-semibold tracking-[0.01em] text-[#1B4D35] transition duration-200 hover:-translate-y-0.5 hover:bg-[#EBF5EF]"
+              className="inline-block rounded-[8px] border border-[#1A4480] bg-transparent px-[34px] py-[15px] text-[15px] font-semibold tracking-[0.01em] text-[#1A4480] transition duration-200 hover:-translate-y-0.5 hover:bg-[#E8F0FA]"
               href={donorRequestHref}
             >
               Request Donor Access →
@@ -175,13 +175,13 @@ export default async function PublicHomePage() {
             ["8+", "Data sources"],
           ].map(([value, label]) => (
             <div
-              className="rounded-xl border border-[rgba(27,77,53,0.1)] bg-white px-6 py-5 text-center shadow-[0_4px_24px_rgba(27,77,53,0.07)]"
+              className="rounded-xl border border-[rgba(26,68,128,0.1)] bg-white px-6 py-5 text-center shadow-[0_4px_24px_rgba(26,68,128,0.07)]"
               key={label}
             >
-              <span className="font-public-serif block text-[36px] font-semibold leading-none text-[#1B4D35]">
+              <span className="font-public-serif block text-[36px] font-semibold leading-none text-[#1A4480]">
                 {value}
               </span>
-              <span className="mt-[5px] block text-[11px] font-medium uppercase tracking-[0.1em] text-[#6B8570]">
+              <span className="mt-[5px] block text-[11px] font-medium uppercase tracking-[0.1em] text-[#7088A5]">
                 {label}
               </span>
             </div>
@@ -189,7 +189,7 @@ export default async function PublicHomePage() {
         </div>
       </section>
 
-      <div className="flex gap-12 overflow-x-auto bg-[#1B4D35] px-6 py-5 md:px-[52px]">
+      <div className="flex gap-12 overflow-x-auto bg-[#0E2E5C] px-6 py-5 md:px-[52px]">
         <span className="shrink-0 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.2em] text-[#F5C842]">
           The SAVE Standard includes
         </span>
@@ -221,10 +221,10 @@ export default async function PublicHomePage() {
         id="how"
       >
         <SectionLabel>Process</SectionLabel>
-        <h2 className="font-public-serif max-w-[640px] text-[32px] font-medium leading-[1.15] text-[#1B4D35] md:text-[48px]">
+        <h2 className="font-public-serif max-w-[640px] text-[32px] font-medium leading-[1.15] text-[#1A4480] md:text-[48px]">
           Four steps. <em>No shortcuts.</em>
         </h2>
-        <p className="mt-5 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5C47]">
+        <p className="mt-5 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5576]">
           Every ministry presented through the SAVE Standard has gone through
           the same clear and consistent evaluation. No exceptions. No
           shortcuts. No pay-to-play.
@@ -251,7 +251,7 @@ export default async function PublicHomePage() {
           />
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-2xl border border-l-[4px] border-[rgba(27,77,53,0.1)] border-l-[#E8A020] bg-white transition duration-200 hover:shadow-[0_12px_40px_rgba(27,77,53,0.09)]">
+        <div className="mt-8 overflow-hidden rounded-2xl border border-l-[4px] border-[rgba(26,68,128,0.1)] border-l-[#E8A020] bg-white transition duration-200 hover:shadow-[0_12px_40px_rgba(26,68,128,0.09)]">
           <div className="grid md:grid-cols-[1fr_1px_340px]">
             <div className="px-7 py-9 md:px-12 md:py-11">
               <div className="mb-5 flex items-center gap-3.5">
@@ -264,13 +264,13 @@ export default async function PublicHomePage() {
                   Select organizations only
                 </span>
               </div>
-              <h3 className="font-public-serif text-[26px] font-medium text-[#1B4D35]">
+              <h3 className="font-public-serif text-[26px] font-medium text-[#1A4480]">
                 Relational Discernment
               </h3>
-              <p className="mb-4 mt-2 text-[16px] font-medium leading-[1.5] text-[#236645]">
+              <p className="mb-4 mt-2 text-[16px] font-medium leading-[1.5] text-[#2A5FA0]">
                 Evaluation goes beyond documents. Leadership is seen up close.
               </p>
-              <p className="mb-5 text-[14px] leading-[1.8] text-[#3D5C47]">
+              <p className="mb-5 text-[14px] leading-[1.8] text-[#3D5576]">
                 Documents reveal structure. Conversations reveal intention.
                 Proximity reveals character. The most important things about a
                 leader cannot be captured in a form or an interview. For select
@@ -278,66 +278,66 @@ export default async function PublicHomePage() {
                 with ministry leadership, observing the consistency between
                 what is presented and what is lived.
               </p>
-              <div className="mb-5 rounded-[8px] border-l-[3px] border-l-[#1B4D35] bg-[#EBF5EF] px-[18px] py-[14px] text-[13px] leading-[1.7] text-[#6B8570]">
+              <div className="mb-5 rounded-[8px] border-l-[3px] border-l-[#1A4480] bg-[#E8F0FA] px-[18px] py-[14px] text-[13px] leading-[1.7] text-[#7088A5]">
                 This step is mutual and invitational. It is never entered
                 without the ministry&apos;s full knowledge and consent. It is
                 reserved for organizations being considered for significant
                 giving relationships. It is a mark of trust, not suspicion.
               </div>
               {leadershipAlignment ? (
-                <div className="mb-5 rounded-[18px] border border-[rgba(27,77,53,0.1)] bg-[#FCFAF5] px-5 py-5">
+                <div className="mb-5 rounded-[18px] border border-[rgba(26,68,128,0.1)] bg-[#FCFAF5] px-5 py-5">
                   <div className="mb-4 flex flex-wrap items-center gap-2.5">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#236645]">
+                    <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[#2A5FA0]">
                       Leadership Alignment
                     </p>
-                    <span className="rounded-[20px] border border-[rgba(27,77,53,0.12)] bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6B8570]">
+                    <span className="rounded-[20px] border border-[rgba(26,68,128,0.12)] bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#7088A5]">
                       {leadershipAlignment.status}
                     </span>
                   </div>
-                  <p className="mb-5 text-[13px] leading-[1.7] text-[#6B8570]">
+                  <p className="mb-5 text-[13px] leading-[1.7] text-[#7088A5]">
                     Clarity is strengthened when internal and external
                     perspectives align.
                   </p>
                   <div className="grid gap-4 md:grid-cols-2">
-                    <div className="rounded-[14px] border border-[rgba(27,77,53,0.08)] bg-white px-4 py-4">
-                      <p className="text-[12px] font-semibold text-[#1B4D35]">
+                    <div className="rounded-[14px] border border-[rgba(26,68,128,0.08)] bg-white px-4 py-4">
+                      <p className="text-[12px] font-semibold text-[#1A4480]">
                         Internal Perspective
                       </p>
-                      <p className="mt-1.5 text-[13px] leading-[1.7] text-[#6B8570]">
+                      <p className="mt-1.5 text-[13px] leading-[1.7] text-[#7088A5]">
                         Insights gathered from those within the organization.
                       </p>
-                      <p className="mt-3 text-[13px] leading-[1.7] text-[#3D5C47]">
+                      <p className="mt-3 text-[13px] leading-[1.7] text-[#3D5576]">
                         {leadershipAlignment.internalPerspective}
                       </p>
                     </div>
-                    <div className="rounded-[14px] border border-[rgba(27,77,53,0.08)] bg-white px-4 py-4">
-                      <p className="text-[12px] font-semibold text-[#1B4D35]">
+                    <div className="rounded-[14px] border border-[rgba(26,68,128,0.08)] bg-white px-4 py-4">
+                      <p className="text-[12px] font-semibold text-[#1A4480]">
                         External Perspective
                       </p>
-                      <p className="mt-1.5 text-[13px] leading-[1.7] text-[#6B8570]">
+                      <p className="mt-1.5 text-[13px] leading-[1.7] text-[#7088A5]">
                         Insights gathered from partners and those outside the
                         organization.
                       </p>
-                      <p className="mt-3 text-[13px] leading-[1.7] text-[#3D5C47]">
+                      <p className="mt-3 text-[13px] leading-[1.7] text-[#3D5576]">
                         {leadershipAlignment.externalPerspective}
                       </p>
                     </div>
                   </div>
-                  <div className="mt-4 rounded-[14px] border border-[rgba(27,77,53,0.08)] bg-white px-4 py-4">
-                    <p className="text-[12px] font-semibold text-[#1B4D35]">
+                  <div className="mt-4 rounded-[14px] border border-[rgba(26,68,128,0.08)] bg-white px-4 py-4">
+                    <p className="text-[12px] font-semibold text-[#1A4480]">
                       Alignment Insight
                     </p>
-                    <p className="mt-1.5 text-[13px] leading-[1.7] text-[#6B8570]">
+                    <p className="mt-1.5 text-[13px] leading-[1.7] text-[#7088A5]">
                       A summarized view of how closely internal and external
                       perspectives align.
                     </p>
-                    <p className="mt-3 text-[13px] leading-[1.7] text-[#3D5C47]">
+                    <p className="mt-3 text-[13px] leading-[1.7] text-[#3D5576]">
                       {leadershipAlignment.alignmentInsight}
                     </p>
                   </div>
                 </div>
               ) : null}
-              <p className="text-[14px] leading-[1.6] text-[#3D5C47]">
+              <p className="text-[14px] leading-[1.6] text-[#3D5576]">
                 <em>
                   Integrity is not proven in presentation. It is confirmed in
                   consistency, over time, in proximity, in the ordinary.
@@ -345,10 +345,10 @@ export default async function PublicHomePage() {
               </p>
             </div>
 
-            <div className="mx-10 hidden bg-[rgba(27,77,53,0.1)] md:block" />
+            <div className="mx-10 hidden bg-[rgba(26,68,128,0.1)] md:block" />
 
             <div className="px-7 py-8 md:px-10 md:py-11">
-              <p className="mb-5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#236645]">
+              <p className="mb-5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#2A5FA0]">
                 What this includes
               </p>
               <ul className="space-y-3.5">
@@ -360,7 +360,7 @@ export default async function PublicHomePage() {
                   "Conversations with those closest to the leader",
                 ].map((item) => (
                   <li
-                    className="flex items-start gap-3 text-[14px] leading-[1.55] text-[#3D5C47]"
+                    className="flex items-start gap-3 text-[14px] leading-[1.55] text-[#3D5576]"
                     key={item}
                   >
                     <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#E8A020]" />
@@ -379,18 +379,18 @@ export default async function PublicHomePage() {
       >
         <div>
           <SectionLabel>Why it matters</SectionLabel>
-          <h2 className="font-public-serif max-w-[640px] text-[32px] font-medium leading-[1.15] text-[#1B4D35] md:text-[48px]">
+          <h2 className="font-public-serif max-w-[640px] text-[32px] font-medium leading-[1.15] text-[#1A4480] md:text-[48px]">
             Discernment is not doubt.
             <br />
             <em>It is wisdom.</em>
           </h2>
-          <p className="mt-5 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5C47]">
+          <p className="mt-5 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5576]">
             Billions of dollars flow to Christian ministries every year. Very
             little of it is clearly understood. Most donors give based on
             relationship,
             reputation, or a compelling story.
           </p>
-          <p className="mt-4 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5C47]">
+          <p className="mt-4 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5576]">
             Those are not bad starting points. But they are not enough.
           </p>
 
@@ -410,14 +410,14 @@ export default async function PublicHomePage() {
               ],
             ].map(([title, body]) => (
               <div
-                className="flex items-start gap-4 rounded-xl border border-[rgba(27,77,53,0.1)] bg-[#EBF5EF] p-5 transition duration-200 hover:translate-x-1"
+                className="flex items-start gap-4 rounded-xl border border-[rgba(26,68,128,0.1)] bg-[#E8F0FA] p-5 transition duration-200 hover:translate-x-1"
                 key={title}
               >
-                <div className="mt-px flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-[#1B4D35] text-[#F5C842]">
+                <div className="mt-px flex h-9 w-9 shrink-0 items-center justify-center rounded-[8px] bg-[#1A4480] text-[#F5C842]">
                   ✓
                 </div>
-                <div className="text-[14px] leading-[1.7] text-[#3D5C47]">
-                  <strong className="mb-1 block text-[15px] font-semibold text-[#1B4D35]">
+                <div className="text-[14px] leading-[1.7] text-[#3D5576]">
+                  <strong className="mb-1 block text-[15px] font-semibold text-[#1A4480]">
                     {title}
                   </strong>
                   {body}
@@ -427,13 +427,13 @@ export default async function PublicHomePage() {
           </div>
         </div>
 
-        <div className="border-t border-[rgba(27,77,53,0.2)] pt-10 md:border-l md:border-t-0 md:pl-[60px] md:pt-0">
-          <blockquote className="font-public-serif mb-4 border-l-[3px] border-l-[#E8A020] pl-5 text-[22px] italic leading-[1.5] text-[#1B4D35]">
+        <div className="border-t border-[rgba(26,68,128,0.2)] pt-10 md:border-l md:border-t-0 md:pl-[60px] md:pt-0">
+          <blockquote className="font-public-serif mb-4 border-l-[3px] border-l-[#E8A020] pl-5 text-[22px] italic leading-[1.5] text-[#1A4480]">
             &quot;Faithful stewardship starts with honest information, about
             the mission, the leadership, and the evidence of lasting
             fruit.&quot;
           </blockquote>
-          <p className="mb-11 pl-5 text-[12px] font-semibold uppercase tracking-[0.1em] text-[#6B8570]">
+          <p className="mb-11 pl-5 text-[12px] font-semibold uppercase tracking-[0.1em] text-[#7088A5]">
             SAVE Foundation
           </p>
 
@@ -442,7 +442,7 @@ export default async function PublicHomePage() {
               <span className="inline-block h-[14px] w-[14px] rotate-45 bg-[#E8A020]" />
               Our independence guarantee
             </div>
-            <p className="text-[14px] leading-[1.7] text-[#3D5C47]">
+            <p className="text-[14px] leading-[1.7] text-[#3D5576]">
               No ministry pays to be recommended. No brief is issued without
               human review. Every recommendation reflects the data,
               nothing else.
@@ -452,7 +452,7 @@ export default async function PublicHomePage() {
       </section>
 
       <section
-        className="bg-[#1B4D35] px-6 py-16 md:px-[52px] md:py-24"
+        className="bg-[#0E2E5C] px-6 py-16 md:px-[52px] md:py-24"
         id="model"
       >
         <div className="mb-6 inline-flex items-center gap-2 rounded-[20px] bg-[rgba(255,255,255,0.12)] px-[14px] py-[6px] text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F5C842]">
@@ -501,8 +501,8 @@ export default async function PublicHomePage() {
 
         <div className="mt-9 flex flex-wrap gap-6">
           {[
-            ["#3D8A5A", "85–100 Strongly recommended"],
-            ["#7AB08A", "70–84 Recommended"],
+            ["#3B7AC2", "85–100 Strongly recommended"],
+            ["#7FB3E8", "70–84 Recommended"],
             ["#D4A520", "55–69 Conditional"],
             ["#C0392B", "Below 55 Not recommended"],
           ].map(([color, label]) => (
@@ -521,16 +521,16 @@ export default async function PublicHomePage() {
       </section>
 
       <section className="grid xl:grid-cols-2" id="audience">
-        <div className="border-b border-[rgba(27,77,53,0.1)] bg-[#EBF5EF] px-6 py-[56px] md:px-16 md:py-[88px] xl:border-b-0 xl:border-r">
-          <div className="mb-7 inline-flex items-center gap-2 rounded-[20px] border-[1.5px] border-[rgba(27,77,53,0.2)] bg-white px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#1B4D35]">
+        <div className="border-b border-[rgba(26,68,128,0.1)] bg-[#E8F0FA] px-6 py-[56px] md:px-16 md:py-[88px] xl:border-b-0 xl:border-r">
+          <div className="mb-7 inline-flex items-center gap-2 rounded-[20px] border-[1.5px] border-[rgba(26,68,128,0.2)] bg-white px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#1A4480]">
             For Ministries
           </div>
-          <h2 className="font-public-serif text-[32px] font-medium leading-[1.2] text-[#1B4D35]">
+          <h2 className="font-public-serif text-[32px] font-medium leading-[1.2] text-[#1A4480]">
             If your work is real,
             <br />
             you have nothing to <em>fear.</em>
           </h2>
-          <p className="mb-8 mt-4 max-w-[400px] text-[15px] leading-[1.8] text-[#3D5C47]">
+          <p className="mb-8 mt-4 max-w-[400px] text-[15px] leading-[1.8] text-[#3D5576]">
             The SAVE Standard gives your ministry credibility with serious
             donors. It signals accountability. It connects you to givers
             aligned with what you have built.
@@ -544,10 +544,10 @@ export default async function PublicHomePage() {
               "Annual evaluation required to maintain active status",
             ].map((item) => (
               <li
-                className="flex items-start gap-2.5 rounded-[10px] border border-[rgba(27,77,53,0.1)] bg-white px-4 py-3 text-[14px] leading-[1.5] text-[#3D5C47]"
+                className="flex items-start gap-2.5 rounded-[10px] border border-[rgba(26,68,128,0.1)] bg-white px-4 py-3 text-[14px] leading-[1.5] text-[#3D5576]"
                 key={item}
               >
-                <div className="mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-[1.5px] border-[#1B4D35] bg-[#EBF5EF] text-[10px] text-[#1B4D35]">
+                <div className="mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-[1.5px] border-[#1A4480] bg-[#E8F0FA] text-[10px] text-[#1A4480]">
                   ✓
                 </div>
                 {item}
@@ -555,7 +555,7 @@ export default async function PublicHomePage() {
             ))}
           </ul>
           <Link
-            className="inline-block rounded-[8px] bg-[#1B4D35] px-[34px] py-[15px] text-[15px] font-semibold tracking-[0.01em] text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[#236645]"
+            className="inline-block rounded-[8px] bg-[#1A4480] px-[34px] py-[15px] text-[15px] font-semibold tracking-[0.01em] text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[#2A5FA0]"
             href="/portal/inquiry"
           >
             Begin Your Application →
@@ -563,15 +563,15 @@ export default async function PublicHomePage() {
         </div>
 
         <div className="bg-[#FDF5E0] px-6 py-[56px] md:px-16 md:py-[88px]">
-          <div className="mb-7 inline-flex items-center gap-2 rounded-[20px] border-[1.5px] border-[rgba(27,77,53,0.2)] bg-white px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#1B4D35]">
+          <div className="mb-7 inline-flex items-center gap-2 rounded-[20px] border-[1.5px] border-[rgba(26,68,128,0.2)] bg-white px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#1A4480]">
             For Donors
           </div>
-          <h2 className="font-public-serif text-[32px] font-medium leading-[1.2] text-[#1B4D35]">
+          <h2 className="font-public-serif text-[32px] font-medium leading-[1.2] text-[#1A4480]">
             Give with confidence.
             <br />
             Give with <em>conviction.</em>
           </h2>
-          <p className="mb-8 mt-4 max-w-[400px] text-[15px] leading-[1.8] text-[#3D5C47]">
+          <p className="mb-8 mt-4 max-w-[400px] text-[15px] leading-[1.8] text-[#3D5576]">
             You&apos;ve built something. You want it to matter beyond your
             lifetime. The SAVE Standard brings clarity and documents every
             step.
@@ -585,7 +585,7 @@ export default async function PublicHomePage() {
               "Direct connection to ministry leadership",
             ].map((item) => (
               <li
-                className="flex items-start gap-2.5 rounded-[10px] border border-[rgba(27,77,53,0.1)] bg-white px-4 py-3 text-[14px] leading-[1.5] text-[#3D5C47]"
+                className="flex items-start gap-2.5 rounded-[10px] border border-[rgba(26,68,128,0.1)] bg-white px-4 py-3 text-[14px] leading-[1.5] text-[#3D5576]"
                 key={item}
               >
                 <div className="mt-px flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-[1.5px] border-[#E8A020] bg-[#FDF5E0] text-[10px] text-[#9A6800]">
@@ -596,7 +596,7 @@ export default async function PublicHomePage() {
             ))}
           </ul>
           <Link
-            className="inline-block rounded-[8px] border border-[#1B4D35] bg-transparent px-[34px] py-[15px] text-[15px] font-semibold tracking-[0.01em] text-[#1B4D35] transition duration-200 hover:-translate-y-0.5 hover:bg-[#EBF5EF]"
+            className="inline-block rounded-[8px] border border-[#1A4480] bg-transparent px-[34px] py-[15px] text-[15px] font-semibold tracking-[0.01em] text-[#1A4480] transition duration-200 hover:-translate-y-0.5 hover:bg-[#E8F0FA]"
             href={donorExploreHref}
           >
             Explore Verified Ministries →
@@ -609,14 +609,14 @@ export default async function PublicHomePage() {
         id="process"
       >
         <SectionLabel>Timeline</SectionLabel>
-        <h2 className="font-public-serif text-[32px] font-medium leading-[1.15] text-[#1B4D35] md:text-[48px]">
+        <h2 className="font-public-serif text-[32px] font-medium leading-[1.15] text-[#1A4480] md:text-[48px]">
           From inquiry to
           <br />
           <em>funded ministry.</em>
         </h2>
 
         <div className="relative mt-14 max-w-[680px]">
-          <div className="absolute bottom-12 left-[23px] top-12 w-0.5 rounded-[2px] bg-[linear-gradient(to_bottom,#1B4D35_0%,#EBF5EF_100%)]" />
+          <div className="absolute bottom-12 left-[23px] top-12 w-0.5 rounded-[2px] bg-[linear-gradient(to_bottom,#1A4480_0%,#E8F0FA_100%)]" />
           <ProcessStep
             description="Structured 10–15 minute application. Leadership, doctrine, and financials at a surface level."
             label="Ministry submits inquiry"
@@ -666,35 +666,35 @@ export default async function PublicHomePage() {
         className="relative overflow-hidden bg-[#FEFCF8] px-6 py-[120px] text-center md:px-[52px]"
         id="cta"
       >
-        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#EBF5EF] opacity-50" />
+        <div className="pointer-events-none absolute left-1/2 top-1/2 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#E8F0FA] opacity-50" />
         <div className="relative z-10">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-[20px] bg-[#EBF5EF] px-[14px] py-[6px] text-[11px] font-semibold uppercase tracking-[0.18em] text-[#236645]">
+          <div className="mb-6 inline-flex items-center gap-2 rounded-[20px] bg-[#E8F0FA] px-[14px] py-[6px] text-[11px] font-semibold uppercase tracking-[0.18em] text-[#2A5FA0]">
             Get started
           </div>
-          <h2 className="font-public-serif mx-auto max-w-[760px] text-[32px] font-medium leading-[1.15] text-[#1B4D35] md:text-[48px]">
+          <h2 className="font-public-serif mx-auto max-w-[760px] text-[32px] font-medium leading-[1.15] text-[#1A4480] md:text-[48px]">
             Faithful generosity starts with
             <br />
             <em>honest information.</em>
           </h2>
-          <p className="mx-auto mt-4 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5C47]">
+          <p className="mx-auto mt-4 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5576]">
             Ministries ready for accountability and donors ready to give with
             confidence begin here.
           </p>
           <div className="relative mb-9 mt-11 flex flex-wrap justify-center gap-4">
             <Link
-              className="inline-block rounded-[8px] bg-[#1B4D35] px-[34px] py-[15px] text-[15px] font-semibold tracking-[0.01em] text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[#236645]"
+              className="inline-block rounded-[8px] bg-[#1A4480] px-[34px] py-[15px] text-[15px] font-semibold tracking-[0.01em] text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[#2A5FA0]"
               href={ministryHref}
             >
               Apply as a Ministry
             </Link>
             <Link
-              className="inline-block rounded-[8px] border border-[#1B4D35] bg-transparent px-[34px] py-[15px] text-[15px] font-semibold tracking-[0.01em] text-[#1B4D35] transition duration-200 hover:-translate-y-0.5 hover:bg-[#EBF5EF]"
+              className="inline-block rounded-[8px] border border-[#1A4480] bg-transparent px-[34px] py-[15px] text-[15px] font-semibold tracking-[0.01em] text-[#1A4480] transition duration-200 hover:-translate-y-0.5 hover:bg-[#E8F0FA]"
               href={donorRequestHref}
             >
               Request Donor Access →
             </Link>
           </div>
-          <p className="relative text-[12px] font-medium tracking-[0.06em] text-[#6B8570]">
+          <p className="relative text-[12px] font-medium tracking-[0.06em] text-[#7088A5]">
             No ministry pays to be recommended. All briefs include human
             review. Annual evaluation required.
           </p>

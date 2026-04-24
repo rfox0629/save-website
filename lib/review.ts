@@ -222,7 +222,7 @@ export function getStatusLabel(status: string) {
 
 export function getStatusPillClass(status: string) {
   if (status === "approved") {
-    return "border-emerald-400/20 bg-emerald-400/10 text-emerald-200";
+    return "border-blue-400/20 bg-blue-400/10 text-blue-200";
   }
 
   if (status === "under_review" || status === "inquiry_approved") {
@@ -246,7 +246,7 @@ export function getScoreTone(score: number | null) {
   }
 
   if (score >= 80) {
-    return "text-emerald-300";
+    return "text-blue-300";
   }
 
   if (score >= 60) {

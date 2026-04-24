@@ -8,7 +8,7 @@ export default async function PortalDocumentsPage() {
   const context = await requireMinistryContext();
 
   return (
-    <main className="min-h-screen bg-[#F9F6F0] px-6 py-10 text-[#1B4D35]">
+    <main className="min-h-screen bg-[#F9F6F0] px-6 py-10 text-[#1A4480]">
       <div className="mx-auto max-w-6xl space-y-8">
         <MinistryNav
           active="documents"
@@ -16,14 +16,14 @@ export default async function PortalDocumentsPage() {
           currentViewMode={context.currentViewMode}
         />
 
-        <section className="rounded-[32px] border border-[#D8D1C3] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EFE4_100%)] p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)] md:p-10">
+        <section className="rounded-[32px] border border-[#D8D1C3] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EFE4_100%)] p-8 shadow-[0_25px_80px_rgba(26,68,128,0.08)] md:p-10">
           <Link
-            className="text-sm font-semibold text-[#6B8570] hover:text-[#1B4D35]"
+            className="text-sm font-semibold text-[#7088A5] hover:text-[#1A4480]"
             href="/portal"
           >
             Back to portal
           </Link>
-          <p className="mt-5 text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
+          <p className="mt-5 text-sm font-semibold uppercase tracking-[0.35em] text-[#7088A5]">
             Ministry Documents
           </p>
           <h1

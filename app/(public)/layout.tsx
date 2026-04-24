@@ -16,7 +16,7 @@ const publicSerif = Playfair_Display({
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
     <div
-      className={`${publicSans.variable} ${publicSerif.variable} font-public-sans bg-[#F9F6F0] text-[#1A2E20]`}
+      className={`${publicSans.variable} ${publicSerif.variable} font-public-sans bg-[#F9F6F0] text-[#0E2E5C]`}
     >
       <PublicChrome>{children}</PublicChrome>
     </div>

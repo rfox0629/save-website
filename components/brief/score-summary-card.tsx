@@ -28,7 +28,7 @@ function getBandLabel(score: number) {
 function getBandClass(score: number, variant: "dark" | "light") {
   if (variant === "dark") {
     if (score >= 80) {
-      return "border-emerald-400/20 bg-emerald-400/10 text-emerald-200";
+      return "border-blue-400/20 bg-blue-400/10 text-blue-200";
     }
 
     if (score >= 65) {
@@ -39,7 +39,7 @@ function getBandClass(score: number, variant: "dark" | "light") {
   }
 
   if (score >= 80) {
-    return "border-emerald-200 bg-emerald-50 text-emerald-900";
+    return "border-blue-200 bg-blue-50 text-blue-900";
   }
 
   if (score >= 65) {
@@ -60,11 +60,11 @@ export function ScoreSummaryCard({
 }) {
   const isLight = variant === "light";
   const shellClass = isLight
-    ? "border-[#E3DCCF] bg-white text-[#23372B]"
+    ? "border-[#E3DCCF] bg-white text-[#0E2E5C]"
     : "border-white/10 bg-white/[0.03] text-white";
-  const mutedTextClass = isLight ? "text-[#617367]" : "text-slate-300";
+  const mutedTextClass = isLight ? "text-[#7088A5]" : "text-slate-300";
   const sectionLabelClass = isLight
-    ? "text-[#6B8570]"
+    ? "text-[#7088A5]"
     : "text-[#C09A45]";
   const cardClass = isLight
     ? "border-[#E3DCCF] bg-[#FCFAF5]"
@@ -118,7 +118,7 @@ export function ScoreSummaryCard({
               }`}
             >
               <div
-                className={isLight ? "h-full rounded-full bg-[#1B4D35]" : "h-full rounded-full bg-[#C09A45]"}
+                className={isLight ? "h-full rounded-full bg-[#1A4480]" : "h-full rounded-full bg-[#C09A45]"}
                 style={{ width: `${Math.max(0, Math.min(100, (Number(score) / Number(max)) * 100))}%` }}
               />
             </div>

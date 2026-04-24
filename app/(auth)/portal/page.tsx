@@ -57,7 +57,7 @@ function TimelineStep({
 
         <p
           className={`mt-4 max-w-[150px] text-sm font-semibold leading-5 ${
-            isCurrent ? "text-[#1B4D35]" : "text-[#617367]"
+            isCurrent ? "text-[#1A4480]" : "text-[#7088A5]"
           }`}
         >
           {label}
@@ -94,7 +94,7 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
         action: (
           <Button
             asChild
-            className="bg-[#1B4D35] text-white hover:bg-[#236645]"
+            className="bg-[#1A4480] text-white hover:bg-[#2A5FA0]"
           >
             <Link href="/portal/application">Open Complete Application</Link>
           </Button>
@@ -137,7 +137,7 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
         action: publishedBrief ? (
           <Button
             asChild
-            className="bg-[#1B4D35] text-white hover:bg-[#236645]"
+            className="bg-[#1A4480] text-white hover:bg-[#2A5FA0]"
           >
             <Link href={`/donors/${publishedBrief.slug}`}>
               View published brief
@@ -169,7 +169,7 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
   })();
 
   return (
-    <main className="min-h-screen bg-[#F9F6F0] px-6 py-10 text-[#1B4D35]">
+    <main className="min-h-screen bg-[#F9F6F0] px-6 py-10 text-[#1A4480]">
       <div className="mx-auto max-w-6xl space-y-8">
         <MinistryNav
           active="overview"
@@ -178,7 +178,7 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
         />
 
         {showWelcome ? (
-          <section className="rounded-[28px] border border-[#B7D7C4] bg-[#EAF5EE] px-6 py-5 text-[#1B4D35]">
+          <section className="rounded-[28px] border border-[#B8D2EE] bg-[#E8F0FA] px-6 py-5 text-[#1A4480]">
             <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#2F7A53]">
               Welcome
             </p>
@@ -189,8 +189,8 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
           </section>
         ) : null}
 
-        <section className="rounded-[32px] border border-[#D8D1C3] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EFE4_100%)] p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)] md:p-10">
-          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
+        <section className="rounded-[32px] border border-[#D8D1C3] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EFE4_100%)] p-8 shadow-[0_25px_80px_rgba(26,68,128,0.08)] md:p-10">
+          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#7088A5]">
             Ministry Portal
           </p>
           <h1
@@ -205,8 +205,8 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
           </p>
         </section>
 
-        <section className="rounded-[32px] border border-[#D8D1C3] bg-white p-6 shadow-[0_20px_60px_rgba(27,77,53,0.07)] md:p-8">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
+        <section className="rounded-[32px] border border-[#D8D1C3] bg-white p-6 shadow-[0_20px_60px_rgba(26,68,128,0.07)] md:p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7088A5]">
             Application Timeline
           </p>
           <div className="mt-8 overflow-x-auto pb-2">
@@ -231,8 +231,8 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="rounded-[32px] border border-[#D8D1C3] bg-white p-8 shadow-[0_20px_60px_rgba(27,77,53,0.07)]">
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
+          <div className="rounded-[32px] border border-[#D8D1C3] bg-white p-8 shadow-[0_20px_60px_rgba(26,68,128,0.07)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7088A5]">
               Status
             </p>
             <h2
@@ -250,31 +250,31 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
             ) : null}
           </div>
 
-          <div className="rounded-[32px] border border-[#D8D1C3] bg-[#FFFDF8] p-8 shadow-[0_20px_60px_rgba(27,77,53,0.07)]">
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
+          <div className="rounded-[32px] border border-[#D8D1C3] bg-[#FFFDF8] p-8 shadow-[0_20px_60px_rgba(26,68,128,0.07)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7088A5]">
               Quick Links
             </p>
             <div className="mt-6 grid gap-3">
               <Link
-                className="rounded-2xl border border-[#D8D1C3] px-5 py-4 text-sm font-semibold text-[#1B4D35] transition hover:bg-[#F4EFE4]"
+                className="rounded-2xl border border-[#D8D1C3] px-5 py-4 text-sm font-semibold text-[#1A4480] transition hover:bg-[#F4EFE4]"
                 href="/portal"
               >
                 Overview
               </Link>
               <Link
-                className="rounded-2xl border border-[#D8D1C3] px-5 py-4 text-sm font-semibold text-[#1B4D35] transition hover:bg-[#F4EFE4]"
+                className="rounded-2xl border border-[#D8D1C3] px-5 py-4 text-sm font-semibold text-[#1A4480] transition hover:bg-[#F4EFE4]"
                 href="/portal/inquiry"
               >
                 Inquiry
               </Link>
               <Link
-                className="rounded-2xl border border-[#D8D1C3] px-5 py-4 text-sm font-semibold text-[#1B4D35] transition hover:bg-[#F4EFE4]"
+                className="rounded-2xl border border-[#D8D1C3] px-5 py-4 text-sm font-semibold text-[#1A4480] transition hover:bg-[#F4EFE4]"
                 href="/portal/application"
               >
                 Complete Application
               </Link>
               <Link
-                className="rounded-2xl border border-[#D8D1C3] px-5 py-4 text-sm font-semibold text-[#1B4D35] transition hover:bg-[#F4EFE4]"
+                className="rounded-2xl border border-[#D8D1C3] px-5 py-4 text-sm font-semibold text-[#1A4480] transition hover:bg-[#F4EFE4]"
                 href="/portal/documents"
               >
                 Documents
@@ -283,9 +283,9 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
           </div>
         </section>
 
-        <section className="rounded-[32px] border border-[#D8D1C3] bg-white shadow-[0_20px_60px_rgba(27,77,53,0.07)]">
+        <section className="rounded-[32px] border border-[#D8D1C3] bg-white shadow-[0_20px_60px_rgba(26,68,128,0.07)]">
           <div className="border-b border-[#E5DED1] px-8 py-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7088A5]">
               Documents
             </p>
             <h2
@@ -301,7 +301,7 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
 
           <div className="overflow-x-auto">
             <table className="min-w-full text-left text-sm">
-              <thead className="border-b border-[#E5DED1] bg-[#FFFDF8] text-[#6B8570]">
+              <thead className="border-b border-[#E5DED1] bg-[#FFFDF8] text-[#7088A5]">
                 <tr>
                   <th className="px-8 py-4 font-semibold">Name</th>
                   <th className="px-8 py-4 font-semibold">Type</th>
@@ -314,7 +314,7 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
                     <td className="px-8 py-5">
                       {document.signedUrl ? (
                         <a
-                          className="font-medium text-[#1B4D35] underline-offset-4 hover:underline"
+                          className="font-medium text-[#1A4480] underline-offset-4 hover:underline"
                           href={document.signedUrl}
                           rel="noreferrer"
                           target="_blank"
@@ -322,7 +322,7 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
                           {document.file_name}
                         </a>
                       ) : (
-                        <span className="font-medium text-[#1B4D35]">
+                        <span className="font-medium text-[#1A4480]">
                           {document.file_name}
                         </span>
                       )}

@@ -102,7 +102,7 @@ function getRecommendationClass(level: string | null) {
     level === "Recommended" ||
     level === "Recommend"
   ) {
-    return "border-emerald-200 bg-emerald-50 text-emerald-900";
+    return "border-blue-200 bg-blue-50 text-blue-900";
   }
 
   if (
@@ -128,12 +128,12 @@ function getRiskFlagClass(severity: PublishedBriefCard["highestRiskSeverity"]) {
     return "border-stone-200 bg-stone-50 text-stone-700";
   }
 
-  return "border-emerald-200 bg-emerald-50 text-emerald-900";
+  return "border-blue-200 bg-blue-50 text-blue-900";
 }
 
 function getAlignmentClass(status: NonNullable<PublishedBriefCard["voiceAlignment"]>["status"]) {
   if (status === "aligned") {
-    return "border-emerald-200 bg-emerald-50 text-emerald-900";
+    return "border-blue-200 bg-blue-50 text-blue-900";
   }
 
   if (status === "partially_aligned") {
@@ -150,12 +150,12 @@ export function DonorHome({ briefs }: DonorHomeProps) {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-[32px] border border-[#D8D1C3] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EFE4_100%)] p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)] md:p-10">
-        <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
+      <section className="rounded-[32px] border border-[#D8D1C3] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EFE4_100%)] p-8 shadow-[0_25px_80px_rgba(26,68,128,0.08)] md:p-10">
+        <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#7088A5]">
           Donor Access
         </p>
         <h1
-          className="mt-4 text-4xl leading-tight text-[#1B4D35] md:text-5xl"
+          className="mt-4 text-4xl leading-tight text-[#1A4480] md:text-5xl"
           style={{ fontFamily: "var(--font-auth-serif)" }}
         >
           Verified Ministries
@@ -168,16 +168,16 @@ export function DonorHome({ briefs }: DonorHomeProps) {
       </section>
 
       {briefs.length === 0 ? (
-        <section className="rounded-[32px] border border-dashed border-[#D8D1C3] bg-[#FFFDF8] px-8 py-14 text-center shadow-[0_20px_60px_rgba(27,77,53,0.05)]">
+        <section className="rounded-[32px] border border-dashed border-[#D8D1C3] bg-[#FFFDF8] px-8 py-14 text-center shadow-[0_20px_60px_rgba(26,68,128,0.05)]">
           <p
-            className="text-3xl text-[#1B4D35]"
+            className="text-3xl text-[#1A4480]"
             style={{ fontFamily: "var(--font-auth-serif)" }}
           >
             The first verified ministries will be listed here soon.
           </p>
         </section>
       ) : (
-        <section className="overflow-hidden rounded-[32px] border border-[#D8D1C3] bg-white shadow-[0_20px_60px_rgba(27,77,53,0.07)]">
+        <section className="overflow-hidden rounded-[32px] border border-[#D8D1C3] bg-white shadow-[0_20px_60px_rgba(26,68,128,0.07)]">
           <div className="border-b border-[#E5DED1] bg-[#FFFDF8] px-6 py-5 md:px-8">
             <div className="grid gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-[#7A867D] md:grid-cols-[minmax(0,2.2fr)_140px_220px_minmax(0,1.5fr)_130px_120px]">
               <span>Ministry</span>
@@ -221,12 +221,12 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                   >
                     <div>
                       <h2
-                        className="text-[20px] leading-7 text-[#1B4D35]"
+                        className="text-[20px] leading-7 text-[#1A4480]"
                         style={{ fontFamily: "var(--font-auth-serif)" }}
                       >
                         {brief.organization.legal_name}
                       </h2>
-                      <p className="mt-1 text-sm text-[#6B8570]">
+                      <p className="mt-1 text-sm text-[#7088A5]">
                         {brief.headline ||
                           (brief.organization.primary_focus ?? []).join(", ") ||
                           "Verified ministry"}
@@ -234,7 +234,7 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                     </div>
 
                     <div>
-                      <p className="text-2xl font-semibold text-[#1B4D35]">
+                      <p className="text-2xl font-semibold text-[#1A4480]">
                         {scoreValue ?? "—"}
                       </p>
                       <p className="mt-1 text-xs uppercase tracking-[0.18em] text-[#8B7A57]">
@@ -269,7 +269,7 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                     </div>
 
                     <div className="flex items-start justify-end">
-                      <span className="inline-flex items-center rounded-full border border-[#1B4D35] px-4 py-2 text-sm font-semibold text-[#1B4D35] transition group-hover:bg-[#F4EFE4]">
+                      <span className="inline-flex items-center rounded-full border border-[#1A4480] px-4 py-2 text-sm font-semibold text-[#1A4480] transition group-hover:bg-[#F4EFE4]">
                         View Brief
                       </span>
                     </div>
@@ -285,7 +285,7 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8B7A57]">
                                   SAVE Score
                                 </p>
-                                <p className="mt-3 text-5xl font-semibold leading-none text-[#1B4D35]">
+                                <p className="mt-3 text-5xl font-semibold leading-none text-[#1A4480]">
                                   {scoreValue ?? "—"}
                                 </p>
                               </div>
@@ -317,7 +317,7 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                                   <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#8B7A57]">
                                     Final Recommendation
                                   </p>
-                                  <p className="mt-2 text-[28px] leading-tight text-[#1B4D35]">
+                                  <p className="mt-2 text-[28px] leading-tight text-[#1A4480]">
                                     {scoreValue ?? "—"} — {brief.recommendationLabel}
                                   </p>
                                   <p className="mt-2 text-sm text-[#4F6357]">
@@ -329,7 +329,7 @@ export function DonorHome({ briefs }: DonorHomeProps) {
 
                             <div className="flex flex-wrap items-center gap-3">
                               <Link
-                                className="inline-flex items-center rounded-full bg-[#1B4D35] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#236645]"
+                                className="inline-flex items-center rounded-full bg-[#1A4480] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#2A5FA0]"
                                 href={`/donors/${brief.slug}`}
                               >
                                 View Brief
@@ -356,7 +356,7 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                                   {keyStrengths.slice(0, 2).map((item) => (
                                     <p
                                       key={`strength-${item}`}
-                                      className="text-sm font-medium text-[#1B4D35]"
+                                      className="text-sm font-medium text-[#1A4480]"
                                     >
                                       <span className="mr-2 text-[#2F7A53]">✔</span>
                                       {item}
@@ -365,7 +365,7 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                                   {keyRisks.slice(0, 2).map((item) => (
                                     <p
                                       key={`risk-${item}`}
-                                      className="text-sm font-medium text-[#1B4D35]"
+                                      className="text-sm font-medium text-[#1A4480]"
                                     >
                                       <span className="mr-2 text-[#B7791F]">⚠</span>
                                       {item}
@@ -402,7 +402,7 @@ export function DonorHome({ briefs }: DonorHomeProps) {
 
                               {brief.voiceAlignment ? (
                                 <details className="mt-4 rounded-2xl border border-[#ECE4D7] bg-white p-4">
-                                  <summary className="cursor-pointer list-none text-sm font-semibold text-[#1B4D35]">
+                                  <summary className="cursor-pointer list-none text-sm font-semibold text-[#1A4480]">
                                     Expand alignment detail
                                   </summary>
                                   <div className="mt-4 grid gap-5 lg:grid-cols-[1fr_1fr]">
@@ -451,7 +451,7 @@ export function DonorHome({ briefs }: DonorHomeProps) {
 
                         <section className="grid gap-4 xl:grid-cols-3">
                           <details className="rounded-[24px] border border-[#E5DED0] bg-white p-5">
-                            <summary className="cursor-pointer list-none text-base font-semibold text-[#1B4D35]">
+                            <summary className="cursor-pointer list-none text-base font-semibold text-[#1A4480]">
                               Commendations
                             </summary>
                             <ul className="mt-4 space-y-2 text-sm text-[#4F6357]">
@@ -466,7 +466,7 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                           </details>
 
                           <details className="rounded-[24px] border border-[#E5DED0] bg-white p-5">
-                            <summary className="cursor-pointer list-none text-base font-semibold text-[#1B4D35]">
+                            <summary className="cursor-pointer list-none text-base font-semibold text-[#1A4480]">
                               Cautions
                             </summary>
                             <ul className="mt-4 space-y-2 text-sm text-[#4F6357]">
@@ -481,7 +481,7 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                           </details>
 
                           <details className="rounded-[24px] border border-[#E5DED0] bg-white p-5">
-                            <summary className="cursor-pointer list-none text-base font-semibold text-[#1B4D35]">
+                            <summary className="cursor-pointer list-none text-base font-semibold text-[#1A4480]">
                               See how this was evaluated
                             </summary>
                             <div className="mt-4 grid gap-3">
@@ -497,8 +497,8 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                                   key={label}
                                   className="flex items-center justify-between rounded-2xl bg-[#FBF8F2] px-4 py-3"
                                 >
-                                  <p className="text-sm text-[#5E6C62]">{label}</p>
-                                  <p className="text-lg font-semibold text-[#1B4D35]">
+                                  <p className="text-sm text-[#7088A5]">{label}</p>
+                                  <p className="text-lg font-semibold text-[#1A4480]">
                                     {value}
                                   </p>
                                 </div>

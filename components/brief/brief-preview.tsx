@@ -144,7 +144,7 @@ export function BriefPreview({
             <ul className="mt-4 grid gap-3 text-sm text-slate-700">
               {DILIGENCE_CHECKLIST.map((item) => (
                 <li className="flex items-center gap-3" key={item}>
-                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-700">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-500/15 text-blue-700">
                     ✓
                   </span>
                   <span>{item}</span>

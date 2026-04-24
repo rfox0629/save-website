@@ -417,10 +417,10 @@ export default async function ApplicationDetailPage({
               />
 
               {data.application.ai_summary ? (
-                <div className="rounded-[2rem] border border-emerald-300/20 bg-[#E7F3EA] p-7 text-[#1B4D35] shadow-[0_18px_40px_rgba(27,77,53,0.08)]">
+                <div className="rounded-[2rem] border border-blue-300/20 bg-[#E8F0FA] p-7 text-[#1A4480] shadow-[0_18px_40px_rgba(26,68,128,0.08)]">
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div className="space-y-2">
-                      <h3 className="text-xl font-semibold text-[#1B4D35]">
+                      <h3 className="text-xl font-semibold text-[#1A4480]">
                         AI Review Summary
                       </h3>
                       <p className="max-w-2xl text-sm leading-6 text-[#5A7C64]">
@@ -441,14 +441,14 @@ export default async function ApplicationDetailPage({
                   {reviewerSummary ? (
                     <div className="mt-5 space-y-5 text-sm leading-7 text-[#204B34]">
                       <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2E6A45]">
+                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2A5FA0]">
                           Executive Summary
                         </h3>
                         <p className="mt-2">{reviewerSummary.executive_summary}</p>
                       </div>
 
                       <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2E6A45]">
+                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2A5FA0]">
                           Strengths
                         </h3>
                         {reviewerSummary.top_strengths.length > 0 ? (
@@ -463,7 +463,7 @@ export default async function ApplicationDetailPage({
                       </div>
 
                       <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2E6A45]">
+                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2A5FA0]">
                           Risks
                         </h3>
                         {reviewerSummary.top_risks.length > 0 ? (
@@ -478,7 +478,7 @@ export default async function ApplicationDetailPage({
                       </div>
 
                       <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2E6A45]">
+                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2A5FA0]">
                           Follow Up Questions
                         </h3>
                         {reviewerSummary.follow_up_questions.length > 0 ? (
@@ -493,7 +493,7 @@ export default async function ApplicationDetailPage({
                       </div>
 
                       <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2E6A45]">
+                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2A5FA0]">
                           Category Assessments
                         </h3>
                         <div className="mt-3 grid gap-3 md:grid-cols-2">
@@ -520,11 +520,11 @@ export default async function ApplicationDetailPage({
                           >).map(([label, value]) => (
                             <div
                               key={label}
-                              className="rounded-2xl border border-emerald-700/15 bg-white/40 p-4"
+                              className="rounded-2xl border border-blue-700/15 bg-white/40 p-4"
                             >
                               <div className="flex items-center justify-between gap-3">
                                 <h4 className="font-semibold">{label}</h4>
-                                <span className="rounded-full border border-emerald-700/15 bg-white/70 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#2E6A45]">
+                                <span className="rounded-full border border-blue-700/15 bg-white/70 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#2A5FA0]">
                                   {formatConfidence(value.confidence)}
                                 </span>
                               </div>
@@ -538,11 +538,11 @@ export default async function ApplicationDetailPage({
 
                       {charityNavigatorMeta ? (
                         <div>
-                          <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2E6A45]">
+                          <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2A5FA0]">
                             Charity Navigator
                           </h3>
                           <div className="mt-2 flex flex-wrap items-center gap-3">
-                            <span className="rounded-full border border-emerald-700/15 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#2E6A45]">
+                            <span className="rounded-full border border-blue-700/15 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#2A5FA0]">
                               {charityNavigatorMeta.status}
                             </span>
                             <p className="text-sm">{charityNavigatorMeta.note}</p>
@@ -551,11 +551,11 @@ export default async function ApplicationDetailPage({
                       ) : null}
 
                       <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2E6A45]">
+                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2A5FA0]">
                           Recommendation
                         </h3>
                         <div className="mt-2">
-                          <span className="rounded-full border border-emerald-700/15 bg-white/70 px-3 py-1 text-sm font-semibold text-[#1B4D35]">
+                          <span className="rounded-full border border-blue-700/15 bg-white/70 px-3 py-1 text-sm font-semibold text-[#1A4480]">
                             {formatRecommendation(reviewerSummary.recommendation)}
                           </span>
                         </div>

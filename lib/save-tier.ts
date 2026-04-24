@@ -95,7 +95,7 @@ export function getSaveTierClass(
   if (theme === "dark") {
     switch (tier) {
       case "High Confidence Opportunity":
-        return "border-emerald-400/20 bg-emerald-400/10 text-emerald-200";
+        return "border-blue-400/20 bg-blue-400/10 text-blue-200";
       case "Strong Opportunity":
         return "border-sky-400/20 bg-sky-400/10 text-sky-200";
       case "Proceed with Discernment":
@@ -107,7 +107,7 @@ export function getSaveTierClass(
 
   switch (tier) {
     case "High Confidence Opportunity":
-      return "border-emerald-200 bg-emerald-50 text-emerald-900";
+      return "border-blue-200 bg-blue-50 text-blue-900";
     case "Strong Opportunity":
       return "border-sky-200 bg-sky-50 text-sky-900";
     case "Proceed with Discernment":

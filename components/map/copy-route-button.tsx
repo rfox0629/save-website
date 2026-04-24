@@ -22,7 +22,7 @@ export function CopyRouteButton({ value }: CopyRouteButtonProps) {
   return (
     <button
       type="button"
-      className="rounded-full border border-[#E3DCCF] bg-[#FBF8F2] px-3 py-1 text-xs font-medium text-[#5E6C62] transition hover:border-[#D4C6AE] hover:text-[#1B4D35] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B4D35]/15"
+      className="rounded-full border border-[#E3DCCF] bg-[#FBF8F2] px-3 py-1 text-xs font-medium text-[#7088A5] transition hover:border-[#D4C6AE] hover:text-[#1A4480] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A4480]/15"
       aria-label={`Copy route ${value}`}
       onClick={handleCopy}
     >

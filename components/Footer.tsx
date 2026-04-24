@@ -4,12 +4,15 @@ import { SaveBrand } from "@/components/Nav";
 
 export default function Footer() {
   return (
-    <footer className="bg-[#1B4D35] px-6 pb-10 pt-14 md:px-[52px]">
+    <footer className="bg-[#0E2E5C] px-6 pb-10 pt-14 md:px-[52px]">
       <div className="mb-12 flex flex-col gap-10 border-b border-[rgba(255,255,255,0.12)] pb-12 md:flex-row md:items-start md:justify-between">
         <div>
-          <div className="[&_svg_path:first-child]:fill-[rgba(255,255,255,0.15)] [&_svg_path:nth-child(2)]:fill-[rgba(255,255,255,0.08)]">
+          <div className="[&_svg_path:first-child]:fill-[#0E2E5C] [&_svg_path:nth-child(2)]:fill-[#1A4480]">
             <div className="flex items-center gap-[10px]">
-              <SaveBrand />
+              <SaveBrand
+                subtextClassName="text-[rgba(255,255,255,0.58)]"
+                textClassName="text-white"
+              />
             </div>
           </div>
           <div className="mt-2 text-[13px] text-[rgba(255,255,255,0.5)]">

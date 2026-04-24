@@ -64,7 +64,7 @@ export function getBriefRationale(
 
 export function getRecommendationBadgeClass(level: string | null) {
   if (level === "Strongly Recommended") {
-    return "border-emerald-500/30 bg-emerald-500/12 text-emerald-200";
+    return "border-blue-500/30 bg-blue-500/12 text-blue-200";
   }
 
   if (level === "Recommended") {

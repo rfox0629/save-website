@@ -82,7 +82,7 @@ export default function RegisterPage() {
         </Link>
 
         <Link
-          className="text-sm font-medium text-[#5D7264] transition-colors hover:text-[#1B4D35]"
+          className="text-sm font-medium text-[#7088A5] transition-colors hover:text-[#1A4480]"
           href="/"
         >
           Back to home
@@ -90,12 +90,12 @@ export default function RegisterPage() {
       </header>
 
       <div className="mx-auto grid min-h-[calc(100vh-8rem)] max-w-6xl items-center gap-10 py-6 lg:grid-cols-[1fr_460px]">
-        <section className="rounded-[32px] border border-[#D8D1C3] bg-[#FFFDF8] p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)] md:p-12">
-          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
+        <section className="rounded-[32px] border border-[#D8D1C3] bg-[#FFFDF8] p-8 shadow-[0_25px_80px_rgba(26,68,128,0.08)] md:p-12">
+          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#7088A5]">
             SAVE Platform
           </p>
           <h1
-            className="mt-6 max-w-[640px] text-5xl leading-[1.05] text-[#1B4D35] md:text-6xl"
+            className="mt-6 max-w-[640px] text-5xl leading-[1.05] text-[#1A4480] md:text-6xl"
             style={{ fontFamily: "var(--font-auth-serif)" }}
           >
             Create your ministry account and begin the SAVE process.
@@ -106,7 +106,7 @@ export default function RegisterPage() {
           </p>
 
           <div className="mt-10 rounded-[28px] border border-[#D8D1C3] bg-[#F4EFE4] p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7088A5]">
               Before you start
             </p>
             <p className="mt-3 max-w-[480px] text-base leading-8 text-[#4C5E52]">
@@ -117,17 +117,17 @@ export default function RegisterPage() {
           </div>
         </section>
 
-        <section className="rounded-[32px] border border-[#D8D1C3] bg-white p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)] md:p-10">
+        <section className="rounded-[32px] border border-[#D8D1C3] bg-white p-8 shadow-[0_25px_80px_rgba(26,68,128,0.08)] md:p-10">
           <div className="space-y-2">
             <h2
-              className="text-4xl text-[#1B4D35]"
+              className="text-4xl text-[#1A4480]"
               style={{ fontFamily: "var(--font-auth-serif)" }}
             >
               Register
             </h2>
-            <p className="text-sm leading-7 text-[#5D7264]">
+            <p className="text-sm leading-7 text-[#7088A5]">
               Your account will be provisioned with the{" "}
-              <span className="font-semibold text-[#1B4D35]">ministry</span>{" "}
+              <span className="font-semibold text-[#1A4480]">ministry</span>{" "}
               role.
             </p>
           </div>
@@ -135,7 +135,7 @@ export default function RegisterPage() {
           <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
             <div className="space-y-2">
               <label
-                className="text-sm font-medium text-[#1B4D35]"
+                className="text-sm font-medium text-[#1A4480]"
                 htmlFor="email"
               >
                 Email
@@ -144,7 +144,7 @@ export default function RegisterPage() {
                 id="email"
                 type="email"
                 autoComplete="email"
-                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition placeholder:text-[#7088A5] focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10"
                 placeholder="director@ministry.org"
                 {...form.register("email")}
               />
@@ -153,7 +153,7 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <label
-                className="text-sm font-medium text-[#1B4D35]"
+                className="text-sm font-medium text-[#1A4480]"
                 htmlFor="password"
               >
                 Password
@@ -163,7 +163,7 @@ export default function RegisterPage() {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   autoComplete="new-password"
-                  className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 pr-14 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                  className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 pr-14 text-[#1A4480] outline-none transition placeholder:text-[#7088A5] focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10"
                   placeholder="Choose a secure password"
                   {...form.register("password")}
                 />
@@ -171,7 +171,7 @@ export default function RegisterPage() {
                   type="button"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                   aria-pressed={showPassword}
-                  className="absolute inset-y-0 right-0 inline-flex items-center justify-center rounded-r-2xl px-4 text-[#5D7264] transition hover:text-[#1B4D35] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B4D35]/20"
+                  className="absolute inset-y-0 right-0 inline-flex items-center justify-center rounded-r-2xl px-4 text-[#7088A5] transition hover:text-[#1A4480] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A4480]/20"
                   onClick={() => setShowPassword((current) => !current)}
                 >
                   {showPassword ? (
@@ -186,7 +186,7 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <label
-                className="text-sm font-medium text-[#1B4D35]"
+                className="text-sm font-medium text-[#1A4480]"
                 htmlFor="confirmPassword"
               >
                 Confirm Password
@@ -196,7 +196,7 @@ export default function RegisterPage() {
                   id="confirmPassword"
                   type={showConfirmPassword ? "text" : "password"}
                   autoComplete="new-password"
-                  className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 pr-14 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                  className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 pr-14 text-[#1A4480] outline-none transition placeholder:text-[#7088A5] focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10"
                   placeholder="Re-enter your password"
                   {...form.register("confirmPassword")}
                 />
@@ -208,7 +208,7 @@ export default function RegisterPage() {
                       : "Show confirm password"
                   }
                   aria-pressed={showConfirmPassword}
-                  className="absolute inset-y-0 right-0 inline-flex items-center justify-center rounded-r-2xl px-4 text-[#5D7264] transition hover:text-[#1B4D35] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1B4D35]/20"
+                  className="absolute inset-y-0 right-0 inline-flex items-center justify-center rounded-r-2xl px-4 text-[#7088A5] transition hover:text-[#1A4480] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A4480]/20"
                   onClick={() =>
                     setShowConfirmPassword((current) => !current)
                   }
@@ -227,7 +227,7 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <label
-                className="text-sm font-medium text-[#1B4D35]"
+                className="text-sm font-medium text-[#1A4480]"
                 htmlFor="organizationLegalName"
               >
                 Organization Legal Name
@@ -236,7 +236,7 @@ export default function RegisterPage() {
                 id="organizationLegalName"
                 type="text"
                 autoComplete="organization"
-                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition placeholder:text-[#7088A5] focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10"
                 placeholder="Ministry Organization, Inc."
                 {...form.register("organizationLegalName")}
               />
@@ -247,7 +247,7 @@ export default function RegisterPage() {
 
             <div className="space-y-2">
               <label
-                className="text-sm font-medium text-[#1B4D35]"
+                className="text-sm font-medium text-[#1A4480]"
                 htmlFor="ein"
               >
                 EIN
@@ -257,7 +257,7 @@ export default function RegisterPage() {
                 type="text"
                 inputMode="numeric"
                 autoComplete="off"
-                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition placeholder:text-[#7088A5] focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10"
                 placeholder="12-3456789"
                 {...form.register("ein")}
               />
@@ -269,16 +269,16 @@ export default function RegisterPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full rounded-2xl bg-[#1B4D35] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#236645] disabled:cursor-not-allowed disabled:opacity-70"
+              className="w-full rounded-2xl bg-[#1A4480] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#2A5FA0] disabled:cursor-not-allowed disabled:opacity-70"
             >
               {isPending ? "Creating account..." : "Create account"}
             </button>
           </form>
 
-          <p className="mt-8 text-sm text-[#5D7264]">
+          <p className="mt-8 text-sm text-[#7088A5]">
             Already have an account?{" "}
             <Link
-              className="font-semibold text-[#1B4D35] underline-offset-4 hover:underline"
+              className="font-semibold text-[#1A4480] underline-offset-4 hover:underline"
               href="/login"
             >
               Sign in

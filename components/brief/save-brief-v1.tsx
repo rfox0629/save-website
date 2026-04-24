@@ -15,14 +15,14 @@ import type {
 function SaveMark() {
   return (
     <div className="inline-flex items-center gap-3">
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1B4D35] text-sm font-bold tracking-[0.22em] text-[#F9F6F0]">
+      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1A4480] text-sm font-bold tracking-[0.22em] text-[#F9F6F0]">
         S
       </div>
       <div>
-        <div className="text-sm font-semibold uppercase tracking-[0.3em] text-[#1B4D35]">
+        <div className="text-sm font-semibold uppercase tracking-[0.3em] text-[#1A4480]">
           SAVE
         </div>
-        <div className="text-xs text-[#6B8570]">Ministry Vetting</div>
+        <div className="text-xs text-[#7088A5]">Ministry Vetting</div>
       </div>
     </div>
   );
@@ -84,7 +84,7 @@ function formatVoiceAlignmentStatus(status: PublicVoiceAlignmentData["status"]) 
 
 function getVoiceAlignmentBadgeClass(status: PublicVoiceAlignmentData["status"]) {
   if (status === "aligned") {
-    return "border-emerald-200 bg-emerald-50 text-emerald-900";
+    return "border-blue-200 bg-blue-50 text-blue-900";
   }
 
   if (status === "partially_aligned") {
@@ -95,7 +95,7 @@ function getVoiceAlignmentBadgeClass(status: PublicVoiceAlignmentData["status"])
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <h2 className="text-xl font-semibold text-[#1B4D35]">{children}</h2>;
+  return <h2 className="text-xl font-semibold text-[#1A4480]">{children}</h2>;
 }
 
 function BulletList({
@@ -106,7 +106,7 @@ function BulletList({
   tone?: "default" | "warm";
 }) {
   if (items.length === 0) {
-    return <p className="text-[15px] leading-8 text-[#617367]">No data available.</p>;
+    return <p className="text-[15px] leading-8 text-[#7088A5]">No data available.</p>;
   }
 
   return (
@@ -132,7 +132,7 @@ function SignalCard({
   return (
     <div className="rounded-[24px] border border-[#E3DCCF] bg-[#FCFAF5] p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h4 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#6B8570]">
+        <h4 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#7088A5]">
           {label}
         </h4>
         <span className="rounded-full border border-[#E3DCCF] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#4F6357]">
@@ -208,7 +208,7 @@ export function SaveBriefV1({
   ].filter((item): item is NonNullable<typeof item> => Boolean(item));
 
   return (
-    <article className="mx-auto w-full max-w-5xl rounded-[32px] border border-[#E3DCCF] bg-white px-6 py-8 text-[#23372B] shadow-[0_20px_60px_rgba(27,77,53,0.06)] md:px-10 md:py-10 print:max-w-none print:rounded-none print:border-0 print:px-0 print:py-0 print:shadow-none">
+    <article className="mx-auto w-full max-w-5xl rounded-[32px] border border-[#E3DCCF] bg-white px-6 py-8 text-[#0E2E5C] shadow-[0_20px_60px_rgba(26,68,128,0.06)] md:px-10 md:py-10 print:max-w-none print:rounded-none print:border-0 print:px-0 print:py-0 print:shadow-none">
       <header className="border-b border-[#E8E0D2] pb-8 print:break-inside-avoid-page">
         <div className="flex items-start justify-between gap-6">
           <SaveMark />
@@ -222,14 +222,14 @@ export function SaveBriefV1({
         </div>
 
         <div className="mt-8 space-y-4">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
+          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7088A5]">
             SAVE Brief V1
           </p>
-          <h1 className={`${titleClassName ?? ""} text-[34px] text-[#1B4D35]`}>
+          <h1 className={`${titleClassName ?? ""} text-[34px] text-[#1A4480]`}>
             {org.legal_name}
           </h1>
           {metadata.length > 0 ? (
-            <p className="text-sm text-[#617367]">{metadata.join(" · ")}</p>
+            <p className="text-sm text-[#7088A5]">{metadata.join(" · ")}</p>
           ) : null}
         </div>
       </header>
@@ -245,20 +245,20 @@ export function SaveBriefV1({
         <section className="print:break-inside-avoid-page">
           <SectionTitle>Recommendation</SectionTitle>
           <div className="mt-4 rounded-[28px] bg-[#F4EFE4] px-6 py-6">
-            <p className="text-2xl font-semibold text-[#1B4D35]">
+            <p className="text-2xl font-semibold text-[#1A4480]">
               {brief.recommendation_level ?? "Recommendation pending"}
             </p>
             <p className="mt-3 text-[15px] leading-8 text-[#475A4F]">
               {rationale}
             </p>
-            <p className="mt-3 text-sm font-medium text-[#6B8570]">
+            <p className="mt-3 text-sm font-medium text-[#7088A5]">
               SAVE Tier: {saveTier}
             </p>
           </div>
         </section>
 
         <section className="grid gap-6 md:grid-cols-2 print:break-inside-avoid-page">
-          <div className="rounded-[28px] border border-[#DCE8DF] bg-[#F7FBF8] p-6">
+          <div className="rounded-[28px] border border-[#D8E5F6] bg-[#F7FBF8] p-6">
             <SectionTitle>Strengths</SectionTitle>
             <div className="mt-4">
               <BulletList items={strengths} />
@@ -296,7 +296,7 @@ export function SaveBriefV1({
                   key={label}
                 >
                   <div className="flex flex-wrap items-center justify-between gap-3">
-                    <h3 className="text-base font-semibold text-[#1B4D35]">
+                    <h3 className="text-base font-semibold text-[#1A4480]">
                       {label}
                     </h3>
                     <span className="rounded-full bg-[#F1ECE1] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#4F6357]">
@@ -325,13 +325,13 @@ export function SaveBriefV1({
             </p>
 
             <div className="mt-5 grid gap-6 lg:grid-cols-[1fr,1fr,1.15fr]">
-              <div className="rounded-[28px] border border-[#DCE8DF] bg-[#F7FBF8] p-6">
-                <h3 className="text-lg font-semibold text-[#1B4D35]">
+              <div className="rounded-[28px] border border-[#D8E5F6] bg-[#F7FBF8] p-6">
+                <h3 className="text-lg font-semibold text-[#1A4480]">
                   Internal Perspective
                 </h3>
                 <div className="mt-4 space-y-5">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6B8570]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7088A5]">
                       Themes
                     </p>
                     <div className="mt-3">
@@ -339,7 +339,7 @@ export function SaveBriefV1({
                     </div>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6B8570]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7088A5]">
                       Strengths
                     </p>
                     <div className="mt-3">
@@ -347,7 +347,7 @@ export function SaveBriefV1({
                     </div>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6B8570]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7088A5]">
                       Concerns
                     </p>
                     <div className="mt-3">
@@ -358,12 +358,12 @@ export function SaveBriefV1({
               </div>
 
               <div className="rounded-[28px] border border-[#E8DDCB] bg-[#FDF8EF] p-6">
-                <h3 className="text-lg font-semibold text-[#1B4D35]">
+                <h3 className="text-lg font-semibold text-[#1A4480]">
                   External Perspective
                 </h3>
                 <div className="mt-4 space-y-5">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6B8570]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7088A5]">
                       Themes
                     </p>
                     <div className="mt-3">
@@ -371,7 +371,7 @@ export function SaveBriefV1({
                     </div>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6B8570]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7088A5]">
                       Strengths
                     </p>
                     <div className="mt-3">
@@ -379,7 +379,7 @@ export function SaveBriefV1({
                     </div>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6B8570]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7088A5]">
                       Concerns
                     </p>
                     <div className="mt-3">
@@ -392,7 +392,7 @@ export function SaveBriefV1({
               <div className="space-y-6">
                 <div className="rounded-[28px] border border-[#E3DCCF] bg-[#FCFAF5] p-6">
                   <div className="flex flex-wrap items-center gap-3">
-                    <h3 className="text-lg font-semibold text-[#1B4D35]">
+                    <h3 className="text-lg font-semibold text-[#1A4480]">
                       Alignment Insight
                     </h3>
                     <span
@@ -410,7 +410,7 @@ export function SaveBriefV1({
 
                 {voiceAlignment.summary.follow_up_questions.length > 0 ? (
                   <div className="rounded-[28px] border border-[#E3DCCF] bg-[#FCFAF5] p-6">
-                    <h3 className="text-lg font-semibold text-[#1B4D35]">
+                    <h3 className="text-lg font-semibold text-[#1A4480]">
                       Follow-Up Considerations
                     </h3>
                     <div className="mt-4">
@@ -449,7 +449,7 @@ export function SaveBriefV1({
         ) : null}
       </div>
 
-      <footer className="border-t border-[#E8E0D2] pt-6 text-sm leading-7 text-[#6B8570] print:break-inside-avoid-page">
+      <footer className="border-t border-[#E8E0D2] pt-6 text-sm leading-7 text-[#7088A5] print:break-inside-avoid-page">
         This brief is for informational purposes only. SAVE does not guarantee
         outcomes. Donors are encouraged to conduct their own additional due
         diligence.

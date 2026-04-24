@@ -10,7 +10,7 @@ export function AppToaster() {
       richColors
       toastOptions={{
         className:
-          "!border-[#D8D1C3] !bg-[#FFFDF8] !text-[#1B4D35] !shadow-[0_20px_60px_rgba(27,77,53,0.12)]",
+          "!border-[#D8D1C3] !bg-[#FFFDF8] !text-[#1A4480] !shadow-[0_20px_60px_rgba(26,68,128,0.12)]",
       }}
     />
   );

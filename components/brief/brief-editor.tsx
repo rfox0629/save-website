@@ -239,7 +239,7 @@ export function BriefEditor({
               <span
                 className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${
                   isPublished
-                    ? "border border-emerald-500/20 bg-emerald-500/10 text-emerald-200"
+                    ? "border border-blue-500/20 bg-blue-500/10 text-blue-200"
                     : "border border-white/10 bg-white/[0.03] text-slate-300"
                 }`}
               >
@@ -272,12 +272,12 @@ export function BriefEditor({
             </label>
 
             {publicUrl ? (
-              <div className="mt-4 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-200/90">
+              <div className="mt-4 rounded-2xl border border-blue-500/20 bg-blue-500/10 px-4 py-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-200/90">
                   Share Link
                 </p>
                 <a
-                  className="mt-2 block break-all text-sm text-emerald-100 underline underline-offset-4"
+                  className="mt-2 block break-all text-sm text-blue-100 underline underline-offset-4"
                   href={publicUrl}
                   rel="noreferrer"
                   target="_blank"

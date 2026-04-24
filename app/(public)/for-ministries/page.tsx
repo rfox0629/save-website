@@ -52,30 +52,30 @@ const process = [
 
 export default function ForMinistriesPage() {
   return (
-    <main className="bg-[#F9F6F0] pt-[68px] text-[#1A2E20]">
+    <main className="bg-[#F9F6F0] pt-[68px] text-[#0E2E5C]">
       <section className="bg-[#FEFCF8] px-6 py-20 md:px-[52px] md:py-24">
         <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
-            <div className="inline-flex rounded-full bg-[#EBF5EF] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#236645]">
+            <div className="inline-flex rounded-full bg-[#E8F0FA] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#2A5FA0]">
               For Ministries
             </div>
-            <h1 className="font-public-serif mt-6 max-w-[680px] text-[38px] font-medium leading-[1.08] text-[#1B4D35] md:text-[62px]">
+            <h1 className="font-public-serif mt-6 max-w-[680px] text-[38px] font-medium leading-[1.08] text-[#1A4480] md:text-[62px]">
               A clear diligence process for ministries that welcome scrutiny.
             </h1>
-            <p className="mt-6 max-w-[600px] text-[17px] leading-[1.85] text-[#3D5C47]">
+            <p className="mt-6 max-w-[600px] text-[17px] leading-[1.85] text-[#3D5576]">
               SAVE helps serious ministries tell the truth well. Leadership,
               doctrinal, governance, and financial context is gathered so
               supporters can give with confidence.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
-                className="rounded-[8px] bg-[#1B4D35] px-7 py-4 text-[15px] font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[#236645]"
+                className="rounded-[8px] bg-[#1A4480] px-7 py-4 text-[15px] font-semibold text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[#2A5FA0]"
                 href="/login?intent=ministry&redirectTo=%2Fportal%2Finquiry"
               >
                 Start the inquiry
               </Link>
               <Link
-                className="rounded-[8px] border border-[#1B4D35] px-7 py-4 text-[15px] font-semibold text-[#1B4D35] transition duration-200 hover:bg-[#EBF5EF]"
+                className="rounded-[8px] border border-[#1A4480] px-7 py-4 text-[15px] font-semibold text-[#1A4480] transition duration-200 hover:bg-[#E8F0FA]"
                 href="/about"
               >
                 Learn about SAVE
@@ -83,7 +83,7 @@ export default function ForMinistriesPage() {
             </div>
           </div>
 
-          <div className="rounded-[28px] border border-[rgba(27,77,53,0.1)] bg-[#1B4D35] p-8 text-white shadow-[0_20px_60px_rgba(27,77,53,0.14)] md:p-10">
+          <div className="rounded-[28px] border border-[rgba(26,68,128,0.1)] bg-[#0E2E5C] p-8 text-white shadow-[0_20px_60px_rgba(26,68,128,0.14)] md:p-10">
             <div className="grid gap-5 sm:grid-cols-2">
               {[
                 ["Inquiry", "10-15 min"],
@@ -118,7 +118,7 @@ export default function ForMinistriesPage() {
             <div className="inline-flex rounded-full bg-[#FDF5E0] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#9A6800]">
               Full Process
             </div>
-            <h2 className="font-public-serif mt-5 text-[34px] text-[#1B4D35] md:text-[48px]">
+            <h2 className="font-public-serif mt-5 text-[34px] text-[#1A4480] md:text-[48px]">
               What ministries can expect from beginning to publication.
             </h2>
           </div>
@@ -126,13 +126,13 @@ export default function ForMinistriesPage() {
           <div className="mt-12 grid gap-5 lg:grid-cols-4">
             {process.map((step) => (
               <div
-                className="rounded-[24px] border border-[rgba(27,77,53,0.1)] bg-white px-6 py-7 shadow-[0_8px_30px_rgba(27,77,53,0.06)]"
+                className="rounded-[24px] border border-[rgba(26,68,128,0.1)] bg-white px-6 py-7 shadow-[0_8px_30px_rgba(26,68,128,0.06)]"
                 key={step.title}
               >
-                <h3 className="font-public-serif text-[22px] text-[#1B4D35]">
+                <h3 className="font-public-serif text-[22px] text-[#1A4480]">
                   {step.title}
                 </h3>
-                <p className="mt-4 text-[15px] leading-[1.8] text-[#3D5C47]">
+                <p className="mt-4 text-[15px] leading-[1.8] text-[#3D5576]">
                   {step.copy}
                 </p>
               </div>
@@ -144,26 +144,26 @@ export default function ForMinistriesPage() {
       <section className="py-18 bg-[#F0EBE0] px-6 md:px-[52px] md:py-24">
         <div className="mx-auto grid max-w-6xl gap-12 lg:grid-cols-[0.95fr_1.05fr]">
           <div>
-            <div className="inline-flex rounded-full bg-white px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#236645]">
+            <div className="inline-flex rounded-full bg-white px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#2A5FA0]">
               Application Requirements
             </div>
-            <h2 className="font-public-serif mt-5 text-[34px] text-[#1B4D35] md:text-[46px]">
+            <h2 className="font-public-serif mt-5 text-[34px] text-[#1A4480] md:text-[46px]">
               Real substance matters more than polished marketing.
             </h2>
-            <p className="mt-5 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5C47]">
+            <p className="mt-5 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5576]">
               The ministries that benefit most from SAVE are ready to show their
               structure, convictions, and stewardship clearly.
             </p>
           </div>
 
-          <div className="rounded-[28px] border border-[rgba(27,77,53,0.1)] bg-white p-8 shadow-[0_14px_40px_rgba(27,77,53,0.08)]">
+          <div className="rounded-[28px] border border-[rgba(26,68,128,0.1)] bg-white p-8 shadow-[0_14px_40px_rgba(26,68,128,0.08)]">
             <ul className="space-y-4">
               {requirements.map((item) => (
                 <li className="flex gap-4" key={item}>
-                  <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#EBF5EF] text-[12px] font-bold text-[#236645]">
+                  <div className="mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#E8F0FA] text-[12px] font-bold text-[#2A5FA0]">
                     ✓
                   </div>
-                  <p className="text-[15px] leading-[1.8] text-[#2D4A37]">
+                  <p className="text-[15px] leading-[1.8] text-[#3D5576]">
                     {item}
                   </p>
                 </li>
@@ -176,10 +176,10 @@ export default function ForMinistriesPage() {
       <section className="py-18 px-6 md:px-[52px] md:py-24">
         <div className="mx-auto max-w-4xl">
           <div className="text-center">
-            <div className="inline-flex rounded-full bg-[#EBF5EF] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#236645]">
+            <div className="inline-flex rounded-full bg-[#E8F0FA] px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#2A5FA0]">
               FAQ
             </div>
-            <h2 className="font-public-serif mt-5 text-[34px] text-[#1B4D35] md:text-[46px]">
+            <h2 className="font-public-serif mt-5 text-[34px] text-[#1A4480] md:text-[46px]">
               Common questions from ministries.
             </h2>
           </div>
@@ -187,16 +187,16 @@ export default function ForMinistriesPage() {
           <div className="mt-10 space-y-4">
             {faqs.map((item) => (
               <details
-                className="group rounded-[22px] border border-[rgba(27,77,53,0.1)] bg-white px-6 py-5 shadow-[0_8px_24px_rgba(27,77,53,0.05)]"
+                className="group rounded-[22px] border border-[rgba(26,68,128,0.1)] bg-white px-6 py-5 shadow-[0_8px_24px_rgba(26,68,128,0.05)]"
                 key={item.question}
               >
-                <summary className="font-public-serif flex cursor-pointer list-none items-center justify-between gap-4 text-[22px] text-[#1B4D35]">
+                <summary className="font-public-serif flex cursor-pointer list-none items-center justify-between gap-4 text-[22px] text-[#1A4480]">
                   {item.question}
                   <span className="text-[#E8A020] transition group-open:rotate-45">
                     +
                   </span>
                 </summary>
-                <p className="pt-4 text-[15px] leading-[1.85] text-[#3D5C47]">
+                <p className="pt-4 text-[15px] leading-[1.85] text-[#3D5576]">
                   {item.answer}
                 </p>
               </details>
@@ -205,7 +205,7 @@ export default function ForMinistriesPage() {
         </div>
       </section>
 
-      <section className="py-18 bg-[#1B4D35] px-6 text-white md:px-[52px] md:py-24">
+      <section className="py-18 bg-[#0E2E5C] px-6 text-white md:px-[52px] md:py-24">
         <div className="mx-auto max-w-5xl rounded-[30px] border border-[rgba(255,255,255,0.12)] bg-[rgba(255,255,255,0.05)] px-8 py-10 text-center md:px-14 md:py-14">
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#F5C842]">
             Apply
@@ -219,7 +219,7 @@ export default function ForMinistriesPage() {
           </p>
           <div className="mt-9">
             <Link
-              className="inline-flex rounded-[8px] bg-[#F5C842] px-8 py-4 text-[15px] font-semibold text-[#1B4D35] transition duration-200 hover:-translate-y-0.5 hover:bg-[#ffd964]"
+              className="inline-flex rounded-[8px] bg-[#F5C842] px-8 py-4 text-[15px] font-semibold text-[#1A4480] transition duration-200 hover:-translate-y-0.5 hover:bg-[#ffd964]"
               href="/login?intent=ministry&redirectTo=%2Fportal%2Finquiry"
             >
               Apply now

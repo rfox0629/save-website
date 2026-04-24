@@ -57,7 +57,7 @@ function CompareCell({
     <div
       className={`rounded-[1.5rem] border p-5 ${
         theme === "light"
-          ? "border-[#D8D1C3] bg-[#FFFDF8] text-[#1B4D35]"
+          ? "border-[#D8D1C3] bg-[#FFFDF8] text-[#1A4480]"
           : "border-white/10 bg-[#0B1622]/70 text-white"
       }`}
     >
@@ -78,7 +78,7 @@ function CompareRow({
   theme: "dark" | "light";
 }) {
   const labelClass =
-    theme === "light" ? "text-[#6B8570]" : "text-[#C09A45]";
+    theme === "light" ? "text-[#7088A5]" : "text-[#C09A45]";
 
   return (
     <section className="space-y-3">
@@ -114,18 +114,18 @@ export function NonprofitCompare({
   const searchParams = useSearchParams();
   const pageShellClass =
     theme === "light"
-      ? "rounded-[2rem] border border-[#D8D1C3] bg-white p-6 shadow-[0_20px_60px_rgba(27,77,53,0.07)]"
+      ? "rounded-[2rem] border border-[#D8D1C3] bg-white p-6 shadow-[0_20px_60px_rgba(26,68,128,0.07)]"
       : "rounded-[2rem] border border-white/10 bg-white/[0.03] p-6";
-  const labelClass = theme === "light" ? "text-[#1B4D35]" : "text-slate-300";
+  const labelClass = theme === "light" ? "text-[#1A4480]" : "text-slate-300";
   const inputClass =
     theme === "light"
-      ? "w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35]"
+      ? "w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480]"
       : "w-full rounded-2xl border border-white/10 bg-[#0B1622] px-4 py-3 text-white";
   const bodyTextClass = theme === "light" ? "text-[#4F6357]" : "text-slate-200";
-  const mutedTextClass = theme === "light" ? "text-[#6B8570]" : "text-slate-400";
+  const mutedTextClass = theme === "light" ? "text-[#7088A5]" : "text-slate-400";
   const pillClass =
     theme === "light"
-      ? "border-[#D8D1C3] bg-white text-[#1B4D35]"
+      ? "border-[#D8D1C3] bg-white text-[#1A4480]"
       : "border-[#C09A45]/25 bg-[#C09A45]/10 text-[#F4E3B2]";
 
   function updateSelection(key: "left" | "right", value: string) {

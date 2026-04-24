@@ -47,7 +47,7 @@ async function postJson(url: string, body: Record<string, unknown> = {}) {
 function getAlignmentStatusClass(status: VoiceAlignmentInsight["alignment_status"]) {
   switch (status) {
     case "aligned":
-      return "border-emerald-400/20 bg-emerald-400/10 text-emerald-200";
+      return "border-blue-400/20 bg-blue-400/10 text-blue-200";
     case "partially_aligned":
       return "border-amber-400/20 bg-amber-400/10 text-amber-200";
     case "misaligned":
@@ -134,7 +134,7 @@ function getRequestStatusMeta(status: string) {
   if (status === "responded") {
     return {
       label: "Completed",
-      tone: "border-emerald-400/20 bg-emerald-400/10 text-emerald-200",
+      tone: "border-blue-400/20 bg-blue-400/10 text-blue-200",
     };
   }
 
@@ -176,7 +176,7 @@ function getSampleQualityMeta(internalCount: number, externalCount: number) {
   if (internalCount >= 7 && externalCount >= 4) {
     return {
       label: "Robust sample",
-      tone: "border-emerald-400/20 bg-emerald-400/10 text-emerald-200",
+      tone: "border-blue-400/20 bg-blue-400/10 text-blue-200",
     };
   }
 
@@ -292,7 +292,7 @@ function RequestForm({
               : "Request External Feedback"}
         </Button>
         {message ? (
-          <p className="break-all text-sm text-emerald-200">{message}</p>
+          <p className="break-all text-sm text-blue-200">{message}</p>
         ) : null}
         {error ? <p className="text-sm text-rose-300">{error}</p> : null}
       </div>

@@ -4,7 +4,7 @@ import type { Applications, ExternalCheck, Organizations } from "@/lib/supabase/
 
 function getRecommendationBadgeClass(recommendation: string) {
   if (recommendation === "advance") {
-    return "border-emerald-200 bg-emerald-50 text-emerald-900";
+    return "border-blue-200 bg-blue-50 text-blue-900";
   }
 
   if (recommendation === "needs_review") {
@@ -79,7 +79,7 @@ function SignalCard({
   return (
     <div className="rounded-[24px] border border-[#E3DCCF] bg-[#FCFAF5] p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h4 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#6B8570]">
+        <h4 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#7088A5]">
           {label}
         </h4>
         <span className="rounded-full border border-[#E3DCCF] bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#4F6357]">
@@ -93,7 +93,7 @@ function SignalCard({
 
 function getVoiceAlignmentBadgeClass(status: PublicVoiceAlignmentData["status"]) {
   if (status === "aligned") {
-    return "border-emerald-200 bg-emerald-50 text-emerald-900";
+    return "border-blue-200 bg-blue-50 text-blue-900";
   }
 
   if (status === "partially_aligned") {
@@ -162,14 +162,14 @@ export function PublicAiSummary({
   ].filter((item): item is NonNullable<typeof item> => Boolean(item));
 
   return (
-    <article className="mx-auto mt-8 w-full max-w-4xl rounded-[32px] border border-[#E3DCCF] bg-white px-6 py-8 text-[#23372B] shadow-[0_20px_60px_rgba(27,77,53,0.06)] md:px-10 md:py-10 print:mt-0 print:max-w-none print:break-inside-avoid-page print:rounded-none print:border-0 print:px-0 print:py-0 print:shadow-none">
+    <article className="mx-auto mt-8 w-full max-w-4xl rounded-[32px] border border-[#E3DCCF] bg-white px-6 py-8 text-[#0E2E5C] shadow-[0_20px_60px_rgba(26,68,128,0.06)] md:px-10 md:py-10 print:mt-0 print:max-w-none print:break-inside-avoid-page print:rounded-none print:border-0 print:px-0 print:py-0 print:shadow-none">
       <header className="border-b border-[#E8E0D2] pb-8 print:break-inside-avoid-page">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="space-y-3">
-            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
+            <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7088A5]">
               Relational Discernment
             </p>
-            <h2 className="text-[30px] leading-tight text-[#1B4D35]">
+            <h2 className="text-[30px] leading-tight text-[#1A4480]">
               {org.legal_name}
             </h2>
           </div>
@@ -189,7 +189,7 @@ export function PublicAiSummary({
         {summary ? (
           <>
             <section className="print:break-inside-avoid-page">
-              <h3 className="text-xl font-semibold text-[#1B4D35]">
+              <h3 className="text-xl font-semibold text-[#1A4480]">
                 Executive Summary
               </h3>
               <p className="mt-4 text-[15px] leading-8 text-[#475A4F]">
@@ -198,8 +198,8 @@ export function PublicAiSummary({
             </section>
 
             <section className="grid gap-6 md:grid-cols-2 print:break-inside-avoid-page">
-              <div className="rounded-[28px] border border-[#DCE8DF] bg-[#F7FBF8] p-6 print:break-inside-avoid-page">
-                <h3 className="text-lg font-semibold text-[#1B4D35]">Strengths</h3>
+              <div className="rounded-[28px] border border-[#D8E5F6] bg-[#F7FBF8] p-6 print:break-inside-avoid-page">
+                <h3 className="text-lg font-semibold text-[#1A4480]">Strengths</h3>
                 <ul className="mt-4 space-y-3 text-[15px] leading-8 text-[#475A4F]">
                   {summary.top_strengths.map((item) => (
                     <li className="ml-5 list-disc pl-1" key={item}>
@@ -210,7 +210,7 @@ export function PublicAiSummary({
               </div>
 
               <div className="rounded-[28px] border border-[#E8DDCB] bg-[#FDF8EF] p-6 print:break-inside-avoid-page">
-                <h3 className="text-lg font-semibold text-[#1B4D35]">Risks</h3>
+                <h3 className="text-lg font-semibold text-[#1A4480]">Risks</h3>
                 <ul className="mt-4 space-y-3 text-[15px] leading-8 text-[#475A4F]">
                   {summary.top_risks.map((item) => (
                     <li className="ml-5 list-disc pl-1" key={item}>
@@ -222,7 +222,7 @@ export function PublicAiSummary({
             </section>
 
             <section className="print:break-inside-avoid-page">
-              <h3 className="text-xl font-semibold text-[#1B4D35]">
+              <h3 className="text-xl font-semibold text-[#1A4480]">
                 Category Assessments
               </h3>
               <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -246,7 +246,7 @@ export function PublicAiSummary({
                     key={label}
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
-                      <h4 className="text-base font-semibold text-[#1B4D35]">
+                      <h4 className="text-base font-semibold text-[#1A4480]">
                         {label}
                       </h4>
                       <span className="rounded-full bg-[#F1ECE1] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-[#4F6357]">
@@ -262,7 +262,7 @@ export function PublicAiSummary({
             </section>
 
             <section className="print:break-inside-avoid-page">
-              <h3 className="text-xl font-semibold text-[#1B4D35]">
+              <h3 className="text-xl font-semibold text-[#1A4480]">
                 Follow-up Questions
               </h3>
               <ul className="mt-4 space-y-3 text-[15px] leading-8 text-[#475A4F]">
@@ -280,7 +280,7 @@ export function PublicAiSummary({
           <section className="print:break-inside-avoid-page">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h3 className="text-xl font-semibold text-[#1B4D35]">
+                <h3 className="text-xl font-semibold text-[#1A4480]">
                   Voice Alignment
                 </h3>
                 <p className="mt-2 max-w-3xl text-[15px] leading-8 text-[#475A4F]">
@@ -298,13 +298,13 @@ export function PublicAiSummary({
             </div>
 
             <div className="mt-5 grid gap-6 md:grid-cols-2">
-              <div className="rounded-[28px] border border-[#DCE8DF] bg-[#F7FBF8] p-6">
-                <h4 className="text-lg font-semibold text-[#1B4D35]">
+              <div className="rounded-[28px] border border-[#D8E5F6] bg-[#F7FBF8] p-6">
+                <h4 className="text-lg font-semibold text-[#1A4480]">
                   Internal Perspective
                 </h4>
                 <div className="mt-4 space-y-5">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6B8570]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7088A5]">
                       Themes
                     </p>
                     <ul className="mt-3 space-y-3 text-[15px] leading-8 text-[#475A4F]">
@@ -316,7 +316,7 @@ export function PublicAiSummary({
                     </ul>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6B8570]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7088A5]">
                       Strengths
                     </p>
                     <ul className="mt-3 space-y-3 text-[15px] leading-8 text-[#475A4F]">
@@ -328,7 +328,7 @@ export function PublicAiSummary({
                     </ul>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6B8570]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7088A5]">
                       Concerns
                     </p>
                     <ul className="mt-3 space-y-3 text-[15px] leading-8 text-[#475A4F]">
@@ -343,12 +343,12 @@ export function PublicAiSummary({
               </div>
 
               <div className="rounded-[28px] border border-[#E8DDCB] bg-[#FDF8EF] p-6">
-                <h4 className="text-lg font-semibold text-[#1B4D35]">
+                <h4 className="text-lg font-semibold text-[#1A4480]">
                   External Perspective
                 </h4>
                 <div className="mt-4 space-y-5">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6B8570]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7088A5]">
                       Themes
                     </p>
                     <ul className="mt-3 space-y-3 text-[15px] leading-8 text-[#475A4F]">
@@ -360,7 +360,7 @@ export function PublicAiSummary({
                     </ul>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6B8570]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7088A5]">
                       Strengths
                     </p>
                     <ul className="mt-3 space-y-3 text-[15px] leading-8 text-[#475A4F]">
@@ -372,7 +372,7 @@ export function PublicAiSummary({
                     </ul>
                   </div>
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#6B8570]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7088A5]">
                       Concerns
                     </p>
                     <ul className="mt-3 space-y-3 text-[15px] leading-8 text-[#475A4F]">
@@ -389,7 +389,7 @@ export function PublicAiSummary({
 
             <div className="mt-6 grid gap-6">
               <div className="rounded-[24px] border border-[#E3DCCF] bg-[#FCFAF5] p-5">
-                <h4 className="text-base font-semibold text-[#1B4D35]">
+                <h4 className="text-base font-semibold text-[#1A4480]">
                   Alignment Insight
                 </h4>
                 <p className="mt-3 text-[15px] leading-8 text-[#475A4F]">
@@ -399,7 +399,7 @@ export function PublicAiSummary({
 
               {voiceAlignment.summary.follow_up_questions.length > 0 ? (
                 <div className="rounded-[24px] border border-[#E3DCCF] bg-[#FCFAF5] p-5">
-                  <h4 className="text-base font-semibold text-[#1B4D35]">
+                  <h4 className="text-base font-semibold text-[#1A4480]">
                     Follow-up Questions
                   </h4>
                   <ul className="mt-3 space-y-3 text-[15px] leading-8 text-[#475A4F]">
@@ -417,7 +417,7 @@ export function PublicAiSummary({
 
         {signals.length > 0 ? (
           <section className="print:break-inside-avoid-page">
-            <h3 className="text-xl font-semibold text-[#1B4D35]">
+            <h3 className="text-xl font-semibold text-[#1A4480]">
               External Signals
             </h3>
             <div className="mt-5 grid gap-4 md:grid-cols-2">

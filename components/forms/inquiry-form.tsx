@@ -74,7 +74,7 @@ function TextInput({
     <input
       {...props}
       readOnly={readOnly}
-      className={`w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10 ${readOnly ? "cursor-not-allowed bg-[#F4EFE4] text-[#617367]" : ""} ${props.className ?? ""}`}
+      className={`w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition placeholder:text-[#7088A5] focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10 ${readOnly ? "cursor-not-allowed bg-[#F4EFE4] text-[#7088A5]" : ""} ${props.className ?? ""}`}
     />
   );
 }
@@ -89,7 +89,7 @@ function TextArea({
     <textarea
       {...props}
       readOnly={readOnly}
-      className={`min-h-[120px] w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition placeholder:text-[#8A968F] focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10 ${readOnly ? "cursor-not-allowed bg-[#F4EFE4] text-[#617367]" : ""} ${props.className ?? ""}`}
+      className={`min-h-[120px] w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition placeholder:text-[#7088A5] focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10 ${readOnly ? "cursor-not-allowed bg-[#F4EFE4] text-[#7088A5]" : ""} ${props.className ?? ""}`}
     />
   );
 }
@@ -102,7 +102,7 @@ function SelectInput({
     <select
       {...props}
       disabled={disabled}
-      className={`w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10 ${disabled ? "cursor-not-allowed bg-[#F4EFE4] text-[#617367]" : ""} ${props.className ?? ""}`}
+      className={`w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10 ${disabled ? "cursor-not-allowed bg-[#F4EFE4] text-[#7088A5]" : ""} ${props.className ?? ""}`}
     />
   );
 }
@@ -111,18 +111,18 @@ function StepHeader({ currentStep }: { currentStep: number }) {
   const progress = ((currentStep + 1) / inquiryStepTitles.length) * 100;
 
   return (
-    <div className="rounded-[28px] border border-[#D8D1C3] bg-white px-6 py-5 shadow-[0_18px_40px_rgba(27,77,53,0.06)]">
+    <div className="rounded-[28px] border border-[#D8D1C3] bg-white px-6 py-5 shadow-[0_18px_40px_rgba(26,68,128,0.06)]">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
+        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7088A5]">
           Step {currentStep + 1} of 6. {inquiryStepTitles[currentStep]}
         </p>
-        <p className="text-sm text-[#617367]">
+        <p className="text-sm text-[#7088A5]">
           Draft saves on every Next click
         </p>
       </div>
       <div className="mt-4 h-2 overflow-hidden rounded-full bg-[#E8E0D3]">
         <div
-          className="h-full rounded-full bg-[#1B4D35] transition-all duration-300"
+          className="h-full rounded-full bg-[#1A4480] transition-all duration-300"
           style={{ width: `${progress}%` }}
         />
       </div>
@@ -133,11 +133,11 @@ function StepHeader({ currentStep }: { currentStep: number }) {
 function SectionTitle({ body, title }: { body: string; title: string }) {
   return (
     <div>
-      <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
+      <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7088A5]">
         Current Section
       </p>
       <h1
-        className="mt-4 text-4xl leading-tight text-[#1B4D35]"
+        className="mt-4 text-4xl leading-tight text-[#1A4480]"
         style={{ fontFamily: "var(--font-auth-serif)" }}
       >
         {title}
@@ -160,8 +160,8 @@ function CheckboxCard({
 }) {
   return (
     <label
-      className={`flex items-center gap-3 rounded-2xl border border-[#D8D1C3] px-4 py-3 text-sm text-[#1B4D35] ${
-        disabled ? "bg-[#F4EFE4] text-[#617367]" : "bg-[#FFFDF8]"
+      className={`flex items-center gap-3 rounded-2xl border border-[#D8D1C3] px-4 py-3 text-sm text-[#1A4480] ${
+        disabled ? "bg-[#F4EFE4] text-[#7088A5]" : "bg-[#FFFDF8]"
       }`}
     >
       <input
@@ -192,8 +192,8 @@ function RadioGroup({
         <button
           className={`rounded-[14px] px-4 py-2 text-sm font-semibold transition ${
             value === option
-              ? "bg-[#1B4D35] text-white"
-              : "text-[#617367] hover:bg-[#F4EFE4]"
+              ? "bg-[#1A4480] text-white"
+              : "text-[#7088A5] hover:bg-[#F4EFE4]"
           } ${disabled ? "cursor-not-allowed opacity-70" : ""}`}
           disabled={disabled}
           key={String(option)}
@@ -226,7 +226,7 @@ function ReadOnlyBanner({ submittedAt }: { submittedAt: string | null }) {
   }
 
   return (
-    <div className="rounded-[28px] border border-[#C9BA98] bg-[#FFF8E8] px-6 py-5 text-[#1B4D35]">
+    <div className="rounded-[28px] border border-[#C9BA98] bg-[#FFF8E8] px-6 py-5 text-[#1A4480]">
       <p className="text-sm font-semibold uppercase tracking-[0.25em] text-[#9A7A2D]">
         Submitted
       </p>
@@ -373,12 +373,12 @@ export function InquiryForm({
             canPreview={canPreview}
             currentViewMode={currentViewMode}
           />
-          <div className="mx-auto max-w-3xl rounded-[32px] border border-[#D8D1C3] bg-white px-8 py-12 text-center shadow-[0_25px_80px_rgba(27,77,53,0.08)]">
-            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#6B8570]">
+          <div className="mx-auto max-w-3xl rounded-[32px] border border-[#D8D1C3] bg-white px-8 py-12 text-center shadow-[0_25px_80px_rgba(26,68,128,0.08)]">
+            <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#7088A5]">
               Inquiry Submitted
             </p>
             <h1
-              className="mt-6 text-5xl leading-tight text-[#1B4D35]"
+              className="mt-6 text-5xl leading-tight text-[#1A4480]"
               style={{ fontFamily: "var(--font-auth-serif)" }}
             >
               Your inquiry has been submitted.
@@ -393,7 +393,7 @@ export function InquiryForm({
   }
 
   return (
-    <main className="min-h-screen bg-[#F9F6F0] px-6 py-10 text-[#1B4D35]">
+    <main className="min-h-screen bg-[#F9F6F0] px-6 py-10 text-[#1A4480]">
       <div className="mx-auto max-w-6xl space-y-8">
         <MinistryNav
           active="inquiry"
@@ -404,7 +404,7 @@ export function InquiryForm({
         {!readOnly ? <StepHeader currentStep={currentStep} /> : null}
 
         <section className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-          <aside className="rounded-[32px] border border-[#D8D1C3] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EFE4_100%)] p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)]">
+          <aside className="rounded-[32px] border border-[#D8D1C3] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EFE4_100%)] p-8 shadow-[0_25px_80px_rgba(26,68,128,0.08)]">
             <SectionTitle
               body={introBody}
               title={
@@ -413,7 +413,7 @@ export function InquiryForm({
             />
 
             <div className="mt-8 rounded-[24px] border border-[#D8D1C3] bg-white p-5 text-sm leading-7 text-[#4F6357]">
-              <p className="font-semibold uppercase tracking-[0.25em] text-[#6B8570]">
+              <p className="font-semibold uppercase tracking-[0.25em] text-[#7088A5]">
                 Review Notes
               </p>
               <p className="mt-3">
@@ -437,7 +437,7 @@ export function InquiryForm({
           </aside>
 
           <form
-            className="rounded-[32px] border border-[#D8D1C3] bg-white p-8 shadow-[0_25px_80px_rgba(27,77,53,0.08)]"
+            className="rounded-[32px] border border-[#D8D1C3] bg-white p-8 shadow-[0_25px_80px_rgba(26,68,128,0.08)]"
             onSubmit={handleSubmit}
           >
             <div className="space-y-6">
@@ -1106,7 +1106,7 @@ export function InquiryForm({
             {!readOnly ? (
               <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-[#E8E0D3] pt-6">
                 <button
-                  className="rounded-2xl border border-[#D8D1C3] px-5 py-3 text-sm font-semibold text-[#1B4D35] transition hover:bg-[#F4EFE4]"
+                  className="rounded-2xl border border-[#D8D1C3] px-5 py-3 text-sm font-semibold text-[#1A4480] transition hover:bg-[#F4EFE4]"
                   disabled={currentStep === 0 || isPending}
                   onClick={() =>
                     setCurrentStep((step) => Math.max(step - 1, 0))
@@ -1118,7 +1118,7 @@ export function InquiryForm({
 
                 {currentStep < inquiryStepTitles.length - 1 ? (
                   <button
-                    className="rounded-2xl bg-[#1B4D35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236645] disabled:cursor-not-allowed disabled:opacity-70"
+                    className="rounded-2xl bg-[#1A4480] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2A5FA0] disabled:cursor-not-allowed disabled:opacity-70"
                     disabled={isPending}
                     onClick={handleNext}
                     type="button"
@@ -1127,7 +1127,7 @@ export function InquiryForm({
                   </button>
                 ) : (
                   <button
-                    className="rounded-2xl bg-[#1B4D35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#236645] disabled:cursor-not-allowed disabled:opacity-70"
+                    className="rounded-2xl bg-[#1A4480] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2A5FA0] disabled:cursor-not-allowed disabled:opacity-70"
                     disabled={isPending || isDisqualified}
                     type="submit"
                   >

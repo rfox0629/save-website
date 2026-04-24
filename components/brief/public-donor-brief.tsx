@@ -22,14 +22,14 @@ const PUBLIC_DILIGENCE_ITEMS = [
 function SaveMark() {
   return (
     <div className="inline-flex items-center gap-3">
-      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1B4D35] text-sm font-bold tracking-[0.22em] text-[#F9F6F0]">
+      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1A4480] text-sm font-bold tracking-[0.22em] text-[#F9F6F0]">
         S
       </div>
       <div>
-        <div className="text-sm font-semibold uppercase tracking-[0.3em] text-[#1B4D35]">
+        <div className="text-sm font-semibold uppercase tracking-[0.3em] text-[#1A4480]">
           SAVE
         </div>
-        <div className="text-xs text-[#6B8570]">Ministry Vetting</div>
+        <div className="text-xs text-[#7088A5]">Ministry Vetting</div>
       </div>
     </div>
   );
@@ -37,7 +37,7 @@ function SaveMark() {
 
 function getRecommendationBadge(level: string | null) {
   if (level === "Strongly Recommended") {
-    return "bg-[#EAF5EE] text-[#1B4D35]";
+    return "bg-[#E8F0FA] text-[#1A4480]";
   }
 
   if (level === "Recommended") {
@@ -54,7 +54,7 @@ function getRecommendationBadge(level: string | null) {
 function CheckItem({ children }: { children: React.ReactNode }) {
   return (
     <li className="flex items-start gap-3">
-      <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#EAF5EE] text-xs font-bold text-[#1B4D35]">
+      <span className="mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#E8F0FA] text-xs font-bold text-[#1A4480]">
         ✓
       </span>
       <span>{children}</span>
@@ -99,7 +99,7 @@ export function PublicDonorBrief({
     );
 
   return (
-    <article className="mx-auto w-full max-w-4xl rounded-[32px] border border-[#E3DCCF] bg-white px-6 py-8 text-[#23372B] shadow-[0_20px_60px_rgba(27,77,53,0.06)] md:px-10 md:py-10 print:max-w-none print:break-after-page print:rounded-none print:border-0 print:px-0 print:py-0 print:shadow-none">
+    <article className="mx-auto w-full max-w-4xl rounded-[32px] border border-[#E3DCCF] bg-white px-6 py-8 text-[#0E2E5C] shadow-[0_20px_60px_rgba(26,68,128,0.06)] md:px-10 md:py-10 print:max-w-none print:break-after-page print:rounded-none print:border-0 print:px-0 print:py-0 print:shadow-none">
       <header className="border-b border-[#E8E0D2] pb-8 print:break-inside-avoid-page">
         <div className="flex items-start justify-between gap-6">
           <SaveMark />
@@ -113,14 +113,14 @@ export function PublicDonorBrief({
         </div>
 
         <div className="mt-8 space-y-4">
-          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
+          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7088A5]">
             Public Donor Brief
           </p>
-          <h1 className={`${titleClassName ?? ""} text-[32px] text-[#1B4D35]`}>
+          <h1 className={`${titleClassName ?? ""} text-[32px] text-[#1A4480]`}>
             {org.legal_name}
           </h1>
           {metadata.length > 0 ? (
-            <p className="text-sm text-[#617367]">{metadata.join(" · ")}</p>
+            <p className="text-sm text-[#7088A5]">{metadata.join(" · ")}</p>
           ) : null}
 
           <div className="flex flex-wrap gap-2">
@@ -142,7 +142,7 @@ export function PublicDonorBrief({
 
       <div className="space-y-10 py-10 print:space-y-8">
         <section className="print:break-inside-avoid-page">
-          <h2 className="text-xl font-semibold text-[#1B4D35]">
+          <h2 className="text-xl font-semibold text-[#1A4480]">
             About this Ministry
           </h2>
           <p className="mt-4 text-[15px] leading-8 text-[#475A4F]">
@@ -152,7 +152,7 @@ export function PublicDonorBrief({
         </section>
 
         <section className="print:break-inside-avoid-page">
-          <h2 className="text-xl font-semibold text-[#1B4D35]">
+          <h2 className="text-xl font-semibold text-[#1A4480]">
             What We Found Commendable
           </h2>
           <ul className="mt-4 space-y-3 text-[15px] leading-8 text-[#475A4F]">
@@ -164,7 +164,7 @@ export function PublicDonorBrief({
 
         {cautions.length > 0 ? (
           <section className="print:break-inside-avoid-page">
-            <h2 className="text-xl font-semibold text-[#1B4D35]">
+            <h2 className="text-xl font-semibold text-[#1A4480]">
               Areas for Donor Awareness
             </h2>
             <div className="mt-4 border-l-4 border-[#C09A45] bg-[#FFF8E8] px-5 py-4">
@@ -182,17 +182,17 @@ export function PublicDonorBrief({
         {application.immersive_discernment_status === "completed" &&
         application.immersive_discernment_notes ? (
           <section className="print:break-inside-avoid-page">
-            <h2 className="text-xl font-semibold text-[#1B4D35]">
+            <h2 className="text-xl font-semibold text-[#1A4480]">
               On the Ground Discernment
             </h2>
-            <div className="mt-4 rounded-[24px] bg-[#EAF5EE] px-5 py-4 text-[15px] leading-8 text-[#365342]">
+            <div className="mt-4 rounded-[24px] bg-[#E8F0FA] px-5 py-4 text-[15px] leading-8 text-[#3D5576]">
               {application.immersive_discernment_notes}
             </div>
           </section>
         ) : null}
 
         <section className="print:break-inside-avoid-page">
-          <h2 className="text-xl font-semibold text-[#1B4D35]">
+          <h2 className="text-xl font-semibold text-[#1A4480]">
             Diligence Completed
           </h2>
           <ul className="mt-4 grid gap-4 text-[15px] leading-7 text-[#475A4F] md:grid-cols-2">
@@ -203,22 +203,22 @@ export function PublicDonorBrief({
         </section>
 
         <section className="print:break-inside-avoid-page">
-          <h2 className="text-xl font-semibold text-[#1B4D35]">
+          <h2 className="text-xl font-semibold text-[#1A4480]">
             Recommendation
           </h2>
           <div className="mt-4 space-y-4 rounded-[28px] bg-[#F4EFE4] px-6 py-6">
-            <p className="text-3xl text-[#1B4D35]">
+            <p className="text-3xl text-[#1A4480]">
               {brief.recommendation_level}
             </p>
             <p className="text-[15px] leading-8 text-[#475A4F]">{rationale}</p>
-            <p className="text-sm text-[#6B8570]">
+            <p className="text-sm text-[#7088A5]">
               Reviewed {reviewedDate} by SAVE Vetting Team
             </p>
           </div>
         </section>
       </div>
 
-      <footer className="border-t border-[#E8E0D2] pt-6 text-sm leading-7 text-[#6B8570] print:break-inside-avoid-page">
+      <footer className="border-t border-[#E8E0D2] pt-6 text-sm leading-7 text-[#7088A5] print:break-inside-avoid-page">
         This brief is for informational purposes only. SAVE does not guarantee
         outcomes. Donors are encouraged to conduct their own additional due
         diligence.

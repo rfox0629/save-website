@@ -19,7 +19,7 @@ type DashboardPageProps = {
 
 function getDashboardStatusPillClass(status: Applications["status"]) {
   if (status === "approved") {
-    return "border-emerald-200 bg-emerald-50 text-emerald-800";
+    return "border-blue-200 bg-blue-50 text-blue-800";
   }
 
   if (status === "under_review" || status === "inquiry_approved") {
@@ -43,7 +43,7 @@ function getDashboardScoreTone(score: number | null) {
   }
 
   if (score >= 80) {
-    return "text-emerald-700";
+    return "text-blue-700";
   }
 
   if (score >= 60) {
@@ -71,11 +71,11 @@ function getDashboardSeverityClass(severity: RiskFlag["severity"]) {
 
 function SummaryCard({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-3xl border border-[#E5DED0] bg-white p-5 shadow-[0_16px_40px_rgba(27,77,53,0.05)]">
+    <div className="rounded-3xl border border-[#E5DED0] bg-white p-5 shadow-[0_16px_40px_rgba(26,68,128,0.05)]">
       <p className="text-xs uppercase tracking-[0.28em] text-[#8B7A57]">
         {label}
       </p>
-      <p className="mt-3 text-3xl font-semibold text-[#1B4D35]">{value}</p>
+      <p className="mt-3 text-3xl font-semibold text-[#1A4480]">{value}</p>
     </div>
   );
 }
@@ -89,18 +89,18 @@ export default async function InternalDashboardPage({
   ]);
 
   return (
-    <main className="min-h-screen bg-[#F7F6F2] px-6 py-10 text-[#1B4D35]">
+    <main className="min-h-screen bg-[#F7F6F2] px-6 py-10 text-[#1A4480]">
       <div className="mx-auto max-w-7xl space-y-8">
-        <section className="rounded-[2rem] border border-[#E5DED0] bg-[#FFFDF8] p-8 shadow-[0_24px_60px_rgba(27,77,53,0.06)]">
+        <section className="rounded-[2rem] border border-[#E5DED0] bg-[#FFFDF8] p-8 shadow-[0_24px_60px_rgba(26,68,128,0.06)]">
           <p className="text-xs uppercase tracking-[0.35em] text-[#8B7A57]">
             Internal Review
           </p>
           <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
-              <h1 className="text-3xl font-semibold text-[#1B4D35]">
+              <h1 className="text-3xl font-semibold text-[#1A4480]">
                 Application dashboard
               </h1>
-              <p className="mt-2 max-w-3xl text-sm text-[#5E6C62]">
+              <p className="mt-2 max-w-3xl text-sm text-[#7088A5]">
                 Review applications, triage flags, and move ministries through
                 inquiry, vetting, and final decisions.
               </p>
@@ -130,12 +130,12 @@ export default async function InternalDashboardPage({
           />
         </section>
 
-        <section className="rounded-[2rem] border border-[#E5DED0] bg-white p-6 shadow-[0_16px_40px_rgba(27,77,53,0.05)]">
+        <section className="rounded-[2rem] border border-[#E5DED0] bg-white p-6 shadow-[0_16px_40px_rgba(26,68,128,0.05)]">
           <form className="grid gap-4 md:grid-cols-4">
             <div className="space-y-2">
-              <label className="text-sm text-[#5E6C62]">Status</label>
+              <label className="text-sm text-[#7088A5]">Status</label>
               <select
-                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10"
                 defaultValue={data.filters.status ?? "all"}
                 name="status"
               >
@@ -158,9 +158,9 @@ export default async function InternalDashboardPage({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm text-[#5E6C62]">Score range</label>
+              <label className="text-sm text-[#7088A5]">Score range</label>
               <select
-                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10"
                 defaultValue={data.filters.scoreRange ?? "all"}
                 name="scoreRange"
               >
@@ -179,9 +179,9 @@ export default async function InternalDashboardPage({
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm text-[#5E6C62]">Flag severity</label>
+              <label className="text-sm text-[#7088A5]">Flag severity</label>
               <select
-                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/10"
+                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10"
                 defaultValue={data.filters.flagSeverity ?? "all"}
                 name="flagSeverity"
               >
@@ -202,7 +202,7 @@ export default async function InternalDashboardPage({
 
             <div className="flex items-end">
               <Button
-                className="w-full bg-[#1B4D35] text-white hover:bg-[#236645]"
+                className="w-full bg-[#1A4480] text-white hover:bg-[#2A5FA0]"
                 type="submit"
               >
                 Apply filters
@@ -211,10 +211,10 @@ export default async function InternalDashboardPage({
           </form>
         </section>
 
-        <section className="overflow-hidden rounded-[2rem] border border-[#E5DED0] bg-white shadow-[0_16px_40px_rgba(27,77,53,0.05)]">
+        <section className="overflow-hidden rounded-[2rem] border border-[#E5DED0] bg-white shadow-[0_16px_40px_rgba(26,68,128,0.05)]">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-[#ECE4D7] text-left text-sm">
-              <thead className="bg-[#FBF8F2] text-[#5E6C62]">
+              <thead className="bg-[#FBF8F2] text-[#7088A5]">
                 <tr>
                   <th className="px-5 py-4 font-medium">Organization name</th>
                   <th className="px-5 py-4 font-medium">EIN</th>
@@ -234,13 +234,13 @@ export default async function InternalDashboardPage({
                   >
                     <td className="px-5 py-4">
                       <Link
-                        className="font-medium text-[#1B4D35] transition hover:text-[#2B6B4A]"
+                        className="font-medium text-[#1A4480] transition hover:text-[#2B6B4A]"
                         href={`/applications/${row.application.id}`}
                       >
                         {row.organization.legal_name}
                       </Link>
                     </td>
-                    <td className="px-5 py-4 text-[#617367]">
+                    <td className="px-5 py-4 text-[#7088A5]">
                       {row.organization.ein ?? "Not provided"}
                     </td>
                     <td className="px-5 py-4">
@@ -271,24 +271,24 @@ export default async function InternalDashboardPage({
                           {row.flagCount}
                         </span>
                       ) : (
-                        <span className="inline-flex rounded-full border border-[#E5DED0] bg-[#FBF8F2] px-3 py-1 text-xs text-[#617367]">
+                        <span className="inline-flex rounded-full border border-[#E5DED0] bg-[#FBF8F2] px-3 py-1 text-xs text-[#7088A5]">
                           0
                         </span>
                       )}
                     </td>
-                    <td className="px-5 py-4 text-[#617367]">
+                    <td className="px-5 py-4 text-[#7088A5]">
                       {new Date(
                         row.application.created_at,
                       ).toLocaleDateString()}
                     </td>
-                    <td className="px-5 py-4 text-[#617367]">
+                    <td className="px-5 py-4 text-[#7088A5]">
                       {row.assignedReviewer ?? "Unassigned"}
                     </td>
                     <td className="px-5 py-4">
                       <Button
                         asChild
                         size="sm"
-                        className="bg-[#1B4D35] text-white hover:bg-[#236645]"
+                        className="bg-[#1A4480] text-white hover:bg-[#2A5FA0]"
                       >
                         <Link href={`/applications/${row.application.id}`}>
                           Open

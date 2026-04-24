@@ -212,12 +212,12 @@ const sections: RouteSection[] = [
 
 function RouteCard({ route }: { route: RouteEntry }) {
   return (
-    <article className="rounded-[28px] border border-[#E5DED0] bg-white p-5 shadow-[0_16px_40px_rgba(27,77,53,0.05)]">
+    <article className="rounded-[28px] border border-[#E5DED0] bg-white p-5 shadow-[0_16px_40px_rgba(26,68,128,0.05)]">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="space-y-3">
           <div>
-            <h3 className="text-lg font-semibold text-[#1B4D35]">{route.label}</h3>
-            <p className="mt-2 max-w-3xl text-sm leading-7 text-[#5E6C62]">
+            <h3 className="text-lg font-semibold text-[#1A4480]">{route.label}</h3>
+            <p className="mt-2 max-w-3xl text-sm leading-7 text-[#7088A5]">
               {route.description}
             </p>
           </div>
@@ -227,7 +227,7 @@ function RouteCard({ route }: { route: RouteEntry }) {
               <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8B7A57]">
                 Route
               </span>
-              <code className="rounded-full border border-[#E3DCCF] bg-[#FBF8F2] px-3 py-1 text-sm text-[#1B4D35]">
+              <code className="rounded-full border border-[#E3DCCF] bg-[#FBF8F2] px-3 py-1 text-sm text-[#1A4480]">
                 {route.path}
               </code>
               <CopyRouteButton value={route.path} />
@@ -238,7 +238,7 @@ function RouteCard({ route }: { route: RouteEntry }) {
                 <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8B7A57]">
                   Example
                 </span>
-                <code className="rounded-full border border-[#E3DCCF] bg-[#FBF8F2] px-3 py-1 text-sm text-[#1B4D35]">
+                <code className="rounded-full border border-[#E3DCCF] bg-[#FBF8F2] px-3 py-1 text-sm text-[#1A4480]">
                   {route.example}
                 </code>
                 <CopyRouteButton value={route.example} />
@@ -254,7 +254,7 @@ function RouteCard({ route }: { route: RouteEntry }) {
         {route.openHref ? (
           <Button
             asChild
-            className="bg-[#1B4D35] text-white hover:bg-[#236645]"
+            className="bg-[#1A4480] text-white hover:bg-[#2A5FA0]"
           >
             <Link href={route.openHref}>Open</Link>
           </Button>
@@ -272,19 +272,19 @@ export default async function MapPage() {
   await requireReviewerPageAccess();
 
   return (
-    <main className="min-h-screen bg-[#F7F6F2] px-6 py-10 text-[#1B4D35]">
+    <main className="min-h-screen bg-[#F7F6F2] px-6 py-10 text-[#1A4480]">
       <div className="mx-auto max-w-7xl space-y-8">
-        <section className="rounded-[32px] border border-[#E5DED0] bg-[#FFFDF8] p-8 shadow-[0_24px_60px_rgba(27,77,53,0.06)] md:p-10">
+        <section className="rounded-[32px] border border-[#E5DED0] bg-[#FFFDF8] p-8 shadow-[0_24px_60px_rgba(26,68,128,0.06)] md:p-10">
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#8B7A57]">
             Internal Map
           </p>
           <h1
-            className="mt-5 text-4xl text-[#1B4D35] md:text-5xl"
+            className="mt-5 text-4xl text-[#1A4480] md:text-5xl"
             style={{ fontFamily: "var(--font-auth-serif)" }}
           >
             SAVE route map
           </h1>
-          <p className="mt-4 max-w-4xl text-base leading-8 text-[#5E6C62]">
+          <p className="mt-4 max-w-4xl text-base leading-8 text-[#7088A5]">
             A hidden internal control-panel style sitemap for navigating the
             main product surfaces quickly. This page is based on the current
             routes present in the app directory.
@@ -298,7 +298,7 @@ export default async function MapPage() {
               {sections.map((section) => (
                 <a
                   key={section.id}
-                  className="rounded-full border border-[#E3DCCF] bg-[#FBF8F2] px-4 py-2 text-sm font-medium text-[#5E6C62] transition hover:border-[#D4C6AE] hover:text-[#1B4D35]"
+                  className="rounded-full border border-[#E3DCCF] bg-[#FBF8F2] px-4 py-2 text-sm font-medium text-[#7088A5] transition hover:border-[#D4C6AE] hover:text-[#1A4480]"
                   href={`#${section.id}`}
                 >
                   {section.title}
@@ -312,14 +312,14 @@ export default async function MapPage() {
           <section
             key={section.id}
             id={section.id}
-            className="space-y-4 rounded-[32px] border border-[#E5DED0] bg-[#FFFDF8] p-6 shadow-[0_16px_40px_rgba(27,77,53,0.05)] md:p-8"
+            className="space-y-4 rounded-[32px] border border-[#E5DED0] bg-[#FFFDF8] p-6 shadow-[0_16px_40px_rgba(26,68,128,0.05)] md:p-8"
           >
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#8B7A57]">
                 Route Group
               </p>
               <h2
-                className="mt-3 text-3xl text-[#1B4D35]"
+                className="mt-3 text-3xl text-[#1A4480]"
                 style={{ fontFamily: "var(--font-auth-serif)" }}
               >
                 {section.title}

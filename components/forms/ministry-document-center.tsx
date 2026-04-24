@@ -152,17 +152,17 @@ export function MinistryDocumentCenter({
   return (
     <div className="space-y-8">
       {toastMessage ? (
-        <div className="fixed right-6 top-6 z-50 rounded-2xl border border-[#B7D7C4] bg-[#EAF5EE] px-4 py-3 text-sm font-medium text-[#1B4D35] shadow-[0_18px_40px_rgba(27,77,53,0.12)]">
+        <div className="fixed right-6 top-6 z-50 rounded-2xl border border-[#B8D2EE] bg-[#E8F0FA] px-4 py-3 text-sm font-medium text-[#1A4480] shadow-[0_18px_40px_rgba(26,68,128,0.12)]">
           {toastMessage}
         </div>
       ) : null}
 
-      <section className="rounded-[32px] border border-[#D8D1C3] bg-white p-8 shadow-[0_20px_60px_rgba(27,77,53,0.07)]">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
+      <section className="rounded-[32px] border border-[#D8D1C3] bg-white p-8 shadow-[0_20px_60px_rgba(26,68,128,0.07)]">
+        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7088A5]">
           Section 1
         </p>
         <h2
-          className="mt-4 text-3xl text-[#1B4D35]"
+          className="mt-4 text-3xl text-[#1A4480]"
           style={{ fontFamily: "var(--font-auth-serif)" }}
         >
           Uploaded Documents
@@ -186,13 +186,13 @@ export function MinistryDocumentCenter({
               <tbody className="divide-y divide-[#EEE7DA] bg-white">
                 {documents.map((document) => (
                   <tr key={document.id}>
-                    <td className="px-5 py-4 text-[#1B4D35]">
+                    <td className="px-5 py-4 text-[#1A4480]">
                       {document.document_type}
                     </td>
                     <td className="px-5 py-4">
                       {document.signedUrl ? (
                         <a
-                          className="font-medium text-[#1B4D35] underline decoration-[#C09A45]/60 underline-offset-4 hover:text-[#2F7A53]"
+                          className="font-medium text-[#1A4480] underline decoration-[#C09A45]/60 underline-offset-4 hover:text-[#2F7A53]"
                           href={document.signedUrl}
                           rel="noreferrer"
                           target="_blank"
@@ -212,7 +212,7 @@ export function MinistryDocumentCenter({
                       <span
                         className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                           document.reviewed
-                            ? "bg-[#EAF5EE] text-[#1B4D35]"
+                            ? "bg-[#E8F0FA] text-[#1A4480]"
                             : "bg-[#FFF4DA] text-[#8A6720]"
                         }`}
                       >
@@ -224,7 +224,7 @@ export function MinistryDocumentCenter({
                 {documents.length === 0 ? (
                   <tr>
                     <td
-                      className="px-5 py-12 text-center text-[#6B8570]"
+                      className="px-5 py-12 text-center text-[#7088A5]"
                       colSpan={4}
                     >
                       No documents uploaded yet.
@@ -237,12 +237,12 @@ export function MinistryDocumentCenter({
         </div>
       </section>
 
-      <section className="rounded-[32px] border border-[#D8D1C3] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EFE4_100%)] p-8 shadow-[0_20px_60px_rgba(27,77,53,0.07)]">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#6B8570]">
+      <section className="rounded-[32px] border border-[#D8D1C3] bg-[linear-gradient(135deg,#FFFDF8_0%,#F4EFE4_100%)] p-8 shadow-[0_20px_60px_rgba(26,68,128,0.07)]">
+        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7088A5]">
           Section 2
         </p>
         <h2
-          className="mt-4 text-3xl text-[#1B4D35]"
+          className="mt-4 text-3xl text-[#1A4480]"
           style={{ fontFamily: "var(--font-auth-serif)" }}
         >
           Upload New Document
@@ -254,10 +254,10 @@ export function MinistryDocumentCenter({
         </p>
 
         <div className="mt-8 grid gap-5 md:grid-cols-[220px,1fr]">
-          <label className="space-y-2 text-sm font-medium text-[#1B4D35]">
+          <label className="space-y-2 text-sm font-medium text-[#1A4480]">
             <span>Document type</span>
             <select
-              className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1B4D35] outline-none transition focus:border-[#1B4D35] focus:ring-2 focus:ring-[#1B4D35]/20 disabled:cursor-not-allowed disabled:bg-[#F4EFE4] disabled:text-[#617367]"
+              className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/20 disabled:cursor-not-allowed disabled:bg-[#F4EFE4] disabled:text-[#7088A5]"
               disabled={readOnly}
               onChange={(event) =>
                 setSelectedType(
@@ -274,11 +274,11 @@ export function MinistryDocumentCenter({
             </select>
           </label>
 
-          <label className="space-y-2 text-sm font-medium text-[#1B4D35]">
+          <label className="space-y-2 text-sm font-medium text-[#1A4480]">
             <span>Choose file</span>
             <input
               accept=".pdf,application/pdf"
-              className="w-full rounded-2xl border border-dashed border-[#CDBFA3] bg-[#FFFDF8] px-4 py-3 text-sm text-[#4F6357] file:mr-4 file:rounded-full file:border-0 file:bg-[#1B4D35] file:px-4 file:py-2 file:font-medium file:text-white disabled:cursor-not-allowed disabled:bg-[#F4EFE4] disabled:text-[#617367]"
+              className="w-full rounded-2xl border border-dashed border-[#CDBFA3] bg-[#FFFDF8] px-4 py-3 text-sm text-[#4F6357] file:mr-4 file:rounded-full file:border-0 file:bg-[#1A4480] file:px-4 file:py-2 file:font-medium file:text-white disabled:cursor-not-allowed disabled:bg-[#F4EFE4] disabled:text-[#7088A5]"
               disabled={readOnly}
               onChange={(event) => setFile(event.target.files?.[0] ?? null)}
               type="file"
@@ -290,7 +290,7 @@ export function MinistryDocumentCenter({
           <div className="mt-6 space-y-2">
             <div className="h-3 overflow-hidden rounded-full bg-[#E5DDD0]">
               <div
-                className="h-full rounded-full bg-[#1B4D35] transition-all duration-200"
+                className="h-full rounded-full bg-[#1A4480] transition-all duration-200"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -308,7 +308,7 @@ export function MinistryDocumentCenter({
 
         <div className="mt-8">
           <Button
-            className="min-w-[180px] bg-[#1B4D35] text-white hover:bg-[#236645]"
+            className="min-w-[180px] bg-[#1A4480] text-white hover:bg-[#2A5FA0]"
             disabled={pending || readOnly}
             onClick={() => void handleUpload()}
             type="button"
