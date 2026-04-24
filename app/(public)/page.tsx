@@ -6,10 +6,10 @@ function HeroWheatBackground() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute right-[18px] top-[54%] hidden h-[900px] w-[670px] -translate-y-1/2 bg-contain bg-right bg-no-repeat opacity-100 md:block lg:right-[30px] lg:h-[960px] lg:w-[710px] xl:right-[44px] xl:h-[1020px] xl:w-[750px]"
+      className="pointer-events-none absolute right-[56px] top-[52%] hidden h-[1040px] w-[760px] -translate-y-1/2 bg-contain bg-right bg-no-repeat opacity-100 md:block lg:right-[88px] lg:h-[1120px] lg:w-[820px] xl:right-[124px] xl:h-[1200px] xl:w-[880px]"
       style={{ backgroundImage: "url('/hero-wheat-cropped.png')" }}
     >
-      <div className="absolute inset-y-0 left-[-250px] w-[330px] bg-gradient-to-r from-[#FEFCF8] via-[#FEFCF8]/95 to-transparent lg:left-[-230px] lg:w-[310px] xl:left-[-210px] xl:w-[290px]" />
+      <div className="absolute inset-y-0 left-[-320px] w-[420px] bg-gradient-to-r from-[#FEFCF8] via-[#FEFCF8]/95 to-transparent lg:left-[-300px] lg:w-[390px] xl:left-[-270px] xl:w-[350px]" />
     </div>
   );
 }
