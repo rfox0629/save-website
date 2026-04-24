@@ -4,160 +4,13 @@ import { getCurrentUserRole } from "@/lib/auth";
 
 function HeroWheatBackground() {
   return (
-    <svg
+    <div
       aria-hidden="true"
-      className="pointer-events-none absolute right-[-40px] top-[34px] h-[980px] w-[760px] opacity-70"
-      fill="none"
-      viewBox="0 0 760 980"
-      xmlns="http://www.w3.org/2000/svg"
+      className="pointer-events-none absolute right-[40px] top-[52%] hidden h-[1240px] w-[1000px] -translate-y-1/2 bg-contain bg-right bg-no-repeat opacity-100 md:block lg:right-[70px] lg:h-[1320px] lg:w-[1080px] xl:right-[110px] xl:h-[1400px] xl:w-[1160px]"
+      style={{ backgroundImage: "url('/hero-wheat-background.png')" }}
     >
-      <path
-        d="M296 976C310 851 341 741 396 635C453 525 530 432 647 332"
-        stroke="#FDF5E0"
-        strokeLinecap="round"
-        strokeWidth="18"
-      />
-      <path
-        d="M425 760C385 737 346 727 297 725"
-        stroke="#FDF5E0"
-        strokeLinecap="round"
-        strokeWidth="12"
-      />
-      <path
-        d="M487 636C439 617 394 611 344 615"
-        stroke="#FDF5E0"
-        strokeLinecap="round"
-        strokeWidth="12"
-      />
-      <path
-        d="M548 524C494 506 449 503 393 507"
-        stroke="#FDF5E0"
-        strokeLinecap="round"
-        strokeWidth="12"
-      />
-      <path
-        d="M607 424C554 411 510 411 455 418"
-        stroke="#FDF5E0"
-        strokeLinecap="round"
-        strokeWidth="12"
-      />
-      <path
-        d="M657 347C618 337 587 336 547 343"
-        stroke="#FDF5E0"
-        strokeLinecap="round"
-        strokeWidth="10"
-      />
-      <path
-        d="M365 628C349 572 346 514 358 440"
-        stroke="#FDF5E0"
-        strokeLinecap="round"
-        strokeWidth="12"
-      />
-      <path
-        d="M441 514C424 450 423 391 437 319"
-        stroke="#FDF5E0"
-        strokeLinecap="round"
-        strokeWidth="12"
-      />
-      <path
-        d="M523 412C508 351 511 285 530 215"
-        stroke="#FDF5E0"
-        strokeLinecap="round"
-        strokeWidth="12"
-      />
-      <path
-        d="M593 329C584 271 592 211 621 159"
-        stroke="#FDF5E0"
-        strokeLinecap="round"
-        strokeWidth="12"
-      />
-      <path
-        d="M688 210C711 184 734 169 760 163"
-        stroke="#FDF5E0"
-        strokeLinecap="round"
-        strokeWidth="10"
-      />
-      <ellipse
-        cx="356"
-        cy="791"
-        fill="#FDF5E0"
-        rx="44"
-        ry="136"
-        transform="rotate(11 356 791)"
-      />
-      <ellipse
-        cx="453"
-        cy="642"
-        fill="#FDF5E0"
-        rx="38"
-        ry="118"
-        transform="rotate(-59 453 642)"
-      />
-      <ellipse
-        cx="524"
-        cy="540"
-        fill="#FDF5E0"
-        rx="35"
-        ry="110"
-        transform="rotate(-58 524 540)"
-      />
-      <ellipse
-        cx="595"
-        cy="439"
-        fill="#FDF5E0"
-        rx="33"
-        ry="102"
-        transform="rotate(-57 595 439)"
-      />
-      <ellipse
-        cx="658"
-        cy="354"
-        fill="#FDF5E0"
-        rx="23"
-        ry="70"
-        transform="rotate(-56 658 354)"
-      />
-      <ellipse
-        cx="717"
-        cy="279"
-        fill="#FDF5E0"
-        rx="16"
-        ry="47"
-        transform="rotate(-54 717 279)"
-      />
-      <ellipse
-        cx="370"
-        cy="581"
-        fill="#FDF5E0"
-        rx="40"
-        ry="120"
-        transform="rotate(5 370 581)"
-      />
-      <ellipse
-        cx="458"
-        cy="456"
-        fill="#FDF5E0"
-        rx="38"
-        ry="116"
-        transform="rotate(8 458 456)"
-      />
-      <ellipse
-        cx="538"
-        cy="313"
-        fill="#FDF5E0"
-        rx="34"
-        ry="108"
-        transform="rotate(18 538 313)"
-      />
-      <ellipse
-        cx="620"
-        cy="222"
-        fill="#FDF5E0"
-        rx="30"
-        ry="95"
-        transform="rotate(28 620 222)"
-      />
-    </svg>
+      <div className="absolute inset-y-0 left-[-420px] w-[560px] bg-gradient-to-r from-[#FEFCF8] via-[#FEFCF8]/96 to-transparent lg:left-[-390px] lg:w-[520px] xl:left-[-350px] xl:w-[470px]" />
+    </div>
   );
 }
 
@@ -288,19 +141,19 @@ export default async function PublicHomePage() {
       <section className="relative flex min-h-screen flex-col justify-center overflow-hidden bg-[#FEFCF8] px-6 pb-20 pt-[130px] md:px-[52px] md:pb-20">
         <HeroWheatBackground />
 
-        <div className="relative z-10">
+        <div className="relative z-10 max-w-[720px]">
           <div className="mb-7 inline-flex items-center gap-[10px] text-[12px] font-semibold uppercase tracking-[0.18em] text-[#2A5FA0]">
             <div className="h-1.5 w-1.5 rounded-full bg-[#E8A020]" />
             Trusted Kingdom Giving
           </div>
 
-          <h1 className="font-public-serif max-w-[720px] text-[40px] font-medium leading-[1.1] text-[#1A4480] md:text-[72px]">
+          <h1 className="font-public-serif text-[40px] font-medium leading-[1.1] tracking-[-0.025em] text-[#1A4480] md:text-[72px]">
             Give with clarity.
             <br />
             Give with{" "}
-            <span className="relative inline-block italic text-[#3B7AC2]">
+            <span className="relative inline-block italic text-[#3E6FB6]">
               conviction.
-              <span className="absolute inset-x-0 bottom-1 h-[3px] rounded-[2px] bg-[#F5C842]" />
+              <span className="absolute inset-x-0 bottom-1 h-[3px] rounded-[2px] bg-[#E5B94E]" />
             </span>
           </h1>
 
@@ -326,20 +179,20 @@ export default async function PublicHomePage() {
           </div>
         </div>
 
-        <div className="absolute bottom-[72px] right-[52px] hidden gap-10 xl:flex">
+        <div className="absolute bottom-[72px] right-6 hidden gap-5 lg:flex xl:right-[52px] xl:gap-10">
           {[
             ["100", "Point model"],
             ["6", "Core categories"],
             ["8+", "Data sources"],
           ].map(([value, label]) => (
             <div
-              className="rounded-xl border border-[rgba(26,68,128,0.1)] bg-white px-6 py-5 text-center shadow-[0_4px_24px_rgba(26,68,128,0.07)]"
+              className="rounded-xl border border-[rgba(26,68,128,0.1)] bg-white px-5 py-4 text-center shadow-[0_4px_24px_rgba(26,68,128,0.07)] xl:px-6 xl:py-5"
               key={label}
             >
-              <span className="font-public-serif block text-[36px] font-semibold leading-none text-[#1A4480]">
+              <span className="font-public-serif block text-[32px] font-semibold leading-none text-[#1A4480] xl:text-[36px]">
                 {value}
               </span>
-              <span className="mt-[5px] block text-[11px] font-medium uppercase tracking-[0.1em] text-[#7088A5]">
+              <span className="mt-[5px] block text-[10px] font-medium uppercase tracking-[0.1em] text-[#7088A5] xl:text-[11px]">
                 {label}
               </span>
             </div>
