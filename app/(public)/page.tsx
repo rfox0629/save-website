@@ -6,10 +6,10 @@ function HeroWheatBackground() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute right-[40px] top-[52%] hidden h-[1240px] w-[1000px] -translate-y-1/2 bg-contain bg-right bg-no-repeat opacity-100 md:block lg:right-[70px] lg:h-[1320px] lg:w-[1080px] xl:right-[110px] xl:h-[1400px] xl:w-[1160px]"
-      style={{ backgroundImage: "url('/hero-wheat-background.png')" }}
+      className="pointer-events-none absolute right-[18px] top-[54%] hidden h-[900px] w-[670px] -translate-y-1/2 bg-contain bg-right bg-no-repeat opacity-100 md:block lg:right-[30px] lg:h-[960px] lg:w-[710px] xl:right-[44px] xl:h-[1020px] xl:w-[750px]"
+      style={{ backgroundImage: "url('/hero-wheat-cropped.png')" }}
     >
-      <div className="absolute inset-y-0 left-[-420px] w-[560px] bg-gradient-to-r from-[#FEFCF8] via-[#FEFCF8]/96 to-transparent lg:left-[-390px] lg:w-[520px] xl:left-[-350px] xl:w-[470px]" />
+      <div className="absolute inset-y-0 left-[-250px] w-[330px] bg-gradient-to-r from-[#FEFCF8] via-[#FEFCF8]/95 to-transparent lg:left-[-230px] lg:w-[310px] xl:left-[-210px] xl:w-[290px]" />
     </div>
   );
 }
