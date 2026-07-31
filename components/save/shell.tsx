@@ -410,7 +410,7 @@ function PublicFooter() {
               },
             ].map((column) => (
               <div key={column.title}>
-                <p className="save-eyebrow mb-3.5 text-brass-600">
+                <p className="save-eyebrow mb-3.5 text-brass-700">
                   {column.title}
                 </p>
                 <ul className="space-y-2.5">

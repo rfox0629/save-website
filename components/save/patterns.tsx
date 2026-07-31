@@ -410,7 +410,7 @@ export function EvidenceRow({
         <div className="flex flex-wrap items-center gap-2">
           <p className="text-sm font-medium text-ink-900">{item.name}</p>
           {item.required ? (
-            <span className="text-micro uppercase tracking-[0.08em] text-brass-600">
+            <span className="text-micro uppercase tracking-[0.08em] text-brass-700">
               Required
             </span>
           ) : null}
@@ -600,7 +600,7 @@ export function AssessmentProvenance({
   return (
     <Card className="p-5" tone="seal">
       <div className="flex items-start gap-3">
-        <SealMark className="mt-0.5 h-4 w-4 shrink-0 text-brass-600" />
+        <SealMark className="mt-0.5 h-4 w-4 shrink-0 text-brass-700" />
         <div>
           <p className="text-caption font-semibold text-brass-700">
             Independently assessed by SAVE

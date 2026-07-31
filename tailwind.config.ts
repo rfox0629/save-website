@@ -39,6 +39,7 @@ const config: Config = {
           50: "var(--save-paper-50)",
         },
         brass: {
+          800: "var(--save-brass-800)",
           700: "var(--save-brass-700)",
           600: "var(--save-brass-600)",
           500: "var(--save-brass-500)",

@@ -43,7 +43,7 @@ export default function LibraryPage() {
       {/* ---------------------------------------------------------- Hero -- */}
       <section className="save-texture border-b border-hairline bg-paper-200">
         <div className="mx-auto max-w-content px-5 py-16 md:px-8 md:py-20">
-          <p className="save-eyebrow text-brass-600">The SAVE Standard</p>
+          <p className="save-eyebrow text-brass-700">The SAVE Standard</p>
           <h1 className="save-display mt-4 max-w-3xl text-display-lg font-semibold text-ink-900 md:text-display-xl">
             Ministries worth a lifetime relationship.
           </h1>
@@ -153,7 +153,7 @@ export default function LibraryPage() {
         <div className="mx-auto max-w-content px-5 py-16 md:px-8">
           <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
             <div>
-              <p className="save-eyebrow text-brass-600">How we assess</p>
+              <p className="save-eyebrow text-brass-700">How we assess</p>
               <h2 className="save-display mt-3.5 text-display-md font-semibold text-ink-900">
                 Six categories. One standard. No exceptions.
               </h2>

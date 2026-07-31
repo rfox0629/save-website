@@ -195,7 +195,7 @@ export default function MinistryOverviewPage() {
         <aside className="space-y-6">
           <Card>
             <CardBody>
-              <p className="save-eyebrow text-brass-600">Your reviewer</p>
+              <p className="save-eyebrow text-brass-700">Your reviewer</p>
               <div className="mt-4 flex items-center gap-3.5">
                 <Monogram name={MINISTRY_ACCOUNT.reviewer} size="lg" tone="brass" />
                 <div className="min-w-0">

@@ -123,7 +123,7 @@ const BUTTON_VARIANT = {
     "border border-hairline-strong bg-surface text-ink-800 shadow-e1 hover:border-ink-300 hover:bg-paper-100 active:translate-y-px",
   ghost: "text-ink-600 hover:bg-ink-50 hover:text-ink-800",
   brass:
-    "bg-brass-600 text-paper-50 shadow-e1 hover:bg-brass-700 active:translate-y-px",
+    "bg-brass-700 text-paper-50 shadow-e1 hover:bg-brass-800 active:translate-y-px",
   quiet: "text-ink-500 hover:text-ink-800 underline underline-offset-4",
   danger:
     "border border-risk-100 bg-risk-50 text-risk-700 hover:bg-risk-100 active:translate-y-px",
@@ -247,7 +247,7 @@ export function TrustSeal({
       />
       <span className="tracking-[0.02em]">{tier}</span>
       {year ? (
-        <span className="save-numeric font-medium text-brass-600 opacity-80">
+        <span className="save-numeric font-medium text-brass-700 opacity-80">
           {year}
         </span>
       ) : null}
@@ -302,7 +302,7 @@ export function PageTitle({
     <div className="flex flex-wrap items-end justify-between gap-5">
       <div className="min-w-0">
         {eyebrow ? (
-          <p className="save-eyebrow mb-2.5 text-brass-600">{eyebrow}</p>
+          <p className="save-eyebrow mb-2.5 text-brass-700">{eyebrow}</p>
         ) : null}
         <h1 className="save-display text-display-md font-semibold text-ink-900">
           {children}
@@ -594,7 +594,7 @@ export function Field({
         <span className="text-sm font-medium text-ink-800">
           {label}
           {required ? (
-            <span className="ml-1 text-brass-600" title="Required">
+            <span className="ml-1 text-brass-700" title="Required">
               *
             </span>
           ) : null}

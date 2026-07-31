@@ -199,7 +199,7 @@ export default function DonorHomePage() {
           {/* Advisor: the relationship, not a support ticket. */}
           <Card id="advisor">
             <CardBody>
-              <p className="save-eyebrow text-brass-600">Your SAVE advisor</p>
+              <p className="save-eyebrow text-brass-700">Your SAVE advisor</p>
               <div className="mt-4 flex items-center gap-3.5">
                 <Monogram name={DONOR.advisor.name} size="lg" tone="brass" />
                 <div className="min-w-0">

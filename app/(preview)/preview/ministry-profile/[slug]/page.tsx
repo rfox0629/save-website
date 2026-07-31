@@ -77,7 +77,7 @@ export default function MinistryProfilePage({
               <div className="flex items-center gap-4">
                 <Monogram name={ministry.name} size="xl" />
                 <div className="min-w-0">
-                  <p className="save-eyebrow text-brass-600">
+                  <p className="save-eyebrow text-brass-700">
                     {ministry.category}
                   </p>
                   <h1 className="save-display mt-2 text-display-md font-semibold text-ink-900">

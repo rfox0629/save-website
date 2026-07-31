@@ -20,7 +20,7 @@
   --save-ink-700: #1d4378;
   --save-ink-600: #2a5691;
   --save-ink-500: #4a6e9b;
-  --save-ink-400: #7089ac;
+  --save-ink-400: #5b7291;
   --save-ink-300: #a3b4c9;
   --save-ink-200: #c9d4e2;
   --save-ink-100: #e2e9f1;
@@ -35,6 +35,9 @@
   --save-paper-500: #b9b0a0;
 
   /* --- Brass: verification only. Never a generic accent. --------------- */
+  /* 700 is the lightest brass clearing 4.5:1 on paper, so it carries every
+     brass text use and the brass button fill; 600 and lighter are surfaces. */
+  --save-brass-800: #6b4b12;
   --save-brass-700: #8a6318;
   --save-brass-600: #a87a22;
   --save-brass-500: #c4952f;
