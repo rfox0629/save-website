@@ -21,8 +21,12 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Save Website",
-  description: "Project scaffold for Save Website",
+  title: {
+    default: "SAVE Standard",
+    template: "%s · SAVE Standard",
+  },
+  description:
+    "SAVE connects generous donors with ministries they can trust — through a relational standard of assessment, discernment, and ongoing relationship.",
   icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon-32x32.png",

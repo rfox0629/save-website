@@ -29,8 +29,8 @@ import { getMinistry } from "@/lib/preview/data";
 export const metadata: Metadata = { title: "Publishing" };
 
 const PUBLISH_QUEUE = [
-  { decided: "2026-07-24", id: "APP-2026-0142", ministry: "Bright Path Foster Care", stage: "Ready to publish", tier: "High Confidence Opportunity" },
-  { decided: "2026-07-26", id: "APP-2026-0144", ministry: "Sierra Leone Medical Mission", stage: "Awaiting ministry sign-off", tier: "Strong Opportunity" },
+  { decided: "2026-07-24", id: "APP-2026-0142", ministry: "Bright Path Foster Care", stage: "Ready to publish", tier: "Ready for partnership" },
+  { decided: "2026-07-26", id: "APP-2026-0144", ministry: "Sierra Leone Medical Mission", stage: "Awaiting ministry sign-off", tier: "Strong and worth knowing" },
 ];
 
 /**

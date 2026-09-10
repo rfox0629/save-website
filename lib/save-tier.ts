@@ -1,10 +1,10 @@
 import type { PublicVoiceAlignmentData } from "@/lib/brief";
 
 export type SaveTier =
-  | "High Confidence Opportunity"
-  | "Strong Opportunity"
-  | "Proceed with Discernment"
-  | "Not Recommended";
+  | "Ready for partnership"
+  | "Strong and worth knowing"
+  | "Worth a conversation"
+  | "Not ready";
 
 type SaveTierInput = {
   categoryConfidences?: Array<string | null | undefined>;
@@ -57,7 +57,7 @@ export function getSaveTier(input: SaveTierInput): SaveTier {
   const moderateRisk = risksCount <= 3 && lowConfidenceCount <= 2;
 
   if (heavyNegative) {
-    return "Not Recommended";
+    return "Not ready";
   }
 
   if (
@@ -65,7 +65,7 @@ export function getSaveTier(input: SaveTierInput): SaveTier {
     lowRisk &&
     voiceStatus === "aligned"
   ) {
-    return "High Confidence Opportunity";
+    return "Ready for partnership";
   }
 
   if (
@@ -73,7 +73,7 @@ export function getSaveTier(input: SaveTierInput): SaveTier {
     moderateRisk &&
     voiceStatus !== "misaligned"
   ) {
-    return "Strong Opportunity";
+    return "Strong and worth knowing";
   }
 
   if (
@@ -82,10 +82,10 @@ export function getSaveTier(input: SaveTierInput): SaveTier {
     moderateRisk &&
     voiceStatus === "aligned"
   ) {
-    return "Strong Opportunity";
+    return "Strong and worth knowing";
   }
 
-  return "Proceed with Discernment";
+  return "Worth a conversation";
 }
 
 export function getSaveTierClass(
@@ -94,11 +94,11 @@ export function getSaveTierClass(
 ) {
   if (theme === "dark") {
     switch (tier) {
-      case "High Confidence Opportunity":
+      case "Ready for partnership":
         return "border-blue-400/20 bg-blue-400/10 text-blue-200";
-      case "Strong Opportunity":
+      case "Strong and worth knowing":
         return "border-sky-400/20 bg-sky-400/10 text-sky-200";
-      case "Proceed with Discernment":
+      case "Worth a conversation":
         return "border-amber-400/20 bg-amber-400/10 text-amber-200";
       default:
         return "border-rose-400/20 bg-rose-400/10 text-rose-200";
@@ -106,11 +106,11 @@ export function getSaveTierClass(
   }
 
   switch (tier) {
-    case "High Confidence Opportunity":
+    case "Ready for partnership":
       return "border-blue-200 bg-blue-50 text-blue-900";
-    case "Strong Opportunity":
+    case "Strong and worth knowing":
       return "border-sky-200 bg-sky-50 text-sky-900";
-    case "Proceed with Discernment":
+    case "Worth a conversation":
       return "border-amber-200 bg-amber-50 text-amber-900";
     default:
       return "border-rose-200 bg-rose-50 text-rose-900";

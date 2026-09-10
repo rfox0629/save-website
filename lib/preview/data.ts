@@ -9,10 +9,10 @@
  */
 
 export type SaveTier =
-  | "High Confidence Opportunity"
-  | "Strong Opportunity"
-  | "Proceed with Discernment"
-  | "Not Recommended";
+  | "Ready for partnership"
+  | "Strong and worth knowing"
+  | "Worth a conversation"
+  | "Not ready";
 
 export const CATEGORY_LABELS = {
   doctrine: "Doctrine",
@@ -197,7 +197,7 @@ export const MINISTRIES: Ministry[] = [
         role: "Church planter, Class of 2022",
       },
     ],
-    tier: "High Confidence Opportunity",
+    tier: "Ready for partnership",
     updates: [
       {
         body: "The Springfield congregation formally called its first local elder board this month, completing our handoff four months ahead of plan.",
@@ -313,7 +313,7 @@ export const MINISTRIES: Ministry[] = [
         role: "Community elder, Turkana",
       },
     ],
-    tier: "Strong Opportunity",
+    tier: "Strong and worth knowing",
     updates: [
       {
         body: "Our independent auditor confirmed 94% of water points drilled since 2014 are still delivering water daily.",
@@ -423,7 +423,7 @@ export const MINISTRIES: Ministry[] = [
         role: "Graduate, 2019",
       },
     ],
-    tier: "High Confidence Opportunity",
+    tier: "Ready for partnership",
     updates: [
       {
         body: "Our Romanian-language track graduated its first full cohort of nineteen students in June.",
@@ -529,7 +529,7 @@ export const MINISTRIES: Ministry[] = [
         role: "Class of 2024",
       },
     ],
-    tier: "Proceed with Discernment",
+    tier: "Worth a conversation",
     updates: [
       {
         body: "Ninety-six percent of our class of 2026 graduated on time, our sixth consecutive year above ninety percent.",
@@ -631,7 +631,7 @@ export const MINISTRIES: Ministry[] = [
         role: "Translator, Karen project",
       },
     ],
-    tier: "Strong Opportunity",
+    tier: "Strong and worth knowing",
     updates: [
       {
         body: "The Karen New Testament went to press in April after eleven years of work.",
@@ -733,7 +733,7 @@ export const MINISTRIES: Ministry[] = [
         role: "Elder, Ouro Branco",
       },
     ],
-    tier: "Strong Opportunity",
+    tier: "Strong and worth knowing",
     updates: [
       {
         body: "Our 2021 cohort of five congregations all reached full financial self-support this year.",
@@ -754,10 +754,10 @@ export const TIER_TONE: Record<
   SaveTier,
   "sage" | "ink" | "brass" | "clay" | "risk"
 > = {
-  "High Confidence Opportunity": "sage",
-  "Strong Opportunity": "ink",
-  "Proceed with Discernment": "clay",
-  "Not Recommended": "risk",
+  "Ready for partnership": "sage",
+  "Strong and worth knowing": "ink",
+  "Worth a conversation": "clay",
+  "Not ready": "risk",
 };
 
 /* ------------------------------------------------------------------ Donor */

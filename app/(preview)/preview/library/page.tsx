@@ -17,7 +17,7 @@ export const metadata: Metadata = { title: "Ministry library" };
 const FILTERS = [
   { label: "Cause", options: ["All causes", "Church Planting", "Relief & Development", "Theological Education", "Bible Translation", "Urban Ministry"] },
   { label: "Region", options: ["All regions", "North America", "Africa", "Asia", "Latin America", "Europe"] },
-  { label: "Assessment", options: ["All assessments", "High Confidence Opportunity", "Strong Opportunity", "Proceed with Discernment"] },
+  { label: "Assessment", options: ["All assessments", "Ready for partnership", "Strong and worth knowing", "Worth a conversation"] },
   { label: "Budget", options: ["Any size", "Under $1M", "$1M – $5M", "Over $5M"] },
 ];
 

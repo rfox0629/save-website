@@ -79,9 +79,9 @@ export default function StaffMinistriesPage() {
               />
               <Select aria-label="Tier" className="h-9 w-auto">
                 <option>All tiers</option>
-                <option>High Confidence Opportunity</option>
-                <option>Strong Opportunity</option>
-                <option>Proceed with Discernment</option>
+                <option>Ready for partnership</option>
+                <option>Strong and worth knowing</option>
+                <option>Worth a conversation</option>
               </Select>
             </div>
           }

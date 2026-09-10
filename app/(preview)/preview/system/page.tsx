@@ -214,8 +214,8 @@ export default function DesignSystemPage() {
 
               <p className="save-eyebrow mb-4 mt-8 text-ink-400">Trust seal</p>
               <div className="flex flex-wrap items-center gap-3">
-                <TrustSeal size="sm" tier="Strong Opportunity" year={2026} />
-                <TrustSeal size="md" tier="High Confidence Opportunity" year={2026} />
+                <TrustSeal size="sm" tier="Strong and worth knowing" year={2026} />
+                <TrustSeal size="md" tier="Ready for partnership" year={2026} />
               </div>
 
               <p className="save-eyebrow mb-4 mt-8 text-ink-400">Monograms</p>

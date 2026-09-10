@@ -620,13 +620,13 @@ export function AssessmentProvenance({
 
 export function TierExplainer({ tier }: { tier: Ministry["tier"] }) {
   const copy: Record<Ministry["tier"], string> = {
-    "High Confidence Opportunity":
+    "Ready for partnership":
       "Every category assessed at high confidence with no unresolved risks. Suited to a long-term, significant relationship.",
-    "Strong Opportunity":
+    "Strong and worth knowing":
       "Strong across the standard with one or two areas we are still watching. Worth a relationship and a conversation.",
-    "Proceed with Discernment":
+    "Worth a conversation":
       "Real fruit alongside open questions. We recommend meeting the leadership before committing.",
-    "Not Recommended":
+    "Not ready":
       "Unresolved concerns against the standard. We do not recommend a giving relationship at this time.",
   };
 
