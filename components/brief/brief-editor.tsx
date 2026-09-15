@@ -1,13 +1,35 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { BriefPreview } from "@/components/brief/brief-preview";
 import { PrintButton } from "@/components/brief/print-button";
-import { Button } from "@/components/ui/button";
+import {
+  Badge,
+  Btn,
+  Callout,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Field,
+  Input,
+  Select,
+  Textarea,
+  formatDate,
+} from "@/components/save/primitives";
 import { RECOMMENDATION_LEVELS, type BriefFormData } from "@/lib/brief-shared";
 import type { Organizations } from "@/lib/supabase/types";
+
+/**
+ * The donor brief editor, on the approved design system.
+ *
+ * Behaviour is unchanged from the original dark editor — the same POST
+ * /api/brief payload, the same publish/unpublish semantics, the same live
+ * preview. What is new is that the second-reviewer gate (decision B3) is
+ * visible here, so a reviewer understands why publishing is unavailable
+ * instead of meeting a raw API error when they press the button.
+ */
 
 type SaveResult = {
   error?: string;
@@ -18,26 +40,34 @@ type SaveResult = {
 
 export function BriefEditor({
   applicationId,
+  approvedAt,
+  approvedByEmail,
   initialData,
   initialGeneratedAt,
   initialIsStale,
   initialPublicUrl,
+  isAuthor,
   org,
 }: {
   applicationId: string;
+  approvedAt: string | null;
+  approvedByEmail: string | null;
   initialData: BriefFormData;
   initialGeneratedAt: string | null;
   initialIsStale: boolean;
   initialPublicUrl: string | null;
+  isAuthor: boolean;
   org: Organizations;
 }) {
   const [form, setForm] = useState(initialData);
   const [publicUrl, setPublicUrl] = useState(initialPublicUrl);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [copyMessage, setCopyMessage] = useState<string | null>(null);
   const generatedAt = initialGeneratedAt ?? new Date().toISOString();
   const isPublished = Boolean(publicUrl) || form.published;
+  const approved = Boolean(approvedAt);
 
   const previewData = useMemo(
     () => ({
@@ -52,6 +82,7 @@ export function BriefEditor({
   async function saveBrief(publishedOverride?: boolean) {
     setPending(true);
     setMessage(null);
+    setError(null);
     setCopyMessage(null);
 
     const published =
@@ -83,12 +114,14 @@ export function BriefEditor({
       }));
       setPublicUrl(result.public_url ?? null);
       setMessage(
-        published ? "Donor brief published." : "Donor brief unpublished.",
+        published
+          ? "Donor brief published."
+          : publishedOverride === false
+            ? "Donor brief unpublished."
+            : "Draft saved.",
       );
-    } catch (error) {
-      setMessage(
-        error instanceof Error ? error.message : "Unable to save brief.",
-      );
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : "Unable to save brief.");
     } finally {
       setPending(false);
     }
@@ -103,154 +136,153 @@ export function BriefEditor({
       await navigator.clipboard.writeText(publicUrl);
       setCopyMessage("Share link copied.");
     } catch {
-      setCopyMessage("Unable to copy share link.");
+      setCopyMessage("Unable to copy — select the link above instead.");
     }
   }
 
-  return (
-    <div className="grid gap-8 lg:grid-cols-[460px,1fr]">
-      <section className="space-y-6 rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
-        <div>
-          <p className="text-xs uppercase tracking-[0.32em] text-[#C09A45]">
-            Donor Brief Editor
-          </p>
-          <h1 className="mt-3 text-3xl font-semibold text-white">
-            Build donor-facing brief
-          </h1>
-        </div>
+  function updateList(
+    key: "cautions" | "commendations",
+    index: number,
+    value: string,
+  ) {
+    setForm((current) => {
+      const next = [...current[key]];
+      next[index] = value;
+      return { ...current, [key]: next };
+    });
+  }
 
+  return (
+    <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,460px)]">
+      <div className="min-w-0 space-y-6">
         {initialIsStale ? (
-          <div className="rounded-[1.5rem] border border-amber-400/20 bg-amber-400/10 px-5 py-4 text-amber-100">
-            <p className="text-sm font-semibold">
-              This donor brief is out of date with the latest review data.
-            </p>
-            <p className="mt-1 text-sm text-amber-100/85">
-              Update and republish to reflect the latest information.
-            </p>
-          </div>
+          <Callout title="This brief is behind the review" tone="clay">
+            The assessment has changed since this brief was generated. Update and
+            republish so donors are reading the current picture.
+          </Callout>
         ) : null}
 
-        <div className="space-y-4">
-          <label className="block space-y-2">
-            <span className="text-sm text-slate-200">Headline</span>
-            <input
-              className="w-full rounded-2xl border border-white/10 bg-[#0B1622] px-4 py-3 text-white"
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  headline: event.target.value,
-                }))
-              }
-              value={form.headline}
-            />
-          </label>
-
-          <label className="block space-y-2">
-            <span className="text-sm text-slate-200">Ministry description</span>
-            <textarea
-              className="min-h-36 w-full rounded-2xl border border-white/10 bg-[#0B1622] px-4 py-3 text-white"
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  ministry_description: event.target.value,
-                }))
-              }
-              value={form.ministry_description}
-            />
-          </label>
-
-          <div className="space-y-3">
-            <p className="text-sm text-slate-200">Commendations</p>
-            {form.commendations.map((value, index) => (
-              <input
-                className="w-full rounded-2xl border border-white/10 bg-[#0B1622] px-4 py-3 text-white"
-                key={`commendation-${index + 1}`}
+        <Card>
+          <CardHeader
+            description="Two sentences a donor sees first, then the fuller description."
+            title="What donors read"
+          />
+          <CardBody className="space-y-5">
+            <Field label="Headline" required>
+              <Input
                 onChange={(event) =>
-                  setForm((current) => {
-                    const next = [...current.commendations];
-                    next[index] = event.target.value;
-
-                    return {
-                      ...current,
-                      commendations: next,
-                    };
-                  })
+                  setForm((current) => ({
+                    ...current,
+                    headline: event.target.value,
+                  }))
                 }
-                placeholder={`Commendation ${index + 1}`}
-                value={value}
+                value={form.headline}
               />
-            ))}
-          </div>
+            </Field>
 
-          <div className="space-y-3">
-            <p className="text-sm text-slate-200">Cautions</p>
-            {form.cautions.map((value, index) => (
-              <input
-                className="w-full rounded-2xl border border-white/10 bg-[#0B1622] px-4 py-3 text-white"
-                key={`caution-${index + 1}`}
-                onChange={(event) =>
-                  setForm((current) => {
-                    const next = [...current.cautions];
-                    next[index] = event.target.value;
-
-                    return {
-                      ...current,
-                      cautions: next,
-                    };
-                  })
-                }
-                placeholder={`Caution ${index + 1} (optional)`}
-                value={value}
-              />
-            ))}
-          </div>
-
-          <label className="block space-y-2">
-            <span className="text-sm text-slate-200">Recommendation level</span>
-            <select
-              className="w-full rounded-2xl border border-white/10 bg-[#0B1622] px-4 py-3 text-white"
-              onChange={(event) =>
-                setForm((current) => ({
-                  ...current,
-                  recommendation_level: event.target
-                    .value as BriefFormData["recommendation_level"],
-                }))
-              }
-              value={form.recommendation_level}
+            <Field
+              help="What a donor needs to know before a first conversation."
+              label="Ministry description"
+              required
             >
-              {RECOMMENDATION_LEVELS.map((level) => (
-                <option key={level} value={level}>
-                  {level}
-                </option>
-              ))}
-            </select>
-          </label>
+              <Textarea
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    ministry_description: event.target.value,
+                  }))
+                }
+                rows={7}
+                value={form.ministry_description}
+              />
+            </Field>
 
-          <div className="rounded-[1.75rem] border border-white/10 bg-[#0B1622] p-5">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-medium text-white">
-                  Donor brief sharing
-                </p>
-                <p className="mt-1 text-xs leading-6 text-slate-400">
-                  Publish this brief to create a public donor-facing link.
-                </p>
-              </div>
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${
-                  isPublished
-                    ? "border border-blue-500/20 bg-blue-500/10 text-blue-200"
-                    : "border border-white/10 bg-white/[0.03] text-slate-300"
-                }`}
+            <Field label="Recommendation level" required>
+              <Select
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    recommendation_level: event.target
+                      .value as BriefFormData["recommendation_level"],
+                  }))
+                }
+                value={form.recommendation_level}
               >
-                {isPublished ? "Published" : "Not Published"}
-              </span>
-            </div>
+                {RECOMMENDATION_LEVELS.map((level) => (
+                  <option key={level} value={level}>
+                    {level}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+          </CardBody>
+        </Card>
 
-            <label className="mt-4 flex items-start gap-3 rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-4">
+        <Card>
+          <CardHeader
+            description="Say plainly what is strong and what a donor should weigh. Cautions are not a failure — they are the honesty that makes the commendations credible."
+            title="Commendations and cautions"
+          />
+          <CardBody className="grid gap-5 md:grid-cols-2">
+            <div className="space-y-3">
+              <p className="save-eyebrow text-ink-400">Commendations</p>
+              {form.commendations.map((value, index) => (
+                <Input
+                  key={`commendation-${index + 1}`}
+                  onChange={(event) =>
+                    updateList("commendations", index, event.target.value)
+                  }
+                  placeholder={`Commendation ${index + 1}`}
+                  value={value}
+                />
+              ))}
+            </div>
+            <div className="space-y-3">
+              <p className="save-eyebrow text-ink-400">Cautions</p>
+              {form.cautions.map((value, index) => (
+                <Input
+                  key={`caution-${index + 1}`}
+                  onChange={(event) =>
+                    updateList("cautions", index, event.target.value)
+                  }
+                  placeholder={`Caution ${index + 1} (optional)`}
+                  value={value}
+                />
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+
+        <Card>
+          <CardHeader
+            action={
+              approved ? (
+                <Badge tone="sage">Second reviewer approved</Badge>
+              ) : (
+                <Badge tone="clay">Awaiting second reviewer</Badge>
+              )
+            }
+            description="SAVE does not put its name behind a ministry on one reviewer's judgement."
+            title="Publishing"
+          />
+          <CardBody className="space-y-5">
+            {approved ? (
+              <Callout title="Approved for donors" tone="sage">
+                Approved by {approvedByEmail ?? "another reviewer"} on{" "}
+                {formatDate(approvedAt)}. Publishing is available.
+              </Callout>
+            ) : (
+              <Callout title="A second reviewer must approve this first" tone="clay">
+                {isAuthor
+                  ? "You wrote this brief, so you cannot be its second reviewer. Another reviewer approves it from the reviewer workspace."
+                  : "Approval is recorded from the reviewer workspace. Until then this brief cannot be published to donors."}
+              </Callout>
+            )}
+
+            <label className="flex items-start gap-3 rounded-md border border-hairline px-4 py-3.5">
               <input
                 checked={form.include_voice_alignment}
-                className="mt-1 h-4 w-4 rounded border-white/20 bg-[#0B1622] text-[#C09A45]"
+                className="save-focus-ring mt-0.5 h-4 w-4"
                 onChange={(event) =>
                   setForm((current) => ({
                     ...current,
@@ -260,24 +292,22 @@ export function BriefEditor({
                 type="checkbox"
               />
               <span>
-                <span className="block text-sm font-medium text-white">
-                  Include Voice Alignment in donor brief
+                <span className="block text-sm font-medium text-ink-900">
+                  Include voice alignment in the donor brief
                 </span>
-                <span className="mt-1 block text-xs leading-6 text-slate-400">
-                  Off by default. When enabled, the donor/public brief may show a
-                  reviewer-approved summary of internal and external perspective
-                  alignment.
+                <span className="mt-1 block text-caption leading-relaxed text-ink-500">
+                  Off by default. When enabled, the published brief may show a
+                  reviewer-approved summary of how internal and external
+                  perspective line up. Individual references are never named.
                 </span>
               </span>
             </label>
 
             {publicUrl ? (
-              <div className="mt-4 rounded-2xl border border-blue-500/20 bg-blue-500/10 px-4 py-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-200/90">
-                  Share Link
-                </p>
+              <div className="rounded-md border border-hairline bg-surface-sunken px-4 py-3.5">
+                <p className="save-eyebrow text-ink-400">Share link</p>
                 <a
-                  className="mt-2 block break-all text-sm text-blue-100 underline underline-offset-4"
+                  className="save-focus-ring mt-1.5 block break-all text-caption text-ink-700 underline decoration-hairline underline-offset-4"
                   href={publicUrl}
                   rel="noreferrer"
                   target="_blank"
@@ -287,87 +317,80 @@ export function BriefEditor({
               </div>
             ) : null}
 
-            <div className="mt-4 flex flex-wrap gap-3">
-              <Button
-                className="bg-[#C09A45] text-[#0B1622] hover:bg-[#d4ac57]"
+            {message ? (
+              <p className="text-caption text-sage-700">{message}</p>
+            ) : null}
+            {error ? <p className="text-caption text-risk-700">{error}</p> : null}
+            {copyMessage ? (
+              <p className="text-caption text-ink-500">{copyMessage}</p>
+            ) : null}
+          </CardBody>
+
+          <CardFooter>
+            <div className="flex flex-wrap gap-2.5">
+              <Btn
                 disabled={pending}
                 onClick={() => void saveBrief()}
-                type="button"
+                size="sm"
+                variant="secondary"
               >
-                {pending ? "Saving..." : "Save brief"}
-              </Button>
+                {pending ? "Saving…" : "Save draft"}
+              </Btn>
+              <Btn
+                href={`/applications/${applicationId}/brief/export`}
+                size="sm"
+                variant="ghost"
+              >
+                Export PDF
+              </Btn>
+              <PrintButton label="Print" />
+            </div>
 
+            <div className="flex flex-wrap gap-2.5">
               {isPublished ? (
                 <>
-                  <Button asChild type="button" variant="outline">
-                    <Link
-                      href={`/applications/${applicationId}/brief/export`}
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      Export PDF
-                    </Link>
-                  </Button>
-                  <Button
+                  <Btn
                     disabled={pending || !publicUrl}
                     onClick={() => void copyShareLink()}
-                    type="button"
-                    variant="outline"
+                    size="sm"
+                    variant="ghost"
                   >
-                    Copy Share Link
-                  </Button>
-                  <Button
+                    Copy share link
+                  </Btn>
+                  <Btn
                     disabled={pending}
                     onClick={() => void saveBrief(false)}
-                    type="button"
-                    variant="outline"
+                    size="sm"
+                    variant="danger"
                   >
                     Unpublish
-                  </Button>
+                  </Btn>
                 </>
               ) : (
-                <>
-                  <Button asChild type="button" variant="outline">
-                    <Link
-                      href={`/applications/${applicationId}/brief/export`}
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      Export PDF
-                    </Link>
-                  </Button>
-                  <Button
-                    disabled={pending}
-                    onClick={() => void saveBrief(true)}
-                    type="button"
-                    variant="outline"
-                  >
-                    Publish Donor Brief
-                  </Button>
-                </>
+                <Btn
+                  disabled={pending || !approved}
+                  onClick={() => void saveBrief(true)}
+                  size="sm"
+                >
+                  {pending ? "Publishing…" : "Publish to donors"}
+                </Btn>
               )}
             </div>
-          </div>
+          </CardFooter>
+        </Card>
+      </div>
 
-          <div className="flex flex-wrap gap-3">
-            <PrintButton label="Generate PDF" />
-          </div>
-
-          {message ? <p className="text-sm text-slate-300">{message}</p> : null}
-          {copyMessage ? (
-            <p className="text-sm text-slate-300">{copyMessage}</p>
-          ) : null}
-        </div>
-      </section>
-
-      <section className="lg:sticky lg:top-6 lg:self-start">
-        <div className="rounded-[2rem] border border-white/10 bg-[#102133]/70 p-4">
-          <p className="mb-4 text-xs uppercase tracking-[0.32em] text-[#C09A45]">
-            Live Preview
-          </p>
-          <BriefPreview brief={previewData} org={org} />
-        </div>
-      </section>
+      <aside className="min-w-0 xl:sticky xl:top-6 xl:self-start">
+        <Card>
+          <CardHeader
+            description="Exactly what a donor will see."
+            title="Preview"
+          />
+          <CardBody className="overflow-x-auto">
+            <BriefPreview brief={previewData} org={org} />
+          </CardBody>
+        </Card>
+      </aside>
     </div>
   );
 }
