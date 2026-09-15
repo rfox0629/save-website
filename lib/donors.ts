@@ -3,11 +3,13 @@ import { redirect } from "next/navigation";
 import { parseReviewerSummary, type ReviewerSummary } from "@/lib/ai/reviewerSummary";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getPathForRole } from "@/lib/auth";
+import { getRelationalDiligenceStatus } from "@/lib/diligence";
 import { getSaveTier, type SaveTier } from "@/lib/save-tier";
 import { getViewerContext } from "@/lib/view-mode";
 import { parseVoiceAlignmentInsight, type VoiceAlignmentInsight } from "@/lib/voice-alignment";
 import type {
   Applications,
+  DiligenceEngagement,
   DonorBrief,
   Organizations,
   RiskFlag,
@@ -153,6 +155,8 @@ export async function requireDonorBriefs() {
     .from("donor_briefs")
     .select("*")
     .eq("published", true)
+    // B3: a brief reaches donors only after a second reviewer has approved it.
+    .not("approved_by", "is", null)
     .order("published_at", { ascending: false });
 
   const resolvedBriefs = ((briefs ?? []) as DonorBrief[]).filter((brief) =>
@@ -173,12 +177,19 @@ export async function requireDonorBriefs() {
 
   const { data: applications } = await admin
     .from("applications")
-    .select("id, organization_id, status, updated_at, ai_summary")
+    .select(
+      "id, organization_id, status, updated_at, ai_summary, relational_diligence_exception",
+    )
     .in("id", organizationIds);
   const resolvedApplications = (applications ?? []) as Array<
     Pick<
       Applications,
-      "ai_summary" | "id" | "organization_id" | "status" | "updated_at"
+      | "ai_summary"
+      | "id"
+      | "organization_id"
+      | "relational_diligence_exception"
+      | "status"
+      | "updated_at"
     >
   >;
 
@@ -241,6 +252,18 @@ export async function requireDonorBriefs() {
     ),
   );
 
+  const { data: engagementRows } = await admin
+    .from("diligence_engagements")
+    .select("*")
+    .in("application_id", organizationIds);
+  const engagementsByApplication = new Map<string, DiligenceEngagement[]>();
+  for (const engagement of (engagementRows ?? []) as DiligenceEngagement[]) {
+    const current =
+      engagementsByApplication.get(engagement.application_id) ?? [];
+    current.push(engagement);
+    engagementsByApplication.set(engagement.application_id, current);
+  }
+
   return {
     canPreview: viewer.canPreview,
     currentViewMode: viewer.currentViewMode,
@@ -275,6 +298,11 @@ export async function requireDonorBriefs() {
             : null;
         const recommendationLabel =
           brief.recommendation_level ?? getScoreRecommendation(score);
+        // Decision B4: the top tier is not reachable on paperwork alone.
+        const relational = getRelationalDiligenceStatus(
+          engagementsByApplication.get(application.id) ?? [],
+          application,
+        );
         const saveTier = getSaveTier({
           categoryConfidences: aiSummary
             ? [
@@ -286,6 +314,10 @@ export async function requireDonorBriefs() {
               ]
             : [],
           recommendation: recommendationLabel,
+          relationalDiligence: {
+            exception: relational.exception,
+            met: relational.met,
+          },
           risks: aiSummary?.top_risks ?? brief.cautions ?? [],
           strengths: aiSummary?.top_strengths ?? brief.commendations ?? [],
           voiceAlignmentStatus: voiceAlignment?.status ?? null,

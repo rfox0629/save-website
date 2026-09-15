@@ -18,7 +18,12 @@ import type {
 
 export type BriefEditorData = {
   application: Applications;
+  /** When the second reviewer approved this brief, if one has. */
+  approvedAt: string | null;
+  approvedByEmail: string | null;
   brief: DonorBrief | null;
+  /** True when the signed-in reviewer wrote this brief, so cannot approve it. */
+  isAuthor: boolean;
   isStale: boolean;
   org: Organizations;
   publicUrl: string | null;
@@ -135,7 +140,7 @@ function buildScoreSummary(score: Score | null) {
 export async function getBriefEditorData(
   applicationId: string,
 ): Promise<BriefEditorData> {
-  await requireReviewerPageAccess();
+  const context = await requireReviewerPageAccess();
   const admin = createAdminClient();
   const { data: application } = await admin
     .from("applications")
@@ -172,9 +177,22 @@ export async function getBriefEditorData(
   const resolvedBrief = brief as DonorBrief | null;
   const baseUrl = getRequestBaseUrl();
 
+  let approvedByEmail: string | null = null;
+  if (resolvedBrief?.approved_by) {
+    const { data: approver } = await admin.auth.admin.getUserById(
+      resolvedBrief.approved_by,
+    );
+    approvedByEmail = approver.user?.email ?? null;
+  }
+
   return {
     application: resolvedApplication,
+    approvedAt: resolvedBrief?.approved_at ?? null,
+    approvedByEmail,
     brief: resolvedBrief,
+    isAuthor: Boolean(
+      resolvedBrief && resolvedBrief.generated_by === context.user.id,
+    ),
     isStale: isBriefStale(
       resolvedApplication.updated_at,
       resolvedBrief?.generated_at,
@@ -196,6 +214,9 @@ export async function getPublishedBriefBySlug(
     .select("*")
     .eq("slug", slug)
     .eq("published", true)
+    // B3: the public brief page is donor-facing, so it carries the same
+    // second-reviewer gate as the donor library.
+    .not("approved_by", "is", null)
     .maybeSingle();
   const resolvedBrief = brief as DonorBrief | null;
 

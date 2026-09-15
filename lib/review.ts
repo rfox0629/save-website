@@ -57,6 +57,8 @@ export type ApplicationDetailData = {
   application: Applications;
   assignedReviewer: string | null;
   brief: DonorBrief | null;
+  /** Email of the second reviewer who approved the brief, when there is one. */
+  briefApproverEmail: string | null;
   documents: Array<
     Document & {
       signedUrl: string | null;
@@ -65,6 +67,12 @@ export type ApplicationDetailData = {
   >;
   externalChecks: ExternalCheck[];
   flags: RiskFlag[];
+  /**
+   * False when the ministry has not submitted vetting answers. The scoring
+   * engine cannot run without them, so the workspace uses this to explain why
+   * rather than starting a pipeline that will fail out of sight.
+   */
+  hasVettingResponse: boolean;
   latestScore: Score | null;
   organization: Organizations;
   reviewerOptions: ReviewerOption[];
@@ -598,6 +606,12 @@ export async function getApplicationDetail(
     redirect("/dashboard");
   }
 
+  const { data: vettingResponse } = await admin
+    .from("vetting_responses")
+    .select("application_id")
+    .eq("application_id", applicationId)
+    .maybeSingle();
+
   const latestScore = ((scores ?? []) as Score[])[0] ?? null;
   const scoreComponents = latestScore
     ? (((
@@ -626,6 +640,7 @@ export async function getApplicationDetail(
     ...(resolvedOrganization.assigned_reviewer_id
       ? [resolvedOrganization.assigned_reviewer_id]
       : []),
+    ...(resolvedBrief?.approved_by ? [resolvedBrief.approved_by] : []),
   ]);
 
   const signedDocuments = await Promise.all(
@@ -661,6 +676,9 @@ export async function getApplicationDetail(
       ? (actorEmailMap.get(resolvedOrganization.assigned_reviewer_id) ?? null)
       : null,
     brief: resolvedBrief,
+    briefApproverEmail: resolvedBrief?.approved_by
+      ? (actorEmailMap.get(resolvedBrief.approved_by) ?? null)
+      : null,
     documents: signedDocuments,
     externalChecks: [
       ...resolvedExternalChecks,
@@ -680,6 +698,7 @@ export async function getApplicationDetail(
       })),
     ],
     flags: resolvedFlags,
+    hasVettingResponse: Boolean(vettingResponse),
     latestScore,
     notes: resolvedNotes.map((note) => ({
       ...note,

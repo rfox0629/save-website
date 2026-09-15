@@ -83,15 +83,40 @@ export async function POST(request: Request) {
 
     const { data: existingBrief } = await admin
       .from("donor_briefs")
-      .select("id, slug")
+      .select("id, slug, approved_by, approved_at, generated_by")
       .eq("application_id", body.application_id)
       .order("generated_at", { ascending: false })
       .limit(1)
       .maybeSingle();
     const resolvedExistingBrief = existingBrief as Pick<
       DonorBrief,
-      "id" | "slug"
+      "approved_at" | "approved_by" | "generated_by" | "id" | "slug"
     > | null;
+
+    // Founder decision B3: nothing becomes donor-visible on one reviewer's say-so.
+    if (body.published) {
+      const approvedBy = resolvedExistingBrief?.approved_by ?? null;
+
+      if (!approvedBy) {
+        return NextResponse.json(
+          {
+            error:
+              "A second reviewer must approve this brief before it can be published to donors.",
+          },
+          { status: 400 },
+        );
+      }
+
+      if (approvedBy === user.id) {
+        return NextResponse.json(
+          {
+            error:
+              "The reviewer who approved this brief cannot also be the one who publishes it.",
+          },
+          { status: 400 },
+        );
+      }
+    }
 
     const payload = {
       application_id: body.application_id,

@@ -3,11 +3,13 @@ import "server-only";
 import { parseReviewerSummary } from "@/lib/ai/reviewerSummary";
 import { requireDonorBriefs } from "@/lib/donors";
 import { getPublishedBriefBySlug } from "@/lib/brief";
+import { getRelationalDiligenceStatus } from "@/lib/diligence";
 import { getSaveTier, type SaveTier } from "@/lib/save-tier";
 import { getRecommendationLevel, requireReviewerPageAccess } from "@/lib/review";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   Applications,
+  DiligenceEngagement,
   ExternalCheck,
   Organizations,
   Score,
@@ -81,12 +83,15 @@ function getCheckSignal(checks: ExternalCheck[], source: string, label: string) 
 function buildCompareRecord({
   application,
   checks,
+  engagements,
   fallbackRecommendation,
   org,
   voiceAlignmentStatus,
 }: {
   application: Applications;
   checks: ExternalCheck[];
+  /** Omit to leave the relational-diligence gate out of the tier entirely. */
+  engagements?: DiligenceEngagement[];
   fallbackRecommendation: string;
   org: Organizations;
   voiceAlignmentStatus?: VoiceAlignmentSummaryRecord["status"] | null;
@@ -95,6 +100,10 @@ function buildCompareRecord({
   const topRisks = summary?.top_risks ?? [];
   const topStrengths = summary?.top_strengths ?? [];
   const recommendation = summary?.recommendation ?? fallbackRecommendation;
+  // Decision B4: the top tier is not reachable on paperwork alone.
+  const relational = engagements
+    ? getRelationalDiligenceStatus(engagements, application)
+    : null;
   const saveTier = getSaveTier({
     categoryConfidences: summary
       ? [
@@ -106,6 +115,9 @@ function buildCompareRecord({
         ]
       : [],
     recommendation,
+    relationalDiligence: relational
+      ? { exception: relational.exception, met: relational.met }
+      : null,
     risks: topRisks,
     strengths: topStrengths,
     voiceAlignmentStatus,
@@ -248,6 +260,22 @@ export async function getReviewerComparisonPageData(
     return map;
   }, new Map());
 
+  const { data: engagementRows } = selectedIds.length
+    ? await admin
+        .from("diligence_engagements")
+        .select("*")
+        .in("application_id", selectedIds)
+    : { data: [] as DiligenceEngagement[] };
+
+  const engagementsByApplication = (
+    (engagementRows ?? []) as DiligenceEngagement[]
+  ).reduce<Map<string, DiligenceEngagement[]>>((map, engagement) => {
+    const current = map.get(engagement.application_id) ?? [];
+    current.push(engagement);
+    map.set(engagement.application_id, current);
+    return map;
+  }, new Map());
+
   function buildSelectedRecord(applicationId: string | null) {
     if (!applicationId) {
       return null;
@@ -264,6 +292,7 @@ export async function getReviewerComparisonPageData(
     return buildCompareRecord({
       application: match.application,
       checks: checksByApplication.get(applicationId) ?? [],
+      engagements: engagementsByApplication.get(applicationId) ?? [],
       fallbackRecommendation: normalizeRecommendation(
         getRecommendationLevel(latestScoreMap.get(applicationId) ?? null),
       ),
@@ -313,9 +342,16 @@ export async function getDonorComparisonPageData(
       return null;
     }
 
+    const admin = createAdminClient();
+    const { data: engagementRows } = await admin
+      .from("diligence_engagements")
+      .select("*")
+      .eq("application_id", data.application.id);
+
     return buildCompareRecord({
       application: data.application,
       checks: data.externalChecks,
+      engagements: (engagementRows ?? []) as DiligenceEngagement[],
       fallbackRecommendation: data.brief.recommendation_level ?? data.scoreRecommendation,
       org: data.org,
       voiceAlignmentStatus: data.voiceAlignment?.status ?? null,

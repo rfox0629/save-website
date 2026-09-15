@@ -19,6 +19,10 @@ import {
   RelationalDiligenceExceptionForm,
 } from "@/components/dashboard/diligence-actions";
 import {
+  BriefApprovalControls,
+  LibraryVisibilityToggle,
+} from "@/components/dashboard/publishing-actions";
+import {
   Badge,
   type BadgeTone,
   Btn,
@@ -324,7 +328,16 @@ export default async function ApplicationWorkspacePage({
           {/* ------------------------------------------------------- Scoring */}
           <Card id="scoring">
             <CardHeader
-              action={<RunAssessmentButton applicationId={params.id} />}
+              action={
+                <RunAssessmentButton
+                  applicationId={params.id}
+                  blockedReason={
+                    data.hasVettingResponse
+                      ? null
+                      : "The ministry has not submitted its vetting answers yet, so the scoring engine cannot run."
+                  }
+                />
+              }
               description="Engine scores are advisory. Any override requires a written reason and is recorded against the score record."
               title="Scoring"
             />
@@ -945,8 +958,17 @@ export default async function ApplicationWorkspacePage({
                       "No description written yet."}
                   </p>
                   <Badge tone={data.brief.published ? "sage" : "neutral"}>
-                    {data.brief.published ? "Published" : "Draft"}
+                    {data.brief.published ? "Published to donors" : "Draft"}
                   </Badge>
+
+                  <div className="pt-1">
+                    <BriefApprovalControls
+                      applicationId={params.id}
+                      approvedAt={data.brief.approved_at}
+                      approvedByEmail={data.briefApproverEmail}
+                      isAuthor={data.brief.generated_by === viewer.userId}
+                    />
+                  </div>
                 </div>
               ) : (
                 <p className="text-caption leading-relaxed text-ink-500">
@@ -996,6 +1018,12 @@ export default async function ApplicationWorkspacePage({
                 />
               </DataList>
             </div>
+            {isAdmin ? (
+              <LibraryVisibilityToggle
+                organizationId={data.organization.id}
+                visible={data.organization.library_visible}
+              />
+            ) : null}
           </Card>
         </aside>
       </div>
