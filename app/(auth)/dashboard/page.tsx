@@ -1,13 +1,33 @@
 import Link from "next/link";
 
 import { ViewModeSwitcher } from "@/components/app/view-mode-switcher";
-import { Button } from "@/components/ui/button";
+import { SignOutButton } from "@/components/auth/sign-out-button";
+import { StaffShell } from "@/components/dashboard/staff-shell";
+import {
+  Badge,
+  Btn,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Monogram,
+  PageTitle,
+  Stat,
+  StatRow,
+  Table,
+  Td,
+  Th,
+  formatDate,
+} from "@/components/save/primitives";
+import { TopBar } from "@/components/save/shell";
 import {
   getDashboardData,
+  getReviewerOptions,
   getStatusLabel,
 } from "@/lib/review";
-import type { Applications, RiskFlag } from "@/lib/supabase/types";
+import type { Applications } from "@/lib/supabase/types";
 import { getViewerContext } from "@/lib/view-mode";
+import { cn } from "@/lib/utils";
 
 type DashboardPageProps = {
   searchParams?: {
@@ -17,301 +37,292 @@ type DashboardPageProps = {
   };
 };
 
-function getDashboardStatusPillClass(status: Applications["status"]) {
-  if (status === "approved") {
-    return "border-blue-200 bg-blue-50 text-blue-800";
-  }
+const STATUS_OPTIONS = [
+  "inquiry_submitted",
+  "inquiry_approved",
+  "vetting_submitted",
+  "under_review",
+  "more_info_requested",
+  "approved",
+  "declined",
+  "hard_stop",
+] as const;
 
-  if (status === "under_review" || status === "inquiry_approved") {
-    return "border-sky-200 bg-sky-50 text-sky-800";
-  }
-
-  if (status === "declined" || status === "hard_stop") {
-    return "border-rose-200 bg-rose-50 text-rose-800";
-  }
-
-  if (status === "more_info_requested") {
-    return "border-amber-200 bg-amber-50 text-amber-800";
-  }
-
-  return "border-stone-200 bg-stone-50 text-stone-700";
+function statusTone(status: Applications["status"]) {
+  if (status === "approved") return "sage" as const;
+  if (status === "declined" || status === "hard_stop") return "risk" as const;
+  if (status === "under_review" || status === "inquiry_approved")
+    return "ink" as const;
+  if (status === "more_info_requested") return "brass" as const;
+  return "neutral" as const;
 }
 
-function getDashboardScoreTone(score: number | null) {
-  if (score === null) {
-    return "text-[#7A867D]";
-  }
-
-  if (score >= 80) {
-    return "text-blue-700";
-  }
-
-  if (score >= 60) {
-    return "text-amber-700";
-  }
-
-  return "text-rose-700";
+function daysSince(value: string | null | undefined) {
+  if (!value) return null;
+  const then = Date.parse(value);
+  if (Number.isNaN(then)) return null;
+  return Math.max(0, Math.floor((Date.now() - then) / 86_400_000));
 }
 
-function getDashboardSeverityClass(severity: RiskFlag["severity"]) {
-  if (severity === "hard_stop") {
-    return "border-rose-200 bg-rose-50 text-rose-800";
-  }
-
-  if (severity === "high") {
-    return "border-orange-200 bg-orange-50 text-orange-800";
-  }
-
-  if (severity === "medium") {
-    return "border-amber-200 bg-amber-50 text-amber-800";
-  }
-
-  return "border-stone-200 bg-stone-50 text-stone-700";
-}
-
-function SummaryCard({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-3xl border border-[#E5DED0] bg-white p-5 shadow-[0_16px_40px_rgba(26,68,128,0.05)]">
-      <p className="text-xs uppercase tracking-[0.28em] text-[#8B7A57]">
-        {label}
-      </p>
-      <p className="mt-3 text-3xl font-semibold text-[#1A4480]">{value}</p>
-    </div>
-  );
-}
-
-export default async function InternalDashboardPage({
+export default async function DashboardPage({
   searchParams,
 }: DashboardPageProps) {
-  const [data, viewer] = await Promise.all([
-    getDashboardData(searchParams ?? {}),
+  const [data, viewer, reviewers] = await Promise.all([
+    getDashboardData({
+      flagSeverity: searchParams?.flagSeverity,
+      scoreRange: searchParams?.scoreRange,
+      status: searchParams?.status,
+    }),
     getViewerContext(),
+    getReviewerOptions(),
   ]);
 
+  const unassigned = data.rows.filter((row) => !row.assignedReviewer);
+  const activeStatus = searchParams?.status ?? "";
+
+  const reviewerLoad = reviewers.map((reviewer) => ({
+    ...reviewer,
+    active: data.rows.filter((row) => row.assignedReviewer === reviewer.email)
+      .length,
+  }));
+
   return (
-    <main className="min-h-screen bg-[#F7F6F2] px-6 py-10 text-[#1A4480]">
-      <div className="mx-auto max-w-7xl space-y-8">
-        <section className="rounded-[2rem] border border-[#E5DED0] bg-[#FFFDF8] p-8 shadow-[0_24px_60px_rgba(26,68,128,0.06)]">
-          <p className="text-xs uppercase tracking-[0.35em] text-[#8B7A57]">
-            Internal Review
-          </p>
-          <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div>
-              <h1 className="text-3xl font-semibold text-[#1A4480]">
-                Application dashboard
-              </h1>
-              <p className="mt-2 max-w-3xl text-sm text-[#7088A5]">
-                Review applications, triage flags, and move ministries through
-                inquiry, vetting, and final decisions.
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
+    <StaffShell
+      active="queue"
+      topBar={
+        <TopBar
+          actions={
+            <>
               <ViewModeSwitcher
                 canPreview={viewer.canPreview}
                 currentViewMode={viewer.currentViewMode}
               />
-              <Button
-                asChild
-                className="border border-[#D9C8A4] bg-[#F4EFE4] text-[#6F5D34] hover:bg-[#EEE5D4]"
-              >
-                <Link href="/dashboard">Reset filters</Link>
-              </Button>
-            </div>
-          </div>
-        </section>
+              <SignOutButton className="save-focus-ring rounded-md border border-hairline px-3 py-1.5 text-caption font-semibold text-ink-500 transition hover:bg-paper-200 hover:text-ink-800" />
+            </>
+          }
+          breadcrumb={[{ label: "Queue" }]}
+          status={
+            unassigned.length > 0 ? (
+              <Badge tone="clay">{unassigned.length} unassigned</Badge>
+            ) : null
+          }
+        />
+      }
+    >
+      <PageTitle
+        description="Every application SAVE is currently carrying, and who is carrying it."
+        eyebrow="Operations"
+      >
+        Application queue
+      </PageTitle>
 
-        <section className="grid gap-4 md:grid-cols-4">
-          <SummaryCard label="Total Applications" value={data.summary.total} />
-          <SummaryCard label="Under Review" value={data.summary.underReview} />
-          <SummaryCard label="Approved" value={data.summary.approved} />
-          <SummaryCard
-            label="Pending Inquiry"
-            value={data.summary.pendingInquiry}
+      <div className="mt-8">
+        <StatRow>
+          <Stat
+            caption={`${unassigned.length} awaiting a reviewer`}
+            label="In queue"
+            value={data.summary.total}
           />
-        </section>
-
-        <section className="rounded-[2rem] border border-[#E5DED0] bg-white p-6 shadow-[0_16px_40px_rgba(26,68,128,0.05)]">
-          <form className="grid gap-4 md:grid-cols-4">
-            <div className="space-y-2">
-              <label className="text-sm text-[#7088A5]">Status</label>
-              <select
-                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10"
-                defaultValue={data.filters.status ?? "all"}
-                name="status"
-              >
-                {[
-                  ["all", "All statuses"],
-                  ["inquiry_submitted", "Pending inquiry"],
-                  ["inquiry_approved", "Inquiry approved"],
-                  ["vetting_submitted", "Vetting submitted"],
-                  ["under_review", "Under review"],
-                  ["approved", "Approved"],
-                  ["declined", "Declined"],
-                  ["hard_stop", "Hard stop"],
-                  ["more_info_requested", "More info requested"],
-                ].map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm text-[#7088A5]">Score range</label>
-              <select
-                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10"
-                defaultValue={data.filters.scoreRange ?? "all"}
-                name="scoreRange"
-              >
-                {[
-                  ["all", "All scores"],
-                  ["80_plus", "80 and above"],
-                  ["60_79", "60 to 79"],
-                  ["below_60", "Below 60"],
-                  ["unscored", "Unscored"],
-                ].map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm text-[#7088A5]">Flag severity</label>
-              <select
-                className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10"
-                defaultValue={data.filters.flagSeverity ?? "all"}
-                name="flagSeverity"
-              >
-                {[
-                  ["all", "All flags"],
-                  ["any", "Any flag"],
-                  ["hard_stop", "Hard stop"],
-                  ["high", "High"],
-                  ["medium", "Medium"],
-                  ["low", "Low"],
-                ].map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="flex items-end">
-              <Button
-                className="w-full bg-[#1A4480] text-white hover:bg-[#2A5FA0]"
-                type="submit"
-              >
-                Apply filters
-              </Button>
-            </div>
-          </form>
-        </section>
-
-        <section className="overflow-hidden rounded-[2rem] border border-[#E5DED0] bg-white shadow-[0_16px_40px_rgba(26,68,128,0.05)]">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-[#ECE4D7] text-left text-sm">
-              <thead className="bg-[#FBF8F2] text-[#7088A5]">
-                <tr>
-                  <th className="px-5 py-4 font-medium">Organization name</th>
-                  <th className="px-5 py-4 font-medium">EIN</th>
-                  <th className="px-5 py-4 font-medium">Status</th>
-                  <th className="px-5 py-4 font-medium">Score</th>
-                  <th className="px-5 py-4 font-medium">Flags</th>
-                  <th className="px-5 py-4 font-medium">Submitted date</th>
-                  <th className="px-5 py-4 font-medium">Assigned reviewer</th>
-                  <th className="px-5 py-4 font-medium">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#ECE4D7] bg-white">
-                {data.rows.map((row) => (
-                  <tr
-                    key={row.application.id}
-                    className="transition-colors hover:bg-[#FBF8F2]"
-                  >
-                    <td className="px-5 py-4">
-                      <Link
-                        className="font-medium text-[#1A4480] transition hover:text-[#2B6B4A]"
-                        href={`/applications/${row.application.id}`}
-                      >
-                        {row.organization.legal_name}
-                      </Link>
-                    </td>
-                    <td className="px-5 py-4 text-[#7088A5]">
-                      {row.organization.ein ?? "Not provided"}
-                    </td>
-                    <td className="px-5 py-4">
-                      <span
-                        className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getDashboardStatusPillClass(
-                          row.application.status,
-                        )}`}
-                      >
-                        {getStatusLabel(row.application.status)}
-                      </span>
-                    </td>
-                    <td className="px-5 py-4">
-                      <span
-                        className={`font-semibold ${getDashboardScoreTone(
-                          row.latestScore?.total_score ?? null,
-                        )}`}
-                      >
-                        {row.latestScore?.total_score ?? "Not scored"}
-                      </span>
-                    </td>
-                    <td className="px-5 py-4">
-                      {row.flagCount > 0 ? (
-                        <span
-                          className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getDashboardSeverityClass(
-                            row.highestSeverity ?? "low",
-                          )}`}
-                        >
-                          {row.flagCount}
-                        </span>
-                      ) : (
-                        <span className="inline-flex rounded-full border border-[#E5DED0] bg-[#FBF8F2] px-3 py-1 text-xs text-[#7088A5]">
-                          0
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-5 py-4 text-[#7088A5]">
-                      {new Date(
-                        row.application.created_at,
-                      ).toLocaleDateString()}
-                    </td>
-                    <td className="px-5 py-4 text-[#7088A5]">
-                      {row.assignedReviewer ?? "Unassigned"}
-                    </td>
-                    <td className="px-5 py-4">
-                      <Button
-                        asChild
-                        size="sm"
-                        className="bg-[#1A4480] text-white hover:bg-[#2A5FA0]"
-                      >
-                        <Link href={`/applications/${row.application.id}`}>
-                          Open
-                        </Link>
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-                {data.rows.length === 0 ? (
-                  <tr>
-                    <td
-                      className="px-5 py-10 text-center text-[#7A867D]"
-                      colSpan={8}
-                    >
-                      No applications matched the current filters.
-                    </td>
-                  </tr>
-                ) : null}
-              </tbody>
-            </table>
-          </div>
-        </section>
+          <Stat label="Under review" value={data.summary.underReview} />
+          <Stat label="Pending inquiry" value={data.summary.pendingInquiry} />
+          <Stat
+            caption="Assessment completed"
+            label="Approved"
+            value={data.summary.approved}
+          />
+        </StatRow>
       </div>
-    </main>
+
+      <div className="mt-8 grid gap-6 2xl:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="min-w-0 space-y-6">
+          <Card>
+            <CardHeader
+              action={
+                <form className="flex gap-2.5" method="get">
+                  <select
+                    aria-label="Filter by status"
+                    className="save-focus-ring h-9 rounded-md border border-hairline bg-paper-50 px-3 text-caption font-medium text-ink-700"
+                    defaultValue={activeStatus}
+                    name="status"
+                  >
+                    <option value="">All statuses</option>
+                    {STATUS_OPTIONS.map((status) => (
+                      <option key={status} value={status}>
+                        {getStatusLabel(status)}
+                      </option>
+                    ))}
+                  </select>
+                  <Btn size="sm" type="submit" variant="secondary">
+                    Filter
+                  </Btn>
+                </form>
+              }
+              title="Applications"
+            />
+            {data.rows.length === 0 ? (
+              <CardBody>
+                <p className="py-8 text-center text-caption text-ink-400">
+                  No applications match this view.
+                </p>
+              </CardBody>
+            ) : (
+              <Table>
+                <thead>
+                  <tr>
+                    <Th>Ministry</Th>
+                    <Th>Status</Th>
+                    <Th>Reviewer</Th>
+                    <Th align="right">Days</Th>
+                    <Th align="right">Flags</Th>
+                    <Th align="right">Score</Th>
+                    <Th align="right" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.rows.map((row) => {
+                    const days = daysSince(row.application.created_at);
+                    const score = row.latestScore?.total_score ?? null;
+                    return (
+                      <tr
+                        className="transition hover:bg-paper-100"
+                        key={row.application.id}
+                      >
+                        <Td>
+                          <div className="flex items-center gap-3">
+                            <Monogram
+                              name={row.organization.legal_name}
+                              size="sm"
+                            />
+                            <div className="min-w-0">
+                              <p className="truncate font-medium text-ink-900">
+                                {row.organization.dba_name ||
+                                  row.organization.legal_name}
+                              </p>
+                              <p className="save-numeric text-caption text-ink-400">
+                                {row.application.id.slice(0, 8)} ·{" "}
+                                {formatDate(row.application.created_at)}
+                              </p>
+                            </div>
+                          </div>
+                        </Td>
+                        <Td>
+                          <Badge tone={statusTone(row.application.status)}>
+                            {getStatusLabel(row.application.status)}
+                          </Badge>
+                        </Td>
+                        <Td>
+                          {row.assignedReviewer ? (
+                            <span className="text-ink-700">
+                              {row.assignedReviewer}
+                            </span>
+                          ) : (
+                            <Badge tone="clay">Unassigned</Badge>
+                          )}
+                        </Td>
+                        <Td align="right" numeric>
+                          <span
+                            className={cn(
+                              days !== null && days > 90 && "text-clay-700",
+                            )}
+                          >
+                            {days ?? "—"}
+                          </span>
+                        </Td>
+                        <Td align="right" numeric>
+                          {row.flagCount > 0 ? (
+                            <Badge
+                              tone={
+                                row.highestSeverity === "hard_stop" ||
+                                row.highestSeverity === "high"
+                                  ? "risk"
+                                  : "clay"
+                              }
+                            >
+                              {row.flagCount}
+                            </Badge>
+                          ) : (
+                            <span className="text-ink-300">—</span>
+                          )}
+                        </Td>
+                        <Td align="right" numeric>
+                          {score !== null ? (
+                            <span className="font-semibold text-ink-900">
+                              {score}
+                            </span>
+                          ) : (
+                            <span className="text-ink-300">—</span>
+                          )}
+                        </Td>
+                        <Td align="right">
+                          <Btn
+                            href={`/applications/${row.application.id}`}
+                            size="sm"
+                            variant="secondary"
+                          >
+                            Open
+                          </Btn>
+                        </Td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            )}
+            <CardFooter>
+              <span className="save-numeric text-caption text-ink-400">
+                {data.rows.length} shown · {unassigned.length} unassigned
+              </span>
+            </CardFooter>
+          </Card>
+        </div>
+
+        <aside className="space-y-6">
+          <Card>
+            <CardHeader
+              description="Active assignments per SAVE reviewer."
+              title="Reviewers"
+            />
+            <CardBody className="space-y-4">
+              {reviewerLoad.length === 0 ? (
+                <p className="text-caption text-ink-400">
+                  No reviewers provisioned yet.
+                </p>
+              ) : (
+                reviewerLoad.map((reviewer) => (
+                  <div className="flex items-center gap-3" key={reviewer.id}>
+                    <Monogram name={reviewer.email} size="sm" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-caption font-semibold text-ink-900">
+                        {reviewer.email}
+                      </p>
+                      <p className="truncate text-micro uppercase tracking-[0.08em] text-ink-400">
+                        {reviewer.role}
+                      </p>
+                    </div>
+                    <span className="save-numeric shrink-0 text-caption font-semibold text-ink-700">
+                      {reviewer.active} active
+                    </span>
+                  </div>
+                ))
+              )}
+            </CardBody>
+          </Card>
+
+          <Card className="p-6" tone="sunken">
+            <p className="text-sm font-semibold text-ink-900">Route map</p>
+            <p className="mt-2 text-caption leading-relaxed text-ink-500">
+              Open an application to review evidence, scoring, external checks,
+              voice alignment and the decision.
+            </p>
+            <Link
+              className="save-focus-ring mt-3.5 inline-flex rounded-md text-caption font-semibold text-ink-700 underline decoration-hairline underline-offset-4 hover:text-ink-900"
+              href="/map"
+            >
+              Internal route directory
+            </Link>
+          </Card>
+        </aside>
+      </div>
+    </StaffShell>
   );
 }
