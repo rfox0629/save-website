@@ -83,16 +83,18 @@ export function SaveWordmark({
 function SideNav({
   footer,
   groups,
+  homeHref = "/preview",
   persona,
 }: {
   footer?: ReactNode;
   groups: NavGroup[];
+  homeHref?: string;
   persona: ShellPersona;
 }) {
   return (
     <div className="flex h-full flex-col">
       <div className="px-5 py-6">
-        <Link href="/preview">
+        <Link href={homeHref}>
           <SaveWordmark sublabel={PERSONA_LABEL[persona]} />
         </Link>
       </div>
@@ -202,12 +204,14 @@ export function AppShell({
   account,
   children,
   groups,
+  homeHref,
   persona,
   topBar,
 }: {
   account: { name: string; role: string };
   children: ReactNode;
   groups: NavGroup[];
+  homeHref?: string;
   persona: ShellPersona;
   topBar?: ReactNode;
 }) {
@@ -230,6 +234,7 @@ export function AppShell({
             />
           }
           groups={groups}
+          homeHref={homeHref}
           persona={persona}
         />
       </aside>
