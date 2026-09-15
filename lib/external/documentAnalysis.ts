@@ -1,11 +1,8 @@
 import "server-only";
 
-import Anthropic from "@anthropic-ai/sdk";
-
+import { analyzePdf, extractJsonObject, OPENAI_MODEL } from "@/lib/ai/openai";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database, Document } from "@/lib/supabase/types";
-
-const DEFAULT_MODEL = "claude-sonnet-4-6";
 
 type AnalysisSource = "990_analysis" | "bylaws_analysis" | "doctrinal_analysis";
 
@@ -13,18 +10,6 @@ type AnalysisConfig = {
   prompt: string;
   source: AnalysisSource;
 };
-
-function getAnthropicClient() {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-
-  if (!apiKey) {
-    throw new Error(
-      "ANTHROPIC_API_KEY is not set. Add it to your environment before running document analysis.",
-    );
-  }
-
-  return new Anthropic({ apiKey });
-}
 
 function getDocumentConfig(documentType: string): AnalysisConfig | null {
   const normalized = documentType.toLowerCase();
@@ -67,29 +52,6 @@ function getDocumentConfig(documentType: string): AnalysisConfig | null {
   return null;
 }
 
-function extractTextContent(content: Anthropic.Messages.ContentBlock[]) {
-  return content
-    .filter(
-      (block): block is Anthropic.Messages.TextBlock => block.type === "text",
-    )
-    .map((block) => block.text)
-    .join("\n")
-    .trim();
-}
-
-function extractJsonObject(text: string) {
-  const fencedMatch = text.match(/```json\s*([\s\S]*?)```/i);
-  const raw = fencedMatch?.[1] ?? text;
-  const start = raw.indexOf("{");
-  const end = raw.lastIndexOf("}");
-
-  if (start === -1 || end === -1 || end <= start) {
-    throw new Error("Claude response did not contain valid JSON.");
-  }
-
-  return raw.slice(start, end + 1);
-}
-
 function getStatusFromAnalysis(result: unknown) {
   const concerns =
     result &&
@@ -115,7 +77,6 @@ function getStatusFromAnalysis(result: unknown) {
 }
 
 async function analyzeSingleDocument(
-  client: Anthropic,
   document: Document,
   applicationId: string,
 ) {
@@ -139,32 +100,15 @@ async function analyzeSingleDocument(
   const arrayBuffer = await data.arrayBuffer();
   const base64data = Buffer.from(arrayBuffer).toString("base64");
 
-  const response = await client.messages.create({
-    max_tokens: 1500,
-    messages: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "document",
-            source: {
-              type: "base64",
-              media_type: "application/pdf",
-              data: base64data,
-            },
-          },
-          {
-            type: "text",
-            text: config.prompt,
-          },
-        ],
-      },
-    ],
-    model: DEFAULT_MODEL,
-  });
+  const responseText = await analyzePdf(
+    config.prompt,
+    base64data,
+    document.file_name,
+    1500,
+  );
 
   const parsed = JSON.parse(
-    extractJsonObject(extractTextContent(response.content)),
+    extractJsonObject(responseText),
   ) as Record<string, unknown>;
   const { status, summary } = getStatusFromAnalysis(parsed);
 
@@ -183,7 +127,7 @@ async function analyzeSingleDocument(
       ...parsed,
       document_id: document.id,
       document_name: document.file_name,
-      model: DEFAULT_MODEL,
+      model: OPENAI_MODEL,
     },
     score_impact: null,
     source: config.source,
@@ -201,7 +145,6 @@ async function analyzeSingleDocument(
 
 export async function analyzeDocuments(applicationId: string) {
   const admin = createAdminClient();
-  const client = getAnthropicClient();
   const { data: documents, error } = await admin
     .from("documents")
     .select("*")
@@ -219,7 +162,7 @@ export async function analyzeDocuments(applicationId: string) {
   const results = [];
 
   for (const document of relevantDocuments) {
-    const result = await analyzeSingleDocument(client, document, applicationId);
+    const result = await analyzeSingleDocument(document, applicationId);
 
     if (result) {
       results.push(result);

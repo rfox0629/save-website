@@ -1,8 +1,8 @@
 import "server-only";
 
-import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 
+import { completeJson, extractJsonObject } from "@/lib/ai/openai";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   Applications,
@@ -12,8 +12,6 @@ import type {
   ReviewerNote,
   VettingResponse,
 } from "@/lib/supabase/types";
-
-const DEFAULT_MODEL = "claude-sonnet-4-6";
 
 const confidenceSchema = z.enum(["low", "medium", "high"]);
 
@@ -54,18 +52,6 @@ type LoadedApplication = Pick<
   organizations: Organizations | null;
 };
 
-function getAnthropicClient() {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-
-  if (!apiKey) {
-    throw new Error(
-      "ANTHROPIC_API_KEY is not set. Add it to your environment before generating reviewer summaries.",
-    );
-  }
-
-  return new Anthropic({ apiKey });
-}
-
 function compactValue(value: unknown): unknown {
   if (value === null || value === undefined) {
     return undefined;
@@ -94,29 +80,6 @@ function compactRecord(record: Record<string, unknown>) {
       return compacted === undefined ? [] : [[key, compacted]];
     }),
   );
-}
-
-function extractTextContent(content: Anthropic.Messages.ContentBlock[]) {
-  return content
-    .filter(
-      (block): block is Anthropic.Messages.TextBlock => block.type === "text",
-    )
-    .map((block) => block.text)
-    .join("\n")
-    .trim();
-}
-
-function extractJsonObject(text: string) {
-  const fencedMatch = text.match(/```json\s*([\s\S]*?)```/i);
-  const raw = fencedMatch?.[1] ?? text;
-  const start = raw.indexOf("{");
-  const end = raw.lastIndexOf("}");
-
-  if (start === -1 || end === -1 || end <= start) {
-    throw new Error("Claude response did not contain valid reviewer summary JSON.");
-  }
-
-  return raw.slice(start, end + 1);
 }
 
 function buildOrganizationPayload(organization: Organizations) {
@@ -334,7 +297,6 @@ export async function generateReviewerSummary(applicationId: string) {
   const admin = createAdminClient();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = admin as any;
-  const anthropic = getAnthropicClient();
 
   const { data: application } = await admin
     .from("applications")
@@ -385,21 +347,10 @@ export async function generateReviewerSummary(applicationId: string) {
       notes.length > 0 ? buildReviewerNotesPayload(notes) : undefined,
   });
 
-  const response = await anthropic.messages.create({
-    max_tokens: 1200,
-    messages: [
-      {
-        role: "user",
-        content: buildPrompt(payload),
-      },
-    ],
-    model: DEFAULT_MODEL,
-  });
-
-  const text = extractTextContent(response.content);
+  const text = await completeJson(buildPrompt(payload), 1200);
 
   if (!text) {
-    throw new Error("Claude did not return a reviewer summary.");
+    throw new Error("The AI service did not return a reviewer summary.");
   }
 
   let summary: ReviewerSummary;
@@ -409,7 +360,7 @@ export async function generateReviewerSummary(applicationId: string) {
       JSON.parse(extractJsonObject(text)),
     );
   } catch {
-    throw new Error("Claude returned invalid reviewer summary JSON.");
+    throw new Error("The AI service returned invalid reviewer summary JSON.");
   }
 
   const serializedSummary = JSON.stringify(summary);
