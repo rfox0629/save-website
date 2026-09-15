@@ -3,11 +3,34 @@
 import { startTransition, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { Button } from "@/components/ui/button";
+import {
+  Badge,
+  type BadgeTone,
+  Btn,
+  Callout,
+  Card,
+  CardBody,
+  CardHeader,
+  DataList,
+  DataRow,
+  EmptyState,
+  Field,
+  Input,
+  formatDate,
+} from "@/components/save/primitives";
 import type {
   VoiceAlignmentInsight,
   VoiceAlignmentSummary,
 } from "@/lib/voice-alignment";
+
+/**
+ * Voice alignment — collecting what the people around a ministry actually say.
+ *
+ * Restyled onto the approved SAVE design system in Phase B Stage 4. Every
+ * behaviour is preserved from the original manager: the same invite endpoints,
+ * the same synthesis endpoint and its insufficient-data handling, the same
+ * invite copy, and the same clipboard helpers. Only the interface changed.
+ */
 
 type VoiceAlignmentManagerProps = {
   applicationId: string;
@@ -44,20 +67,24 @@ async function postJson(url: string, body: Record<string, unknown> = {}) {
   return data;
 }
 
-function getAlignmentStatusClass(status: VoiceAlignmentInsight["alignment_status"]) {
+function getAlignmentTone(
+  status: VoiceAlignmentInsight["alignment_status"],
+): BadgeTone {
   switch (status) {
     case "aligned":
-      return "border-blue-400/20 bg-blue-400/10 text-blue-200";
+      return "sage";
     case "partially_aligned":
-      return "border-amber-400/20 bg-amber-400/10 text-amber-200";
+      return "brass";
     case "misaligned":
-      return "border-rose-400/20 bg-rose-400/10 text-rose-200";
+      return "risk";
     default:
-      return "border-white/10 bg-white/5 text-slate-300";
+      return "neutral";
   }
 }
 
-function formatAlignmentStatus(status: VoiceAlignmentInsight["alignment_status"]) {
+function formatAlignmentStatus(
+  status: VoiceAlignmentInsight["alignment_status"],
+) {
   return status
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
@@ -130,74 +157,42 @@ Thank you for your time.
 SAVE Team`;
 }
 
-function getRequestStatusMeta(status: string) {
+function getRequestStatusMeta(status: string): {
+  label: string;
+  tone: BadgeTone;
+} {
   if (status === "responded") {
-    return {
-      label: "Completed",
-      tone: "border-blue-400/20 bg-blue-400/10 text-blue-200",
-    };
+    return { label: "Completed", tone: "sage" };
   }
 
   if (status === "expired") {
-    return {
-      label: "Expired",
-      tone: "border-amber-400/20 bg-amber-400/10 text-amber-200",
-    };
+    return { label: "Expired", tone: "brass" };
   }
 
   if (status === "invalid") {
-    return {
-      label: "Unavailable",
-      tone: "border-slate-400/20 bg-slate-400/10 text-slate-300",
-    };
+    return { label: "Unavailable", tone: "neutral" };
   }
 
-  return {
-    label: "Pending",
-    tone: "border-sky-400/20 bg-sky-400/10 text-sky-200",
-  };
+  return { label: "Pending", tone: "ink" };
 }
 
-function formatDateTime(value: string | null) {
-  if (!value) {
-    return null;
-  }
-
-  const parsed = Date.parse(value);
-
-  if (Number.isNaN(parsed)) {
-    return null;
-  }
-
-  return new Date(parsed).toLocaleString();
-}
-
-function getSampleQualityMeta(internalCount: number, externalCount: number) {
+function getSampleQualityMeta(
+  internalCount: number,
+  externalCount: number,
+): { label: string; tone: BadgeTone } {
   if (internalCount >= 7 && externalCount >= 4) {
-    return {
-      label: "Robust sample",
-      tone: "border-blue-400/20 bg-blue-400/10 text-blue-200",
-    };
+    return { label: "Robust sample", tone: "sage" };
   }
 
   if (internalCount >= 5 && externalCount >= 3) {
-    return {
-      label: "Moderate sample",
-      tone: "border-sky-400/20 bg-sky-400/10 text-sky-200",
-    };
+    return { label: "Moderate sample", tone: "ink" };
   }
 
   if (internalCount >= 3 && externalCount >= 2) {
-    return {
-      label: "Minimum threshold met",
-      tone: "border-amber-400/20 bg-amber-400/10 text-amber-200",
-    };
+    return { label: "Minimum threshold met", tone: "brass" };
   }
 
-  return {
-    label: "Insufficient feedback collected",
-    tone: "border-white/10 bg-white/5 text-slate-300",
-  };
+  return { label: "Insufficient feedback collected", tone: "neutral" };
 }
 
 function RequestForm({
@@ -216,10 +211,6 @@ function RequestForm({
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
-  const title =
-    requestType === "internal"
-      ? "Request internal feedback"
-      : "Request external feedback";
 
   async function submit() {
     setPending(true);
@@ -257,46 +248,53 @@ function RequestForm({
   }
 
   return (
-    <div className="rounded-[1.75rem] border border-white/10 bg-[#0B1622]/70 p-5">
-      <h3 className="text-lg font-semibold text-white">{title}</h3>
-      <div className="mt-4 space-y-3">
-        <input
-          className="w-full rounded-2xl border border-white/10 bg-[#102133] px-4 py-3 text-white"
-          onChange={(event) => setRespondentName(event.target.value)}
-          placeholder="Respondent name"
-          value={respondentName}
-        />
-        <input
-          className="w-full rounded-2xl border border-white/10 bg-[#102133] px-4 py-3 text-white"
-          onChange={(event) => setRespondentEmail(event.target.value)}
-          placeholder="Respondent email"
-          type="email"
-          value={respondentEmail}
-        />
-        <input
-          className="w-full rounded-2xl border border-white/10 bg-[#102133] px-4 py-3 text-white"
-          onChange={(event) => setRelationship(event.target.value)}
-          placeholder="Role / relationship"
-          value={relationship}
-        />
-        <Button
-          className="bg-[#C09A45] text-[#0B1622] hover:bg-[#d4ac57]"
+    <Card>
+      <CardHeader
+        description={
+          requestType === "internal"
+            ? "People with direct internal context and lived experience."
+            : "People outside the organization who can speak to reputation and observed experience."
+        }
+        title={
+          requestType === "internal"
+            ? "Request internal feedback"
+            : "Request external feedback"
+        }
+      />
+      <CardBody className="space-y-3.5">
+        <Field label="Respondent name" required>
+          <Input
+            onChange={(event) => setRespondentName(event.target.value)}
+            value={respondentName}
+          />
+        </Field>
+        <Field label="Respondent email" required>
+          <Input
+            onChange={(event) => setRespondentEmail(event.target.value)}
+            type="email"
+            value={respondentEmail}
+          />
+        </Field>
+        <Field label="Role or relationship">
+          <Input
+            onChange={(event) => setRelationship(event.target.value)}
+            value={relationship}
+          />
+        </Field>
+        <Btn
           disabled={pending || !respondentName.trim() || !respondentEmail.trim()}
           onClick={() => void submit()}
-          type="button"
+          size="sm"
+          variant="secondary"
         >
-          {pending
-            ? "Creating..."
-            : requestType === "internal"
-              ? "Request Internal Feedback"
-              : "Request External Feedback"}
-        </Button>
+          {pending ? "Creating…" : "Create invite"}
+        </Btn>
         {message ? (
-          <p className="break-all text-sm text-blue-200">{message}</p>
+          <p className="break-all text-caption text-sage-700">{message}</p>
         ) : null}
-        {error ? <p className="text-sm text-rose-300">{error}</p> : null}
-      </div>
-    </div>
+        {error ? <p className="text-caption text-risk-700">{error}</p> : null}
+      </CardBody>
+    </Card>
   );
 }
 
@@ -324,10 +322,9 @@ function InviteRow({
   status: string;
 }) {
   const [message, setMessage] = useState<string | null>(null);
+  const [showCopy, setShowCopy] = useState(false);
   const inviteUrl = `${baseUrl}/voice-alignment/${inviteToken}`;
   const statusMeta = getRequestStatusMeta(status);
-  const createdLabel = formatDateTime(createdAt);
-  const completedLabel = formatDateTime(respondedAt);
   const inviteCopy = buildInviteCopy({
     inviteUrl,
     organizationName,
@@ -335,94 +332,74 @@ function InviteRow({
     respondentName,
   });
 
-  async function copyLink() {
+  async function copy(text: string, confirmation: string) {
     try {
-      await navigator.clipboard.writeText(inviteUrl);
-      setMessage("Invite link copied.");
+      await navigator.clipboard.writeText(text);
+      setMessage(confirmation);
     } catch {
-      setMessage("Unable to copy invite link.");
-    }
-  }
-
-  async function copyInviteMessage() {
-    try {
-      await navigator.clipboard.writeText(inviteCopy);
-      setMessage("Invite message copied.");
-    } catch {
-      setMessage("Unable to copy invite message.");
-    }
-  }
-
-  async function resendInvite() {
-    try {
-      await navigator.clipboard.writeText(inviteCopy);
-      setMessage("Invite message refreshed and copied for resending.");
-    } catch {
-      setMessage("Unable to prepare resend message.");
+      setMessage("Unable to copy — select the text below instead.");
+      setShowCopy(true);
     }
   }
 
   return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-[#0B1622]/60 p-4">
+    <div className="px-6 py-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="font-medium text-white">{respondentName}</p>
-          <p className="text-sm text-slate-300">{respondentEmail}</p>
-          <p className="mt-1 text-sm text-slate-400">
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-ink-900">
+            {respondentName}
+          </p>
+          <p className="text-caption text-ink-500">{respondentEmail}</p>
+          <p className="mt-0.5 text-caption text-ink-400">
             {requestType === "internal" ? "Internal" : "External"}
             {relationship ? ` · ${relationship}` : ""}
           </p>
-          <div className="mt-3 flex flex-col gap-1 text-xs text-slate-400">
-            {createdLabel ? <p>Requested {createdLabel}</p> : null}
-            {completedLabel ? <p>Completed {completedLabel}</p> : null}
-          </div>
+          <p className="save-numeric mt-1 text-micro text-ink-400">
+            Requested {formatDate(createdAt)}
+            {respondedAt ? ` · Completed ${formatDate(respondedAt)}` : ""}
+          </p>
         </div>
-        <span
-          className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${statusMeta.tone}`}
-        >
-          {statusMeta.label}
-        </span>
+        <Badge tone={statusMeta.tone}>{statusMeta.label}</Badge>
       </div>
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <Button
-          onClick={() => void copyInviteMessage()}
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <Btn
+          onClick={() => void copy(inviteCopy, "Invite message copied.")}
           size="sm"
-          type="button"
-          variant="outline"
+          variant="secondary"
         >
-          Copy Invite Message
-        </Button>
-        <Button onClick={() => void copyLink()} size="sm" type="button" variant="outline">
-          Copy Invite Link
-        </Button>
-        {statusMeta.label === "Pending" ? (
-          <Button
-            onClick={() => void resendInvite()}
-            size="sm"
-            type="button"
-            variant="outline"
-          >
-            Resend Invite
-          </Button>
-        ) : null}
-        <a
-          className="break-all text-sm text-[#F4E3B2] underline underline-offset-4"
-          href={inviteUrl}
-          rel="noreferrer"
-          target="_blank"
+          Copy invite message
+        </Btn>
+        <Btn
+          onClick={() => void copy(inviteUrl, "Invite link copied.")}
+          size="sm"
+          variant="ghost"
         >
-          {inviteUrl}
-        </a>
+          Copy link
+        </Btn>
+        <Btn
+          onClick={() => setShowCopy((value) => !value)}
+          size="sm"
+          variant="ghost"
+        >
+          {showCopy ? "Hide message" : "Show message"}
+        </Btn>
       </div>
-      <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">
-          Suggested Invite Copy
-        </p>
-        <pre className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-200">
-          {inviteCopy}
-        </pre>
-      </div>
-      {message ? <p className="mt-2 text-sm text-slate-300">{message}</p> : null}
+
+      {showCopy ? (
+        <div className="mt-3 rounded-md border border-hairline bg-surface-sunken px-4 py-3">
+          <p className="save-numeric break-all text-micro text-ink-500">
+            {inviteUrl}
+          </p>
+          <pre className="mt-2.5 whitespace-pre-wrap font-[inherit] text-caption leading-relaxed text-ink-600">
+            {inviteCopy}
+          </pre>
+        </div>
+      ) : null}
+
+      {message ? (
+        <p className="mt-2 text-caption text-ink-500">{message}</p>
+      ) : null}
     </div>
   );
 }
@@ -438,72 +415,103 @@ function InviteGroup({
   organizationName: string;
   requestType: RequestType;
 }) {
-  const filteredInvites = invites.filter(
+  const filtered = invites.filter(
     (invite) => invite.request_type === requestType,
   );
-  const title =
-    requestType === "internal" ? "Internal Requests" : "External Requests";
-  const description =
-    requestType === "internal"
-      ? "People with direct internal context and lived experience."
-      : "People outside the organization who can speak to reputation and observed experience.";
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h4 className="text-base font-semibold text-white">{title}</h4>
-          <p className="mt-1 text-sm text-slate-400">{description}</p>
+    <Card>
+      <CardHeader
+        action={<Badge tone="neutral">{filtered.length}</Badge>}
+        description={
+          requestType === "internal"
+            ? "People with direct internal context and lived experience."
+            : "People outside the organization who can speak to reputation."
+        }
+        title={requestType === "internal" ? "Internal requests" : "External requests"}
+      />
+      {filtered.length > 0 ? (
+        <div className="divide-y divide-hairline">
+          {filtered.map((invite) => (
+            <InviteRow
+              baseUrl={baseUrl}
+              createdAt={invite.created_at}
+              inviteToken={invite.invite_token}
+              key={invite.id}
+              organizationName={organizationName}
+              relationship={invite.relationship}
+              requestType={invite.request_type}
+              respondedAt={invite.responded_at}
+              respondentEmail={invite.respondent_email}
+              respondentName={invite.respondent_name}
+              status={invite.status}
+            />
+          ))}
         </div>
-        <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-slate-300">
-          {filteredInvites.length} total
-        </span>
-      </div>
-
-      {filteredInvites.length > 0 ? (
-        filteredInvites.map((invite) => (
-          <InviteRow
-            baseUrl={baseUrl}
-            createdAt={invite.created_at}
-            inviteToken={invite.invite_token}
-            key={invite.id}
-            organizationName={organizationName}
-            relationship={invite.relationship}
-            requestType={invite.request_type}
-            respondedAt={invite.responded_at}
-            respondentEmail={invite.respondent_email}
-            respondentName={invite.respondent_name}
-            status={invite.status}
-          />
-        ))
       ) : (
-        <p className="rounded-[1.5rem] border border-dashed border-white/10 bg-[#0B1622]/40 px-4 py-5 text-sm text-slate-400">
-          No {requestType} requests have been created yet.
-        </p>
+        <EmptyState
+          description={`No ${requestType} requests have been created yet.`}
+          title="Nothing requested"
+        />
       )}
-    </div>
+    </Card>
   );
 }
 
 function SummaryList({
-  items,
   emptyLabel,
+  items,
 }: {
-  items: string[];
   emptyLabel: string;
+  items: string[];
 }) {
   if (items.length === 0) {
-    return <p className="text-sm text-slate-400">{emptyLabel}</p>;
+    return <p className="text-caption text-ink-400">{emptyLabel}</p>;
   }
 
   return (
-    <ul className="space-y-2 text-sm leading-7 text-slate-200">
+    <ul className="space-y-1.5">
       {items.map((item) => (
-        <li key={item} className="rounded-2xl border border-white/10 bg-[#0B1622]/50 px-4 py-3">
+        <li
+          className="rounded-md bg-surface-sunken px-3.5 py-2.5 text-caption leading-relaxed text-ink-600"
+          key={item}
+        >
           {item}
         </li>
       ))}
     </ul>
+  );
+}
+
+function PerspectiveColumn({
+  concerns,
+  strengths,
+  themes,
+  title,
+}: {
+  concerns: string[];
+  strengths: string[];
+  themes: string[];
+  title: string;
+}) {
+  return (
+    <div>
+      <h4 className="text-sm font-semibold text-ink-900">{title}</h4>
+      <div className="mt-3 space-y-4">
+        <div>
+          <p className="save-eyebrow mb-2 text-ink-400">Themes</p>
+          <SummaryList emptyLabel="No data available" items={themes} />
+        </div>
+        <div>
+          <p className="save-eyebrow mb-2 text-ink-400">Strengths</p>
+          <SummaryList emptyLabel="No data available" items={strengths} />
+        </div>
+        <div>
+          <p className="save-eyebrow mb-2 text-ink-400">Concerns</p>
+          <SummaryList emptyLabel="No data available" items={concerns} />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -517,12 +525,10 @@ function AlignmentSummaryCard({
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [insufficientMessage, setInsufficientMessage] = useState<string | null>(null);
-  const storedSummary = summary.alignmentSummary;
-  const sampleQuality = getSampleQualityMeta(
-    summary.internalCount,
-    summary.externalCount,
+  const [insufficientMessage, setInsufficientMessage] = useState<string | null>(
+    null,
   );
+  const stored = summary.alignmentSummary;
 
   async function generate() {
     setPending(true);
@@ -538,7 +544,7 @@ function AlignmentSummaryCard({
         const minimumInternal = result.minimums?.internal ?? 3;
         const minimumExternal = result.minimums?.external ?? 2;
         setInsufficientMessage(
-          `Insufficient data. Collect at least ${minimumInternal} internal and ${minimumExternal} external responses before generating a summary.`,
+          `Collect at least ${minimumInternal} internal and ${minimumExternal} external responses before generating a summary.`,
         );
         return;
       }
@@ -556,183 +562,91 @@ function AlignmentSummaryCard({
   }
 
   return (
-    <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div className="max-w-3xl">
-          <p className="text-xs uppercase tracking-[0.3em] text-[#C09A45]">
-            Alignment Summary
-          </p>
-          <h3 className="mt-3 text-2xl font-semibold text-white">
-            Internal and external perspective synthesis
-          </h3>
-          <p className="mt-2 text-sm leading-7 text-slate-300">
-            Generate one grounded synthesis after enough internal and external
-            feedback has been collected.
-          </p>
-          <p className="mt-3 text-sm text-slate-400">
-            Minimum threshold: 3 internal and 2 external responses.
-          </p>
-        </div>
-        <Button
-          className="bg-[#C09A45] text-[#0B1622] hover:bg-[#d4ac57]"
-          disabled={pending}
-          onClick={() => void generate()}
-          type="button"
-        >
-          {pending
-            ? "Generating..."
-            : storedSummary
-              ? "Regenerate"
-              : "Generate Alignment Summary"}
-        </Button>
-      </div>
+    <Card>
+      <CardHeader
+        action={
+          <Btn
+            disabled={pending}
+            onClick={() => void generate()}
+            size="sm"
+            variant="secondary"
+          >
+            {pending
+              ? "Generating…"
+              : stored
+                ? "Regenerate"
+                : "Generate synthesis"}
+          </Btn>
+        }
+        description="One grounded synthesis comparing what insiders say with what outsiders say. Minimum threshold: 3 internal and 2 external responses."
+        title="Alignment synthesis"
+      />
+      <CardBody className="space-y-5">
+        {insufficientMessage ? (
+          <Callout title="Not enough responses yet" tone="brass">
+            {insufficientMessage}
+          </Callout>
+        ) : null}
 
-      {insufficientMessage ? (
-        <div className="mt-5 rounded-[1.5rem] border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-          {insufficientMessage}
-        </div>
-      ) : null}
+        {error ? (
+          <Callout title="Could not generate" tone="risk">
+            {error}
+          </Callout>
+        ) : null}
 
-      {error ? (
-        <div className="mt-5 rounded-[1.5rem] border border-rose-400/20 bg-rose-400/10 px-4 py-3 text-sm text-rose-100">
-          {error}
-        </div>
-      ) : null}
+        {stored ? (
+          <>
+            <div className="flex flex-wrap items-center gap-2.5">
+              <Badge tone={getAlignmentTone(stored.status)}>
+                {formatAlignmentStatus(stored.status)}
+              </Badge>
+              <span className="save-numeric text-caption text-ink-400">
+                Generated {formatDate(stored.generatedAt)}
+              </span>
+            </div>
 
-      {storedSummary ? (
-        <div className="mt-6 space-y-6">
-          <div className="flex flex-wrap items-center gap-3">
-            <span
-              className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${getAlignmentStatusClass(
-                storedSummary.status,
-              )}`}
-            >
-              {formatAlignmentStatus(storedSummary.status)}
-            </span>
-            <p className="text-sm text-slate-400">
-              Generated {new Date(storedSummary.generatedAt).toLocaleString()}
-            </p>
-            <span
-              className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${sampleQuality.tone}`}
-            >
-              {sampleQuality.label}
-            </span>
-          </div>
-
-          <div className="grid gap-6 xl:grid-cols-2">
-            <article className="rounded-[1.75rem] border border-white/10 bg-[#0B1622]/60 p-5">
-              <h4 className="text-lg font-semibold text-white">Internal Summary</h4>
-              <div className="mt-4 space-y-4">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                    Themes
-                  </p>
-                  <div className="mt-3">
-                    <SummaryList
-                      emptyLabel="No data available"
-                      items={storedSummary.summary.internal_summary.themes}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                    Strengths
-                  </p>
-                  <div className="mt-3">
-                    <SummaryList
-                      emptyLabel="No data available"
-                      items={storedSummary.summary.internal_summary.strengths}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                    Concerns
-                  </p>
-                  <div className="mt-3">
-                    <SummaryList
-                      emptyLabel="No data available"
-                      items={storedSummary.summary.internal_summary.concerns}
-                    />
-                  </div>
-                </div>
-              </div>
-            </article>
-
-            <article className="rounded-[1.75rem] border border-white/10 bg-[#0B1622]/60 p-5">
-              <h4 className="text-lg font-semibold text-white">External Summary</h4>
-              <div className="mt-4 space-y-4">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                    Themes
-                  </p>
-                  <div className="mt-3">
-                    <SummaryList
-                      emptyLabel="No data available"
-                      items={storedSummary.summary.external_summary.themes}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                    Strengths
-                  </p>
-                  <div className="mt-3">
-                    <SummaryList
-                      emptyLabel="No data available"
-                      items={storedSummary.summary.external_summary.strengths}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-                    Concerns
-                  </p>
-                  <div className="mt-3">
-                    <SummaryList
-                      emptyLabel="No data available"
-                      items={storedSummary.summary.external_summary.concerns}
-                    />
-                  </div>
-                </div>
-              </div>
-            </article>
-          </div>
-
-          <article className="rounded-[1.75rem] border border-white/10 bg-[#0B1622]/60 p-5">
-            <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-              Alignment Insight
-            </p>
-            <p className="mt-3 text-sm leading-7 text-slate-200">
-              {storedSummary.summary.alignment_insight || "No data available"}
-            </p>
-          </article>
-
-          <article className="rounded-[1.75rem] border border-white/10 bg-[#0B1622]/60 p-5">
-            <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
-              Follow-up Questions
-            </p>
-            <div className="mt-3">
-              <SummaryList
-                emptyLabel="No data available"
-                items={storedSummary.summary.follow_up_questions}
+            <div className="grid gap-6 lg:grid-cols-2">
+              <PerspectiveColumn
+                concerns={stored.summary.internal_summary.concerns}
+                strengths={stored.summary.internal_summary.strengths}
+                themes={stored.summary.internal_summary.themes}
+                title="Internal perspective"
+              />
+              <PerspectiveColumn
+                concerns={stored.summary.external_summary.concerns}
+                strengths={stored.summary.external_summary.strengths}
+                themes={stored.summary.external_summary.themes}
+                title="External perspective"
               />
             </div>
-          </article>
-        </div>
-      ) : (
-        <div className="mt-6 rounded-[1.75rem] border border-dashed border-white/10 bg-[#0B1622]/50 p-6">
-          <p className="text-base font-medium text-white">
-            No alignment summary has been generated yet.
-          </p>
-          <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-300">
-            Once enough feedback is collected, generate one synthesis to compare
-            internal and external perspectives and surface follow-up questions
-            for reviewers.
-          </p>
-        </div>
-      )}
-    </div>
+
+            <div>
+              <p className="save-eyebrow mb-2 text-ink-400">
+                Alignment insight
+              </p>
+              <p className="text-sm leading-relaxed text-ink-700">
+                {stored.summary.alignment_insight || "No data available"}
+              </p>
+            </div>
+
+            <div>
+              <p className="save-eyebrow mb-2 text-ink-400">
+                Follow-up questions
+              </p>
+              <SummaryList
+                emptyLabel="No data available"
+                items={stored.summary.follow_up_questions}
+              />
+            </div>
+          </>
+        ) : (
+          <EmptyState
+            description="Once enough feedback is collected, generate one synthesis to compare internal and external perspectives and surface follow-up questions."
+            title="No synthesis yet"
+          />
+        )}
+      </CardBody>
+    </Card>
   );
 }
 
@@ -746,48 +660,35 @@ export function VoiceAlignmentManager({
     summary.internalCount,
     summary.externalCount,
   );
+  const responded = summary.invites.filter((invite) => invite.response).length;
 
   return (
-    <section className="space-y-6">
-      <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.3em] text-[#C09A45]">
-              Voice Alignment
-            </p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">
-              Invite-Based Perspective Collection
-            </h2>
-            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-300">
-              Collect internal and external feedback with private invite links,
-              then synthesize the feedback into one reviewer-only alignment
-              summary.
-            </p>
-          </div>
-          <div className="rounded-[1.5rem] border border-white/10 bg-[#0B1622]/70 px-5 py-4 text-right">
-            <p className="text-xs uppercase tracking-[0.25em] text-slate-400">
-              Collection Status
-            </p>
-            <p className="mt-2 text-lg font-semibold text-white">
-              {summary.status}
-            </p>
-            <p className="mt-2 text-sm text-slate-300">
-              {summary.internalCount} internal · {summary.externalCount} external
-            </p>
-            <div className="mt-3 flex justify-end">
-              <span
-                className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${sampleQuality.tone}`}
-              >
-                {sampleQuality.label}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader
+          action={<Badge tone={sampleQuality.tone}>{sampleQuality.label}</Badge>}
+          description="Collect internal and external perspective through private invite links, then synthesize it into one reviewer-only summary. Reference feedback is never attributed back to the person who gave it."
+          title="Voice alignment"
+        />
+        <CardBody>
+          <DataList>
+            <DataRow
+              label="Collection status"
+              value={<Badge tone="neutral">{summary.status}</Badge>}
+            />
+            <DataRow label="Internal responses" value={summary.internalCount} />
+            <DataRow label="External responses" value={summary.externalCount} />
+            <DataRow
+              label="Invitations"
+              value={`${responded} of ${summary.invites.length} returned`}
+            />
+          </DataList>
+        </CardBody>
+      </Card>
 
       <AlignmentSummaryCard applicationId={applicationId} summary={summary} />
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-2">
         <RequestForm
           applicationId={applicationId}
           organizationName={organizationName}
@@ -800,33 +701,20 @@ export function VoiceAlignmentManager({
         />
       </div>
 
-      <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
-        <h3 className="text-lg font-semibold text-white">Invites</h3>
-        <p className="mt-2 text-sm text-slate-300">
-          Pending requests stay easy to spot, and resend remains a manual copy
-          helper so you can follow up without extra tooling.
-        </p>
-        <div className="mt-5 space-y-8">
-          {summary.invites.length > 0 ? (
-            <>
-              <InviteGroup
-                baseUrl={baseUrl}
-                invites={summary.invites}
-                organizationName={organizationName}
-                requestType="internal"
-              />
-              <InviteGroup
-                baseUrl={baseUrl}
-                invites={summary.invites}
-                organizationName={organizationName}
-                requestType="external"
-              />
-            </>
-          ) : (
-            <p className="text-sm text-slate-400">No invites have been created yet.</p>
-          )}
-        </div>
+      <div className="grid gap-6 lg:grid-cols-2">
+        <InviteGroup
+          baseUrl={baseUrl}
+          invites={summary.invites}
+          organizationName={organizationName}
+          requestType="internal"
+        />
+        <InviteGroup
+          baseUrl={baseUrl}
+          invites={summary.invites}
+          organizationName={organizationName}
+          requestType="external"
+        />
       </div>
-    </section>
+    </div>
   );
 }

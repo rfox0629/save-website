@@ -15,6 +15,10 @@ import {
   StatusForm,
 } from "@/components/dashboard/workspace-actions";
 import {
+  RecordEngagementForm,
+  RelationalDiligenceExceptionForm,
+} from "@/components/dashboard/diligence-actions";
+import {
   Badge,
   type BadgeTone,
   Btn,
@@ -39,6 +43,14 @@ import {
 } from "@/components/save/primitives";
 import { TopBar } from "@/components/save/shell";
 import { parseReviewerSummary } from "@/lib/ai/reviewerSummary";
+import {
+  DILIGENCE_KIND_LABELS,
+  DILIGENCE_STATUS_LABELS,
+  type DiligenceKind,
+  type DiligenceStatus,
+  getDiligenceEngagements,
+  getRelationalDiligenceStatus,
+} from "@/lib/diligence";
 import {
   getApplicationDetail,
   getExternalCheckLabel,
@@ -131,6 +143,10 @@ export default async function ApplicationWorkspacePage({
     getApplicationDetail(params.id),
     getViewerContext(),
   ]);
+  // Read after the access gate above, never alongside it.
+  const engagements = await getDiligenceEngagements(params.id);
+  const relational = getRelationalDiligenceStatus(engagements, data.application);
+  const isAdmin = viewer.realRole === "admin";
 
   const scoreByCategory: Record<string, number> = {
     doctrine: data.scoreSummary.doctrine,
@@ -225,6 +241,11 @@ export default async function ApplicationWorkspacePage({
               count: recordedChecks.length,
               href: "#external",
               label: "External checks",
+            },
+            {
+              count: engagements.length,
+              href: "#diligence",
+              label: "Time with leadership",
             },
             { href: "#voice", label: "Voice alignment" },
             { href: "#decision", label: "Decision" },
@@ -618,6 +639,129 @@ export default async function ApplicationWorkspacePage({
                 </div>
               ))}
             </div>
+          </Card>
+
+          {/* ------------------------------------------ Time with leadership */}
+          <Card id="diligence">
+            <CardHeader
+              action={<RecordEngagementForm applicationId={params.id} />}
+              description="SAVE's judgement is not only documentary. This is the record of time actually spent with this leadership — internal to SAVE unless a reviewer writes a donor excerpt."
+              title="Time with leadership"
+            />
+            <CardBody>
+              {relational.satisfiedByEngagement ? (
+                <Callout title="In-person time recorded" tone="sage">
+                  {relational.inPersonCompleted.length} in-person{" "}
+                  {relational.inPersonCompleted.length === 1
+                    ? "engagement has"
+                    : "engagements have"}{" "}
+                  taken place with this leadership.
+                </Callout>
+              ) : relational.exception ? (
+                <Callout
+                  title="Documented exception to in-person diligence"
+                  tone="brass"
+                >
+                  {relational.exception}
+                </Callout>
+              ) : (
+                <Callout title="No in-person time recorded yet" tone="clay">
+                  The top trust tier requires an onsite visit or a shared meal
+                  with this leadership, or an exception documented by a SAVE
+                  administrator.
+                </Callout>
+              )}
+            </CardBody>
+
+            {engagements.length > 0 ? (
+              <div className="divide-y divide-hairline border-t border-hairline">
+                {engagements.map((engagement) => (
+                  <div className="px-6 py-5" key={engagement.id}>
+                    <div className="flex flex-wrap items-center gap-2.5">
+                      <Badge tone="ink">
+                        {DILIGENCE_KIND_LABELS[engagement.kind as DiligenceKind]}
+                      </Badge>
+                      <Badge
+                        tone={
+                          engagement.status === "scheduled" ? "neutral" : "sage"
+                        }
+                      >
+                        {
+                          DILIGENCE_STATUS_LABELS[
+                            engagement.status as DiligenceStatus
+                          ]
+                        }
+                      </Badge>
+                      {engagement.visibility === "summary_shareable" ? (
+                        <Badge tone="brass">Excerpt shareable</Badge>
+                      ) : (
+                        <Badge tone="neutral">Internal only</Badge>
+                      )}
+                      <span className="save-numeric text-caption text-ink-400">
+                        {formatDate(engagement.occurred_on)}
+                        {engagement.location ? ` · ${engagement.location}` : ""}
+                      </span>
+                    </div>
+
+                    {engagement.narrative ? (
+                      <p className="mt-3 max-w-prose whitespace-pre-wrap text-sm leading-relaxed text-ink-700">
+                        {engagement.narrative}
+                      </p>
+                    ) : null}
+
+                    {engagement.save_participants.length > 0 ? (
+                      <p className="mt-2 text-caption text-ink-400">
+                        SAVE: {engagement.save_participants.join(", ")}
+                      </p>
+                    ) : null}
+
+                    {engagement.strengths.length > 0 ||
+                    engagement.concerns.length > 0 ? (
+                      <div className="mt-3 grid gap-4 sm:grid-cols-2">
+                        {engagement.strengths.length > 0 ? (
+                          <div>
+                            <p className="save-eyebrow mb-1.5 text-ink-400">
+                              Strengths
+                            </p>
+                            <ul className="list-disc space-y-1 pl-5 text-caption leading-relaxed text-ink-600">
+                              {engagement.strengths.map((item) => (
+                                <li key={item}>{item}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ) : null}
+                        {engagement.concerns.length > 0 ? (
+                          <div>
+                            <p className="save-eyebrow mb-1.5 text-ink-400">
+                              Concerns
+                            </p>
+                            <ul className="list-disc space-y-1 pl-5 text-caption leading-relaxed text-ink-600">
+                              {engagement.concerns.map((item) => (
+                                <li key={item}>{item}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                description="No visits, meals or leadership conversations have been recorded against this assessment."
+                title="Nothing recorded"
+              />
+            )}
+
+            {isAdmin ? (
+              <CardBody className="border-t border-hairline">
+                <RelationalDiligenceExceptionForm
+                  applicationId={params.id}
+                  current={relational.exception}
+                />
+              </CardBody>
+            ) : null}
           </Card>
 
           {/* ------------------------------------------------ Voice alignment */}

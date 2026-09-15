@@ -1,34 +1,69 @@
-import Link from "next/link";
-
+import { ViewModeSwitcher } from "@/components/app/view-mode-switcher";
+import { SignOutButton } from "@/components/auth/sign-out-button";
+import { StaffShell } from "@/components/dashboard/staff-shell";
 import { VoiceAlignmentManager } from "@/components/dashboard/voice-alignment-manager";
+import { Badge, Monogram, PageTitle } from "@/components/save/primitives";
+import { TopBar } from "@/components/save/shell";
 import { getApplicationDetail } from "@/lib/review";
 import { getRequestBaseUrl } from "@/lib/voice-alignment";
+import { getViewerContext } from "@/lib/view-mode";
 
 /**
- * Voice alignment invitation manager, preserved on its own route.
+ * Voice alignment for one application, on the approved design.
  *
- * This is the working legacy manager (reference invitations, responses,
- * synthesis) kept fully functional while the reviewer workspace moves to the
- * approved design. Its full restyle onto the design system is tracked in
- * Phase B Stage 4 alongside Time With Leadership. Access is gated by
- * getApplicationDetail (admin/reviewer only).
+ * Access is gated by getApplicationDetail (admin/reviewer only). Reference
+ * feedback is confidential to the SAVE team and is never attributed back to
+ * the person who gave it.
  */
 export default async function VoiceAlignmentPage({
   params,
 }: {
   params: { id: string };
 }) {
-  const data = await getApplicationDetail(params.id);
+  const [data, viewer] = await Promise.all([
+    getApplicationDetail(params.id),
+    getViewerContext(),
+  ]);
 
   return (
-    <main className="min-h-screen bg-[#0B1622] px-6 py-10 text-white">
-      <div className="mx-auto max-w-5xl space-y-6">
-        <Link
-          className="text-sm text-slate-300 underline underline-offset-4 hover:text-white"
-          href={`/applications/${params.id}`}
-        >
-          ← Back to {data.organization.legal_name}
-        </Link>
+    <StaffShell
+      active="queue"
+      topBar={
+        <TopBar
+          actions={
+            <>
+              <ViewModeSwitcher
+                canPreview={viewer.canPreview}
+                currentViewMode={viewer.currentViewMode}
+              />
+              <SignOutButton className="save-focus-ring rounded-md border border-hairline px-3 py-1.5 text-caption font-semibold text-ink-500 transition hover:bg-paper-200 hover:text-ink-800" />
+            </>
+          }
+          breadcrumb={[
+            { href: "/dashboard", label: "Queue" },
+            {
+              href: `/applications/${params.id}`,
+              label: data.organization.legal_name,
+            },
+            { label: "Voice alignment" },
+          ]}
+          status={<Badge tone="neutral">{data.voiceAlignment.status}</Badge>}
+        />
+      }
+    >
+      <div className="flex flex-wrap items-start gap-5">
+        <Monogram name={data.organization.legal_name} size="lg" />
+        <div className="min-w-0 flex-1">
+          <PageTitle
+            description="What the people around this ministry say, gathered independently from staff and from outside references."
+            eyebrow={`Application ${data.application.id.slice(0, 8)}`}
+          >
+            Voice alignment
+          </PageTitle>
+        </div>
+      </div>
+
+      <div className="mt-7">
         <VoiceAlignmentManager
           applicationId={params.id}
           baseUrl={getRequestBaseUrl()}
@@ -36,6 +71,6 @@ export default async function VoiceAlignmentPage({
           summary={data.voiceAlignment}
         />
       </div>
-    </main>
+    </StaffShell>
   );
 }

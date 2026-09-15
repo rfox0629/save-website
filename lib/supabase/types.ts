@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       organizations: {
         Row: {
+          library_visible: boolean;
           assigned_reviewer_id: string | null;
           countries: string[];
           created_at: string;
@@ -29,6 +30,7 @@ export type Database = {
           year_founded: number | null;
         };
         Insert: {
+          library_visible?: boolean;
           assigned_reviewer_id?: string | null;
           countries?: string[];
           created_at?: string;
@@ -47,6 +49,7 @@ export type Database = {
           year_founded?: number | null;
         };
         Update: {
+          library_visible?: boolean;
           assigned_reviewer_id?: string | null;
           countries?: string[];
           created_at?: string;
@@ -68,6 +71,8 @@ export type Database = {
       };
       applications: {
         Row: {
+          findings_shared_at: string | null;
+          relational_diligence_exception: string | null;
           ai_summary: string | null;
           ai_summary_generated_at: string | null;
           created_at: string;
@@ -84,6 +89,8 @@ export type Database = {
           updated_at: string;
         };
         Insert: {
+          findings_shared_at?: string | null;
+          relational_diligence_exception?: string | null;
           ai_summary?: string | null;
           ai_summary_generated_at?: string | null;
           created_at?: string;
@@ -100,6 +107,8 @@ export type Database = {
           updated_at?: string;
         };
         Update: {
+          findings_shared_at?: string | null;
+          relational_diligence_exception?: string | null;
           ai_summary?: string | null;
           ai_summary_generated_at?: string | null;
           created_at?: string;
@@ -590,6 +599,8 @@ export type Database = {
       };
       donor_briefs: {
         Row: {
+          approved_at: string | null;
+          approved_by: string | null;
           application_id: string;
           cautions: string[];
           commendations: string[];
@@ -607,6 +618,8 @@ export type Database = {
           slug: string | null;
         };
         Insert: {
+          approved_at?: string | null;
+          approved_by?: string | null;
           application_id: string;
           cautions?: string[];
           commendations?: string[];
@@ -624,6 +637,8 @@ export type Database = {
           slug?: string | null;
         };
         Update: {
+          approved_at?: string | null;
+          approved_by?: string | null;
           application_id?: string;
           cautions?: string[];
           commendations?: string[];
@@ -672,6 +687,156 @@ export type Database = {
           organization?: string | null;
           referral_source?: string;
           status?: "approved" | "declined" | "pending";
+        };
+        Relationships: [];
+      };
+      diligence_engagements: {
+        Row: {
+          application_id: string;
+          character_confidence: "high" | "low" | "medium" | null;
+          concerns: string[];
+          created_at: string;
+          created_by: string | null;
+          culture_confidence: "high" | "low" | "medium" | null;
+          culture_observations: string | null;
+          donor_excerpt: string | null;
+          follow_ups: Json;
+          id: string;
+          kind:
+            | "internal_leadership_review"
+            | "onsite_visit"
+            | "other"
+            | "reference_conversation"
+            | "shared_meal"
+            | "video_call";
+          leadership_character_observations: string | null;
+          linked_voice_alignment_request_id: string | null;
+          location: string | null;
+          ministry_participants: Json;
+          narrative: string | null;
+          occurred_on: string | null;
+          org_health_confidence: "high" | "low" | "medium" | null;
+          org_health_observations: string | null;
+          organization_id: string;
+          private_notes: string | null;
+          save_participants: string[];
+          status: "completed" | "scheduled" | "written_up";
+          strengths: string[];
+          updated_at: string;
+          visibility: "internal_only" | "summary_shareable";
+        };
+        Insert: {
+          application_id: string;
+          character_confidence?: "high" | "low" | "medium" | null;
+          concerns?: string[];
+          created_at?: string;
+          created_by?: string | null;
+          culture_confidence?: "high" | "low" | "medium" | null;
+          culture_observations?: string | null;
+          donor_excerpt?: string | null;
+          follow_ups?: Json;
+          id?: string;
+          kind:
+            | "internal_leadership_review"
+            | "onsite_visit"
+            | "other"
+            | "reference_conversation"
+            | "shared_meal"
+            | "video_call";
+          leadership_character_observations?: string | null;
+          linked_voice_alignment_request_id?: string | null;
+          location?: string | null;
+          ministry_participants?: Json;
+          narrative?: string | null;
+          occurred_on?: string | null;
+          org_health_confidence?: "high" | "low" | "medium" | null;
+          org_health_observations?: string | null;
+          organization_id: string;
+          private_notes?: string | null;
+          save_participants?: string[];
+          status?: "completed" | "scheduled" | "written_up";
+          strengths?: string[];
+          updated_at?: string;
+          visibility?: "internal_only" | "summary_shareable";
+        };
+        Update: {
+          application_id?: string;
+          character_confidence?: "high" | "low" | "medium" | null;
+          concerns?: string[];
+          created_at?: string;
+          created_by?: string | null;
+          culture_confidence?: "high" | "low" | "medium" | null;
+          culture_observations?: string | null;
+          donor_excerpt?: string | null;
+          follow_ups?: Json;
+          id?: string;
+          kind?:
+            | "internal_leadership_review"
+            | "onsite_visit"
+            | "other"
+            | "reference_conversation"
+            | "shared_meal"
+            | "video_call";
+          leadership_character_observations?: string | null;
+          linked_voice_alignment_request_id?: string | null;
+          location?: string | null;
+          ministry_participants?: Json;
+          narrative?: string | null;
+          occurred_on?: string | null;
+          org_health_confidence?: "high" | "low" | "medium" | null;
+          org_health_observations?: string | null;
+          organization_id?: string;
+          private_notes?: string | null;
+          save_participants?: string[];
+          status?: "completed" | "scheduled" | "written_up";
+          strengths?: string[];
+          updated_at?: string;
+          visibility?: "internal_only" | "summary_shareable";
+        };
+        Relationships: [];
+      };
+      roadmap_items: {
+        Row: {
+          application_id: string;
+          category: string | null;
+          created_at: string;
+          created_by: string | null;
+          detail: string | null;
+          due_date: string | null;
+          id: string;
+          organization_id: string;
+          owner: string | null;
+          status: "in_progress" | "open" | "verified" | "waived";
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          application_id: string;
+          category?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          detail?: string | null;
+          due_date?: string | null;
+          id?: string;
+          organization_id: string;
+          owner?: string | null;
+          status?: "in_progress" | "open" | "verified" | "waived";
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          application_id?: string;
+          category?: string | null;
+          created_at?: string;
+          created_by?: string | null;
+          detail?: string | null;
+          due_date?: string | null;
+          id?: string;
+          organization_id?: string;
+          owner?: string | null;
+          status?: "in_progress" | "open" | "verified" | "waived";
+          title?: string;
+          updated_at?: string;
         };
         Relationships: [];
       };
@@ -936,3 +1101,6 @@ export type VoiceAlignmentResponse =
   Database["public"]["Tables"]["voice_alignment_responses"]["Row"];
 export type VoiceAlignmentSummaryRecord =
   Database["public"]["Tables"]["voice_alignment_summaries"]["Row"];
+export type DiligenceEngagement =
+  Database["public"]["Tables"]["diligence_engagements"]["Row"];
+export type RoadmapItem = Database["public"]["Tables"]["roadmap_items"]["Row"];
