@@ -321,13 +321,17 @@ export async function requireReviewerPageAccess() {
     redirect("/login");
   }
 
-  if (context.profile?.role === "ministry") {
+  if (!context.profile) {
+    redirect("/access-pending");
+  }
+
+  if (context.profile.role === "ministry") {
     redirect("/portal");
   }
 
   if (
-    context.profile?.role !== "admin" &&
-    context.profile?.role !== "reviewer"
+    context.profile.role !== "admin" &&
+    context.profile.role !== "reviewer"
   ) {
     redirect("/login");
   }
@@ -342,15 +346,19 @@ export async function requireAdminPageAccess() {
     redirect("/login");
   }
 
-  if (context.profile?.role === "ministry") {
+  if (!context.profile) {
+    redirect("/access-pending");
+  }
+
+  if (context.profile.role === "ministry") {
     redirect("/portal");
   }
 
-  if (context.profile?.role === "donor") {
+  if (context.profile.role === "donor") {
     redirect("/donors");
   }
 
-  if (context.profile?.role !== "admin") {
+  if (context.profile.role !== "admin") {
     redirect("/dashboard");
   }
 

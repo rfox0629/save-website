@@ -39,11 +39,15 @@ export async function requireMinistryContext(): Promise<MinistryPortalContext> {
   const isPreviewMinistry =
     viewer.canPreview && viewer.currentViewMode === "ministry";
 
+  // Authenticated but no profile/role yet — hold them, don't bounce to a role
+  // area (which would send them back to /login).
+  if (!isPreviewMinistry && !viewer.realRole) {
+    redirect("/access-pending");
+  }
+
   if (
     !isPreviewMinistry &&
-    (!viewer.realRole ||
-      viewer.realRole !== "ministry" ||
-      !viewer.organizationId)
+    (viewer.realRole !== "ministry" || !viewer.organizationId)
   ) {
     redirect("/dashboard");
   }
