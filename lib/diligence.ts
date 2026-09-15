@@ -2,6 +2,7 @@ import "server-only";
 
 import { revalidatePath } from "next/cache";
 
+import { revokeBriefApprovalForMaterialChange } from "@/lib/brief-approval";
 import { requireReviewerMutationAccess } from "@/lib/review";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -260,10 +261,22 @@ export async function updateDiligenceEngagement(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = admin as any;
 
+  const { data: existing } = await admin
+    .from("diligence_engagements")
+    .select("donor_excerpt")
+    .eq("id", engagementId)
+    .eq("application_id", applicationId)
+    .maybeSingle();
+  const previousExcerpt =
+    (existing as Pick<DiligenceEngagement, "donor_excerpt"> | null)
+      ?.donor_excerpt ?? null;
+
+  const payload = buildPayload(input);
+
   const { error } = await db
     .from("diligence_engagements")
     .update({
-      ...buildPayload(input),
+      ...payload,
       updated_at: new Date().toISOString(),
     })
     .eq("id", engagementId)
@@ -271,6 +284,16 @@ export async function updateDiligenceEngagement(
 
   if (error) {
     throw new Error(error.message);
+  }
+
+  // The donor excerpt is the only part of an engagement a donor can ever read,
+  // so changing it is a material donor-facing change. Everything else in the
+  // record is internal and does not disturb an approval.
+  if ((payload.donor_excerpt ?? null) !== previousExcerpt) {
+    await revokeBriefApprovalForMaterialChange(
+      applicationId,
+      "the relational-diligence donor excerpt was changed",
+    );
   }
 
   revalidateDiligencePaths(applicationId);
