@@ -1,201 +1,138 @@
 import Link from "next/link";
 
-import {
-  assignReviewerAction,
-  quickActionAndRedirect,
-} from "@/app/actions/review";
+import { ViewModeSwitcher } from "@/components/app/view-mode-switcher";
+import { SignOutButton } from "@/components/auth/sign-out-button";
+import { StaffShell } from "@/components/dashboard/staff-shell";
 import {
   AiSummaryButton,
-  DocumentReviewButton,
-  ExternalChecksManager,
-  NotesManager,
-  OverrideScoreDialog,
-  ResolveFlagDialog,
-} from "@/components/dashboard/review-tools";
-import { VoiceAlignmentManager } from "@/components/dashboard/voice-alignment-manager";
-import { ScoreSummaryCard } from "@/components/brief/score-summary-card";
-import { Button } from "@/components/ui/button";
+  AssignReviewerForm,
+  DocumentReviewToggle,
+  ExternalCheckForm,
+  NoteForm,
+  OverrideScoreForm,
+  ResolveFlagForm,
+  RunAssessmentButton,
+  StatusForm,
+} from "@/components/dashboard/workspace-actions";
+import {
+  Badge,
+  type BadgeTone,
+  Btn,
+  Callout,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  DataList,
+  DataRow,
+  Divider,
+  EmptyState,
+  Meter,
+  Monogram,
+  PageTitle,
+  ScoreDial,
+  Table,
+  Tabs,
+  Td,
+  Th,
+  formatDate,
+} from "@/components/save/primitives";
+import { TopBar } from "@/components/save/shell";
+import { parseReviewerSummary } from "@/lib/ai/reviewerSummary";
 import {
   getApplicationDetail,
-  getRecommendationLevel,
-  getScoreTone,
-  getSeverityClass,
+  getExternalCheckLabel,
   getStatusLabel,
-  getStatusPillClass,
 } from "@/lib/review";
-import { parseReviewerSummary } from "@/lib/ai/reviewerSummary";
-import type { ExternalCheck, Json } from "@/lib/supabase/types";
+import type { RiskFlag } from "@/lib/supabase/types";
+import { getViewerContext } from "@/lib/view-mode";
 
-type ApplicationDetailPageProps = {
-  params: {
-    id: string;
-  };
-  searchParams?: {
-    tab?: string;
-  };
-};
+/**
+ * The reviewer workspace — the approved SAVE design over the canonical review
+ * backend. Evidence, scoring, flags, external checks and the decision live on
+ * one page so a reviewer never has to hold context across tabs.
+ *
+ * Every action here calls the same API routes and the same `lib/review`
+ * functions the legacy dark screen called. Nothing about scoring, overrides,
+ * permissions or the audit trail changed — only the interface.
+ */
 
-const TABS = [
-  "overview",
-  "score",
-  "flags",
-  "documents",
-  "external",
-  "notes",
-  "brief",
-  "voice",
+/** Stored category keys, with the maximum the scoring engine can award each. */
+const CATEGORIES = [
+  { key: "leadership", label: "Leadership integrity", max: 20 },
+  { key: "doctrine", label: "Doctrine", max: 15 },
+  { key: "governance", label: "Governance", max: 15 },
+  { key: "financial", label: "Financial stewardship", max: 20 },
+  { key: "fruit", label: "Fruit", max: 20 },
+  { key: "external", label: "External signals", max: 10 },
 ] as const;
 
-const CATEGORY_MAX = {
-  doctrine: 15,
-  external: 10,
-  financial: 20,
-  fruit: 20,
-  governance: 15,
-  leadership: 20,
-} as const;
+const STATUS_OPTIONS = [
+  "inquiry_submitted",
+  "inquiry_approved",
+  "vetting_submitted",
+  "under_review",
+  "more_info_requested",
+  "approved",
+  "declined",
+  "hard_stop",
+] as const;
 
-function formatRecommendation(recommendation: string) {
-  return recommendation
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
+function statusTone(status: string): BadgeTone {
+  if (status === "approved") return "sage";
+  if (status === "declined" || status === "hard_stop") return "risk";
+  if (status === "under_review" || status === "inquiry_approved") return "ink";
+  if (status === "more_info_requested") return "brass";
+  return "neutral";
 }
 
-function formatConfidence(confidence: string) {
-  return confidence.charAt(0).toUpperCase() + confidence.slice(1);
+function severityTone(severity: RiskFlag["severity"]): BadgeTone {
+  if (severity === "hard_stop" || severity === "high") return "risk";
+  if (severity === "medium") return "clay";
+  return "neutral";
 }
 
-function getCharityNavigatorMeta(checks: ExternalCheck[]) {
-  const check = checks.find((item) => item.source === "charity_navigator");
-
-  if (!check) {
-    return null;
-  }
-
-  const raw =
-    check.raw_result && typeof check.raw_result === "object" && !Array.isArray(check.raw_result)
-      ? (check.raw_result as Record<string, Json>)
-      : null;
-  const integrationStatus =
-    typeof raw?.status === "string"
-      ? raw.status
-      : check.status === "pass"
-        ? "found"
-        : "manual_review";
-  const note =
-    typeof raw?.note === "string" ? raw.note : (check.summary ?? "No note recorded.");
-
-  return {
-    note,
-    status: integrationStatus,
-  };
+function checkTone(status: string): BadgeTone {
+  if (status === "pass") return "sage";
+  if (status === "flag") return "risk";
+  if (status === "not_applicable") return "neutral";
+  return "neutral";
 }
 
-function getAiSummaryOutdatedState(
+function meterTone(pct: number) {
+  if (pct >= 85) return "sage" as const;
+  if (pct >= 70) return "brass" as const;
+  return "clay" as const;
+}
+
+function isAiSummaryOutdated(
   aiSummary: string | null,
-  aiSummaryGeneratedAt: string | null,
+  generatedAt: string | null,
   updatedAt: string | null | undefined,
 ) {
-  if (!aiSummary) {
-    return false;
-  }
+  if (!aiSummary) return false;
+  if (!generatedAt) return true;
+  if (!updatedAt) return false;
 
-  if (!aiSummaryGeneratedAt) {
-    return true;
-  }
+  const generatedMs = Date.parse(generatedAt);
+  const updatedMs = Date.parse(updatedAt);
 
-  if (!updatedAt) {
-    return false;
-  }
+  if (Number.isNaN(generatedMs) || Number.isNaN(updatedMs)) return true;
 
-  const generatedAtMs = Date.parse(aiSummaryGeneratedAt);
-  const updatedAtMs = Date.parse(updatedAt);
-
-  if (Number.isNaN(generatedAtMs) || Number.isNaN(updatedAtMs)) {
-    return true;
-  }
-
-  return updatedAtMs > generatedAtMs;
+  return updatedMs > generatedMs;
 }
 
-function ScoreDonut({
-  segments,
-  total,
-}: {
-  segments: { color: string; max: number; score: number }[];
-  total: number;
-}) {
-  const cumulative = segments.reduce<number[]>((acc, segment, index) => {
-    const previous = acc[index - 1] ?? 0;
-    acc.push(previous + segment.max);
-    return acc;
-  }, []);
-
-  const gradient = segments
-    .map((segment, index) => {
-      const start = index === 0 ? 0 : (cumulative[index - 1]! / 100) * 100;
-      const end = (cumulative[index]! / 100) * 100;
-      return `${segment.color} ${start}% ${end}%`;
-    })
-    .join(", ");
-
-  return (
-    <div className="relative flex h-44 w-44 items-center justify-center rounded-full border border-white/10 bg-[#0B1622]">
-      <div
-        className="absolute inset-3 rounded-full"
-        style={{
-          background: `conic-gradient(${gradient})`,
-        }}
-      />
-      <div className="relative z-10 flex h-28 w-28 flex-col items-center justify-center rounded-full bg-[#0B1622]">
-        <span className="text-xs uppercase tracking-[0.25em] text-slate-400">
-          Score
-        </span>
-        <span className="mt-2 text-3xl font-semibold text-white">{total}</span>
-      </div>
-    </div>
-  );
-}
-
-function TabLink({
-  applicationId,
-  currentTab,
-  label,
-  tab,
-}: {
-  applicationId: string;
-  currentTab: string;
-  label: string;
-  tab: string;
-}) {
-  const active = currentTab === tab;
-
-  return (
-    <Link
-      className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-        active
-          ? "border-[#C09A45]/30 bg-[#C09A45]/15 text-[#F4E3B2]"
-          : "border-white/10 bg-white/[0.03] text-slate-300 hover:text-white"
-      }`}
-      href={`/applications/${applicationId}?tab=${tab}`}
-    >
-      {label}
-    </Link>
-  );
-}
-
-export default async function ApplicationDetailPage({
+export default async function ApplicationWorkspacePage({
   params,
-  searchParams,
-}: ApplicationDetailPageProps) {
-  const activeTab = TABS.includes(
-    (searchParams?.tab ?? "overview") as (typeof TABS)[number],
-  )
-    ? ((searchParams?.tab as (typeof TABS)[number]) ?? "overview")
-    : "overview";
-  const data = await getApplicationDetail(params.id);
-  const scoreByCategory = {
+}: {
+  params: { id: string };
+}) {
+  const [data, viewer] = await Promise.all([
+    getApplicationDetail(params.id),
+    getViewerContext(),
+  ]);
+
+  const scoreByCategory: Record<string, number> = {
     doctrine: data.scoreSummary.doctrine,
     external: data.scoreSummary.external,
     financial: data.scoreSummary.financial,
@@ -203,547 +140,133 @@ export default async function ApplicationDetailPage({
     governance: data.scoreSummary.governance,
     leadership: data.scoreSummary.leadership,
   };
+
   const componentsByCategory = data.scoreComponents.reduce<
     Record<string, typeof data.scoreComponents>
   >((acc, component) => {
     acc[component.category] = [...(acc[component.category] ?? []), component];
     return acc;
   }, {});
+
   const reviewerSummary = parseReviewerSummary(data.application.ai_summary);
-  const charityNavigatorMeta = getCharityNavigatorMeta(data.externalChecks);
-  const isAiSummaryOutdated = getAiSummaryOutdatedState(
+  const summaryOutdated = isAiSummaryOutdated(
     data.application.ai_summary,
     data.application.ai_summary_generated_at,
     data.application.updated_at,
   );
 
+  const openFlags = data.flags.filter((flag) => !flag.resolved);
+  const recordedChecks = data.externalChecks.filter((check) => check.id);
+  const adverseChecks = recordedChecks.filter(
+    (check) => check.status === "flag",
+  );
+  const reviewedDocuments = data.documents.filter(
+    (document) => document.reviewed,
+  );
+  const voice = data.voiceAlignment;
+  const respondedInvites = voice.invites.filter((invite) => invite.response);
+
   return (
-    <main className="min-h-screen bg-[#0B1622] px-6 py-10 text-white">
-      <div className="mx-auto max-w-7xl space-y-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <Link
-              className="text-sm text-[#C09A45] hover:text-[#F4E3B2]"
-              href="/dashboard"
-            >
-              Back to dashboard
-            </Link>
-            <h1 className="mt-3 text-3xl font-semibold">
-              {data.organization.legal_name}
-            </h1>
-            <p className="mt-2 text-sm text-slate-300">
-              Application {data.application.id.slice(0, 8)} for internal review.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <span
-              className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${getStatusPillClass(
-                data.application.status,
-              )}`}
-            >
+    <StaffShell
+      active="queue"
+      topBar={
+        <TopBar
+          actions={
+            <>
+              <ViewModeSwitcher
+                canPreview={viewer.canPreview}
+                currentViewMode={viewer.currentViewMode}
+              />
+              <SignOutButton className="save-focus-ring rounded-md border border-hairline px-3 py-1.5 text-caption font-semibold text-ink-500 transition hover:bg-paper-200 hover:text-ink-800" />
+            </>
+          }
+          breadcrumb={[
+            { href: "/dashboard", label: "Queue" },
+            { label: data.organization.legal_name },
+          ]}
+          status={
+            <Badge tone={statusTone(data.application.status)}>
               {getStatusLabel(data.application.status)}
-            </span>
-          </div>
+            </Badge>
+          }
+        />
+      }
+    >
+      <div className="flex flex-wrap items-start gap-5">
+        <Monogram name={data.organization.legal_name} size="xl" />
+        <div className="min-w-0 flex-1">
+          <PageTitle
+            description={[
+              data.organization.entity_type ?? "Entity type not recorded",
+              data.organization.ein ? `EIN ${data.organization.ein}` : null,
+              `Submitted ${formatDate(data.application.created_at)}`,
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+            eyebrow={`Application ${data.application.id.slice(0, 8)}`}
+          >
+            {data.organization.legal_name}
+          </PageTitle>
         </div>
+      </div>
 
-        <nav className="sticky top-4 z-20 flex flex-wrap gap-3 rounded-[2rem] border border-white/10 bg-[#102133]/95 p-3 backdrop-blur">
-          <TabLink
-            applicationId={params.id}
-            currentTab={activeTab}
-            label="Overview"
-            tab="overview"
-          />
-          <TabLink
-            applicationId={params.id}
-            currentTab={activeTab}
-            label="Score"
-            tab="score"
-          />
-          <TabLink
-            applicationId={params.id}
-            currentTab={activeTab}
-            label="Flags"
-            tab="flags"
-          />
-          <TabLink
-            applicationId={params.id}
-            currentTab={activeTab}
-            label="Documents"
-            tab="documents"
-          />
-          <TabLink
-            applicationId={params.id}
-            currentTab={activeTab}
-            label="External Checks"
-            tab="external"
-          />
-          <TabLink
-            applicationId={params.id}
-            currentTab={activeTab}
-            label="Notes"
-            tab="notes"
-          />
-          <TabLink
-            applicationId={params.id}
-            currentTab={activeTab}
-            label="Brief"
-            tab="brief"
-          />
-          <TabLink
-            applicationId={params.id}
-            currentTab={activeTab}
-            label="Voice Alignment"
-            tab="voice"
-          />
-        </nav>
+      <div className="mt-7">
+        <Tabs
+          items={[
+            {
+              active: true,
+              count: data.documents.length,
+              href: "#evidence",
+              label: "Evidence",
+            },
+            { href: "#scoring", label: "Scoring" },
+            { count: openFlags.length, href: "#flags", label: "Risk flags" },
+            {
+              count: recordedChecks.length,
+              href: "#external",
+              label: "External checks",
+            },
+            { href: "#voice", label: "Voice alignment" },
+            { href: "#decision", label: "Decision" },
+          ]}
+        />
+      </div>
 
-        {activeTab === "overview" ? (
-          <section className="grid gap-6 lg:grid-cols-[340px,1fr]">
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
-              <ScoreDonut
-                segments={data.scoreSegments}
-                total={data.scoreSummary.total}
+      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_360px]">
+        <div className="min-w-0 space-y-6">
+          {/* ------------------------------------------------------ Evidence */}
+          <Card id="evidence">
+            <CardHeader
+              action={
+                <Badge tone={data.documents.length > 0 ? "ink" : "neutral"}>
+                  {reviewedDocuments.length} of {data.documents.length} reviewed
+                </Badge>
+              }
+              description="Documents the ministry has supplied. Opening a file uses a short-lived signed link."
+              title="Evidence"
+            />
+            {data.documents.length === 0 ? (
+              <EmptyState
+                description="Nothing has been uploaded against this application yet."
+                title="No documents"
               />
-              <div className="mt-6 space-y-3">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-300">Recommendation</span>
-                  <span
-                    className={getScoreTone(
-                      data.latestScore?.total_score ?? null,
-                    )}
-                  >
-                    {getRecommendationLevel(data.latestScore)}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-300">Assigned reviewer</span>
-                  <span className="text-white">
-                    {data.assignedReviewer ?? "Unassigned"}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-300">Entity type</span>
-                  <span className="text-white">
-                    {data.organization.entity_type ?? "Not provided"}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-slate-300">EIN</span>
-                  <span className="text-white">
-                    {data.organization.ein ?? "Not provided"}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              <div className="grid gap-4 rounded-[2rem] border border-white/10 bg-white/[0.03] p-6 md:grid-cols-2">
-                <div>
-                  <p className="text-xs uppercase tracking-[0.3em] text-[#C09A45]">
-                    Organization
-                  </p>
-                  <h2 className="mt-2 text-2xl font-semibold">
-                    {data.organization.legal_name}
-                  </h2>
-                  <p className="mt-2 text-sm text-slate-300">
-                    {data.organization.entity_type ??
-                      "Entity type not provided"}
-                  </p>
-                </div>
-                <div className="space-y-2 rounded-3xl border border-white/10 bg-[#0B1622]/70 p-5">
-                  <p className="text-sm text-slate-300">Quick actions</p>
-                  <div className="flex flex-wrap gap-3">
-                    {[
-                      ["approved", "Approve"],
-                      ["declined", "Decline"],
-                      ["more_info_requested", "Request More Info"],
-                    ].map(([status, label]) => (
-                      <form action={quickActionAndRedirect} key={status}>
-                        <input
-                          name="application_id"
-                          type="hidden"
-                          value={params.id}
-                        />
-                        <input name="status" type="hidden" value={status} />
-                        <Button
-                          className="bg-[#C09A45] text-[#0B1622] hover:bg-[#d4ac57]"
-                          type="submit"
-                        >
-                          {label}
-                        </Button>
-                      </form>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
-                <h3 className="text-lg font-semibold">Assign reviewer</h3>
-                <form
-                  action={assignReviewerAction}
-                  className="mt-4 flex flex-col gap-4 md:flex-row"
-                >
-                  <input
-                    name="application_id"
-                    type="hidden"
-                    value={params.id}
-                  />
-                  <select
-                    className="flex-1 rounded-2xl border border-white/10 bg-[#0B1622] px-4 py-3 text-white"
-                    defaultValue=""
-                    name="reviewer_id"
-                  >
-                    <option disabled value="">
-                      Select reviewer
-                    </option>
-                    {data.reviewerOptions.map((reviewer) => (
-                      <option key={reviewer.id} value={reviewer.id}>
-                        {reviewer.email} ({reviewer.role})
-                      </option>
-                    ))}
-                  </select>
-                  <Button
-                    className="bg-[#C09A45] text-[#0B1622] hover:bg-[#d4ac57]"
-                    type="submit"
-                  >
-                    Assign Reviewer
-                  </Button>
-                </form>
-              </div>
-
-              <ScoreSummaryCard
-                recommendation={data.scoreRecommendation}
-                scoreSummary={data.scoreSummary}
-              />
-
-              {data.application.ai_summary ? (
-                <div className="rounded-[2rem] border border-blue-300/20 bg-[#E8F0FA] p-7 text-[#1A4480] shadow-[0_18px_40px_rgba(26,68,128,0.08)]">
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div className="space-y-2">
-                      <h3 className="text-xl font-semibold text-[#1A4480]">
-                        AI Review Summary
-                      </h3>
-                      <p className="max-w-2xl text-sm leading-6 text-[#5A7C64]">
-                        A concise reviewer-facing synthesis grounded in the
-                        application materials, external checks, and existing notes.
-                      </p>
-                      {isAiSummaryOutdated ? (
-                        <p className="text-sm leading-6 text-amber-700/90">
-                          ⚠️ This summary may be outdated based on recent changes.
-                        </p>
-                      ) : null}
-                    </div>
-                    <AiSummaryButton
-                      applicationId={params.id}
-                      hasSummary={Boolean(data.application.ai_summary)}
-                    />
-                  </div>
-                  {reviewerSummary ? (
-                    <div className="mt-5 space-y-5 text-sm leading-7 text-[#204B34]">
-                      <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2A5FA0]">
-                          Executive Summary
-                        </h3>
-                        <p className="mt-2">{reviewerSummary.executive_summary}</p>
-                      </div>
-
-                      <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2A5FA0]">
-                          Strengths
-                        </h3>
-                        {reviewerSummary.top_strengths.length > 0 ? (
-                          <ul className="mt-2 list-disc space-y-1 pl-5">
-                            {reviewerSummary.top_strengths.map((strength) => (
-                              <li key={strength}>{strength}</li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="mt-2">No strengths recorded.</p>
-                        )}
-                      </div>
-
-                      <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2A5FA0]">
-                          Risks
-                        </h3>
-                        {reviewerSummary.top_risks.length > 0 ? (
-                          <ul className="mt-2 list-disc space-y-1 pl-5">
-                            {reviewerSummary.top_risks.map((risk) => (
-                              <li key={risk}>{risk}</li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="mt-2">No risks recorded.</p>
-                        )}
-                      </div>
-
-                      <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2A5FA0]">
-                          Follow Up Questions
-                        </h3>
-                        {reviewerSummary.follow_up_questions.length > 0 ? (
-                          <ul className="mt-2 list-disc space-y-1 pl-5">
-                            {reviewerSummary.follow_up_questions.map((question) => (
-                              <li key={question}>{question}</li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="mt-2">No follow-up questions recorded.</p>
-                        )}
-                      </div>
-
-                      <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2A5FA0]">
-                          Category Assessments
-                        </h3>
-                        <div className="mt-3 grid gap-3 md:grid-cols-2">
-                          {([
-                            [
-                              "Leadership Integrity",
-                              reviewerSummary.leadership_integrity,
-                            ],
-                            ["Doctrine", reviewerSummary.doctrine],
-                            ["Governance", reviewerSummary.governance],
-                            [
-                              "Financial Stewardship",
-                              reviewerSummary.financial_stewardship,
-                            ],
-                            ["Fruit", reviewerSummary.fruit],
-                          ] as Array<
-                            [
-                              string,
-                              {
-                                assessment: string;
-                                confidence: "high" | "low" | "medium";
-                              },
-                            ]
-                          >).map(([label, value]) => (
-                            <div
-                              key={label}
-                              className="rounded-2xl border border-blue-700/15 bg-white/40 p-4"
-                            >
-                              <div className="flex items-center justify-between gap-3">
-                                <h4 className="font-semibold">{label}</h4>
-                                <span className="rounded-full border border-blue-700/15 bg-white/70 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#2A5FA0]">
-                                  {formatConfidence(value.confidence)}
-                                </span>
-                              </div>
-                              <p className="mt-2 text-sm leading-6">
-                                {value.assessment}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {charityNavigatorMeta ? (
-                        <div>
-                          <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2A5FA0]">
-                            Charity Navigator
-                          </h3>
-                          <div className="mt-2 flex flex-wrap items-center gap-3">
-                            <span className="rounded-full border border-blue-700/15 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-[#2A5FA0]">
-                              {charityNavigatorMeta.status}
-                            </span>
-                            <p className="text-sm">{charityNavigatorMeta.note}</p>
-                          </div>
-                        </div>
-                      ) : null}
-
-                      <div>
-                        <h3 className="text-sm font-semibold uppercase tracking-[0.16em] text-[#2A5FA0]">
-                          Recommendation
-                        </h3>
-                        <div className="mt-2">
-                          <span className="rounded-full border border-blue-700/15 bg-white/70 px-3 py-1 text-sm font-semibold text-[#1A4480]">
-                            {formatRecommendation(reviewerSummary.recommendation)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="mt-5 whitespace-pre-wrap text-sm leading-7 text-[#204B34]">
-                      {data.application.ai_summary}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-7 shadow-[0_18px_40px_rgba(2,6,11,0.14)]">
-                  <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div>
-                      <h3 className="text-xl font-semibold text-white">
-                        AI Review Summary
-                      </h3>
-                      <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">
-                        A concise reviewer-facing synthesis grounded in the
-                        application materials, external checks, and existing notes.
-                      </p>
-                    </div>
-                    <AiSummaryButton
-                      applicationId={params.id}
-                      hasSummary={Boolean(data.application.ai_summary)}
-                    />
-                  </div>
-                  <div className="mt-6 rounded-[1.5rem] border border-white/10 bg-[#0B1622]/45 p-5">
-                    <p className="text-base font-medium text-white">
-                      No AI summary has been generated yet.
-                    </p>
-                    <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-300">
-                      Generate a grounded summary after reviewing the inquiry,
-                      vetting answers, documents, and external checks.
-                    </p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
-        ) : null}
-
-        {activeTab === "score" ? (
-          <section className="space-y-4">
-            {(
-              [
-                "leadership",
-                "doctrine",
-                "governance",
-                "financial",
-                "fruit",
-                "external",
-              ] as const
-            ).map((category) => (
-              <details
-                key={category}
-                className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6"
-                open
-              >
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.3em] text-[#C09A45]">
-                      Category
-                    </p>
-                    <h3 className="mt-2 text-xl font-semibold capitalize">
-                      {category}
-                    </h3>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span
-                      className={`text-lg font-semibold ${getScoreTone(scoreByCategory[category])}`}
-                    >
-                      {scoreByCategory[category]} / {CATEGORY_MAX[category]}
-                    </span>
-                    <OverrideScoreDialog
-                      applicationId={params.id}
-                      category={category}
-                      currentScore={scoreByCategory[category]}
-                      maxScore={CATEGORY_MAX[category]}
-                    />
-                  </div>
-                </summary>
-                <div className="mt-6 space-y-3">
-                  {(componentsByCategory[category] ?? []).map((component) => (
-                    <div
-                      key={component.id}
-                      className="rounded-3xl border border-white/10 bg-[#0B1622]/70 p-4"
-                    >
-                      <div className="flex items-center justify-between gap-4">
-                        <p className="font-medium text-white">
-                          {component.criterion}
-                        </p>
-                        <p className="text-sm text-slate-300">
-                          {component.awarded_points} / {component.max_points}
-                        </p>
-                      </div>
-                      <p className="mt-2 text-sm text-slate-300">
-                        {component.rationale ?? "No rationale recorded."}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </details>
-            ))}
-          </section>
-        ) : null}
-
-        {activeTab === "flags" ? (
-          <section className="space-y-4">
-            {data.flags.map((flag) => (
-              <article
-                key={flag.id}
-                className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6"
-              >
-                <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                  <div className="space-y-3">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span
-                        className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold uppercase ${getSeverityClass(
-                          flag.severity,
-                        )}`}
-                      >
-                        {flag.severity}
-                      </span>
-                      <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
-                        {flag.category}
-                      </span>
-                      <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
-                        {flag.flag_code}
-                      </span>
-                    </div>
-                    <p className="text-white">{flag.description}</p>
-                    <p className="text-sm text-slate-400">
-                      {flag.resolved
-                        ? `Resolved ${flag.resolved_at ? new Date(flag.resolved_at).toLocaleDateString() : ""}`
-                        : "Open flag"}
-                    </p>
-                  </div>
-                  {!flag.resolved ? (
-                    <ResolveFlagDialog
-                      applicationId={params.id}
-                      flagId={flag.id}
-                    />
-                  ) : null}
-                </div>
-              </article>
-            ))}
-            {data.flags.length === 0 ? (
-              <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-10 text-center text-slate-300">
-                No flags recorded for this application.
-              </div>
-            ) : null}
-          </section>
-        ) : null}
-
-        {activeTab === "voice" ? (
-          <VoiceAlignmentManager
-            applicationId={params.id}
-            baseUrl={process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"}
-            organizationName={data.organization.legal_name}
-            summary={data.voiceAlignment}
-          />
-        ) : null}
-
-        {activeTab === "documents" ? (
-          <section className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.03]">
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-white/10 text-left text-sm">
-                <thead className="bg-white/[0.04] text-slate-300">
+            ) : (
+              <Table>
+                <thead>
                   <tr>
-                    <th className="px-5 py-4">Type</th>
-                    <th className="px-5 py-4">Filename</th>
-                    <th className="px-5 py-4">Upload date</th>
-                    <th className="px-5 py-4">Reviewed</th>
-                    <th className="px-5 py-4">Action</th>
+                    <Th>Document</Th>
+                    <Th>Type</Th>
+                    <Th>Uploaded</Th>
+                    <Th align="right" />
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/10">
+                <tbody>
                   {data.documents.map((document) => (
-                    <tr key={document.id} className="bg-[#102133]/50">
-                      <td className="px-5 py-4 text-white">
-                        {document.document_type}
-                      </td>
-                      <td className="px-5 py-4">
+                    <tr key={document.id}>
+                      <Td>
                         {document.signedUrl ? (
                           <a
-                            className="text-[#F4E3B2] hover:text-white"
+                            className="save-focus-ring rounded-sm font-medium text-ink-900 underline decoration-hairline underline-offset-4 hover:text-ink-600"
                             href={document.signedUrl}
                             rel="noreferrer"
                             target="_blank"
@@ -751,124 +274,587 @@ export default async function ApplicationDetailPage({
                             {document.file_name}
                           </a>
                         ) : (
-                          <span className="text-slate-300">
+                          <span className="font-medium text-ink-900">
                             {document.file_name}
                           </span>
                         )}
-                      </td>
-                      <td className="px-5 py-4 text-slate-300">
-                        {new Date(document.uploaded_at).toLocaleDateString()}
-                      </td>
-                      <td className="px-5 py-4 text-slate-300">
-                        {document.reviewed ? "Yes" : "No"}
-                      </td>
-                      <td className="px-5 py-4">
-                        <DocumentReviewButton
+                        {document.uploadedByEmail ? (
+                          <p className="mt-0.5 text-caption text-ink-400">
+                            {document.uploadedByEmail}
+                          </p>
+                        ) : null}
+                      </Td>
+                      <Td>{document.document_type}</Td>
+                      <Td numeric>{formatDate(document.uploaded_at)}</Td>
+                      <Td align="right">
+                        <DocumentReviewToggle
                           applicationId={params.id}
                           documentId={document.id}
                           reviewed={document.reviewed}
                         />
-                      </td>
+                      </Td>
                     </tr>
                   ))}
-                  {data.documents.length === 0 ? (
-                    <tr>
-                      <td
-                        className="px-5 py-10 text-center text-slate-400"
-                        colSpan={5}
-                      >
-                        No uploaded documents yet.
-                      </td>
-                    </tr>
-                  ) : null}
                 </tbody>
-              </table>
-            </div>
-          </section>
-        ) : null}
+              </Table>
+            )}
+          </Card>
 
-        {activeTab === "external" ? (
-          <section>
-            <ExternalChecksManager
-              applicationId={params.id}
-              checks={data.externalChecks}
+          {/* ------------------------------------------------------- Scoring */}
+          <Card id="scoring">
+            <CardHeader
+              action={<RunAssessmentButton applicationId={params.id} />}
+              description="Engine scores are advisory. Any override requires a written reason and is recorded against the score record."
+              title="Scoring"
             />
-          </section>
-        ) : null}
-
-        {activeTab === "notes" ? (
-          <section className="space-y-6">
-            <NotesManager applicationId={params.id} />
-            <div className="space-y-4">
-              {data.notes.map((note) => (
-                <article
-                  key={note.id}
-                  className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6"
-                >
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className="font-medium text-white">
-                      {note.reviewerEmail ?? "Unknown reviewer"}
-                    </span>
-                    <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300">
-                      {note.section ?? "general"}
-                    </span>
-                    <span className="text-xs text-slate-400">
-                      {new Date(note.created_at).toLocaleString()}
-                    </span>
+            <CardBody>
+              {data.latestScore ? (
+                <>
+                  <div className="flex flex-wrap items-center gap-7">
+                    <ScoreDial
+                      label="Composite"
+                      score={data.scoreSummary.total}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <DataList>
+                        <DataRow
+                          label="Composite"
+                          value={`${data.scoreSummary.total} / ${data.scoreSummary.max}`}
+                        />
+                        <DataRow
+                          label="Recommendation"
+                          value={data.scoreRecommendation}
+                        />
+                        <DataRow
+                          label="Calculated"
+                          value={formatDate(data.latestScore.calculated_at)}
+                        />
+                        <DataRow
+                          label="Reviewer override"
+                          value={data.latestScore.override_by ? "Yes" : "None"}
+                        />
+                      </DataList>
+                    </div>
                   </div>
-                  <p className="mt-4 text-slate-200">{note.note}</p>
-                </article>
-              ))}
-              {data.notes.length === 0 ? (
-                <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-10 text-center text-slate-300">
-                  No notes yet.
-                </div>
-              ) : null}
-            </div>
-          </section>
-        ) : null}
 
-        {activeTab === "brief" ? (
-          <section className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-6">
-            {data.brief ? (
-              <div className="space-y-4">
-                <p className="text-xs uppercase tracking-[0.3em] text-[#C09A45]">
-                  Donor brief
-                </p>
-                <h2 className="text-2xl font-semibold text-white">
-                  {data.brief.headline ?? "Untitled brief"}
-                </h2>
-                <p className="text-slate-300">
-                  {data.brief.ministry_description ??
-                    "No description provided."}
-                </p>
-                <Button
-                  asChild
-                  className="bg-[#C09A45] text-[#0B1622] hover:bg-[#d4ac57]"
+                  {data.latestScore.is_hard_stop ? (
+                    <Callout
+                      className="mt-5"
+                      title="Hard stop recorded"
+                      tone="risk"
+                    >
+                      {data.latestScore.hard_stop_reason ??
+                        "The scoring engine recorded a hard stop for this application."}
+                    </Callout>
+                  ) : null}
+
+                  {data.latestScore.override_notes ? (
+                    <Callout
+                      className="mt-5"
+                      title="Most recent override"
+                      tone="brass"
+                    >
+                      {data.latestScore.override_notes}
+                    </Callout>
+                  ) : null}
+
+                  <Divider className="my-6" />
+
+                  <ul className="divide-y divide-hairline">
+                    {CATEGORIES.map((category) => {
+                      const score = scoreByCategory[category.key] ?? 0;
+                      const pct = Math.round((score / category.max) * 100);
+                      const components =
+                        componentsByCategory[category.key] ?? [];
+
+                      return (
+                        <li className="py-4 first:pt-0" key={category.key}>
+                          <div className="flex items-baseline justify-between gap-4">
+                            <p className="text-sm font-semibold text-ink-900">
+                              {category.label}
+                            </p>
+                            <span className="save-numeric text-sm font-semibold text-ink-900">
+                              {score} / {category.max}
+                            </span>
+                          </div>
+                          <div className="mt-2.5">
+                            <Meter tone={meterTone(pct)} value={pct} />
+                          </div>
+                          {components.length > 0 ? (
+                            <ul className="mt-3 space-y-2">
+                              {components.map((component) => (
+                                <li
+                                  className="rounded-md bg-surface-sunken px-3.5 py-2.5"
+                                  key={component.id}
+                                >
+                                  <div className="flex flex-wrap items-baseline justify-between gap-3">
+                                    <p className="text-caption font-medium text-ink-800">
+                                      {component.criterion}
+                                    </p>
+                                    <span className="save-numeric text-caption font-semibold text-ink-700">
+                                      {component.awarded_points} /{" "}
+                                      {component.max_points}
+                                    </span>
+                                  </div>
+                                  {component.rationale ? (
+                                    <p className="mt-1 text-caption leading-relaxed text-ink-500">
+                                      {component.rationale}
+                                    </p>
+                                  ) : null}
+                                </li>
+                              ))}
+                            </ul>
+                          ) : null}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </>
+              ) : (
+                <EmptyState
+                  description="No score has been calculated yet. Run the assessment pipeline to score this application from its answers, documents and external checks."
+                  title="Not yet scored"
+                />
+              )}
+            </CardBody>
+
+            {data.latestScore ? (
+              <CardBody className="border-t border-hairline">
+                <OverrideScoreForm
+                  applicationId={params.id}
+                  categories={CATEGORIES.map((category) => ({
+                    label: `${category.label} (max ${category.max})`,
+                    value: category.key,
+                  }))}
+                />
+              </CardBody>
+            ) : null}
+          </Card>
+
+          {/* --------------------------------------------------- AI summary */}
+          <Card id="summary">
+            <CardHeader
+              action={<AiSummaryButton applicationId={params.id} />}
+              description="A reviewer-facing synthesis grounded in the application materials, external checks and existing notes. Advisory only — it never sets a score."
+              title="AI review summary"
+            />
+            <CardBody>
+              {summaryOutdated ? (
+                <Callout
+                  className="mb-5"
+                  title="This summary may be out of date"
+                  tone="clay"
                 >
-                  <Link href={`/applications/${params.id}/brief`}>
-                    Open brief editor
-                  </Link>
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="text-slate-300">
-                  No donor brief has been generated for this application yet.
+                  The application has changed since the summary was generated on{" "}
+                  {formatDate(data.application.ai_summary_generated_at)}.
+                </Callout>
+              ) : null}
+
+              {reviewerSummary ? (
+                <div className="space-y-5">
+                  <div>
+                    <p className="save-eyebrow text-ink-400">
+                      Executive summary
+                    </p>
+                    <p className="mt-2 text-sm leading-relaxed text-ink-700">
+                      {reviewerSummary.executive_summary}
+                    </p>
+                  </div>
+
+                  <div className="grid gap-5 md:grid-cols-2">
+                    <div>
+                      <p className="save-eyebrow text-ink-400">Strengths</p>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-ink-700">
+                        {reviewerSummary.top_strengths.map((strength) => (
+                          <li key={strength}>{strength}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="save-eyebrow text-ink-400">Risks</p>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-ink-700">
+                        {reviewerSummary.top_risks.map((risk) => (
+                          <li key={risk}>{risk}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  {reviewerSummary.follow_up_questions.length > 0 ? (
+                    <div>
+                      <p className="save-eyebrow text-ink-400">
+                        Follow-up questions
+                      </p>
+                      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-ink-700">
+                        {reviewerSummary.follow_up_questions.map((question) => (
+                          <li key={question}>{question}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
                 </div>
-                <Button
-                  asChild
-                  className="bg-[#C09A45] text-[#0B1622] hover:bg-[#d4ac57]"
-                >
-                  <Link href={`/applications/${params.id}/brief`}>
-                    Create brief
-                  </Link>
-                </Button>
+              ) : data.application.ai_summary ? (
+                <p className="whitespace-pre-wrap text-sm leading-relaxed text-ink-700">
+                  {data.application.ai_summary}
+                </p>
+              ) : (
+                <EmptyState
+                  description="Generate one after reviewing the inquiry, vetting answers, documents and external checks."
+                  title="No AI summary yet"
+                />
+              )}
+            </CardBody>
+          </Card>
+
+          {/* ----------------------------------------------------- Risk flags */}
+          <Card id="flags">
+            <CardHeader
+              action={
+                openFlags.length > 0 ? (
+                  <Badge tone="risk">{openFlags.length} open</Badge>
+                ) : (
+                  <Badge tone="sage">None open</Badge>
+                )
+              }
+              description="Raised by the scoring engine or by a reviewer. Resolving one requires a written resolution."
+              title="Risk flags"
+            />
+            {data.flags.length === 0 ? (
+              <EmptyState
+                description="No risk flags have been raised against this application."
+                title="No flags"
+              />
+            ) : (
+              <div className="divide-y divide-hairline">
+                {data.flags.map((flag) => (
+                  <div
+                    className="flex flex-wrap items-start gap-4 px-6 py-5"
+                    key={flag.id}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <Badge tone={severityTone(flag.severity)}>
+                          {getStatusLabel(flag.severity)}
+                        </Badge>
+                        <span className="text-caption text-ink-400">
+                          {flag.category} · {flag.flag_code}
+                        </span>
+                      </div>
+                      <p className="mt-2.5 max-w-prose text-sm leading-relaxed text-ink-700">
+                        {flag.description}
+                      </p>
+                      {flag.resolved ? (
+                        <p className="mt-2 text-caption text-ink-400">
+                          Resolved {formatDate(flag.resolved_at)}
+                          {flag.resolution_notes
+                            ? ` — ${flag.resolution_notes}`
+                            : ""}
+                        </p>
+                      ) : null}
+                    </div>
+                    {flag.resolved ? (
+                      <Badge tone="sage">Resolved</Badge>
+                    ) : (
+                      <ResolveFlagForm
+                        applicationId={params.id}
+                        flagId={flag.id}
+                      />
+                    )}
+                  </div>
+                ))}
               </div>
             )}
-          </section>
-        ) : null}
+          </Card>
+
+          {/* ------------------------------------------------ External checks */}
+          <Card id="external">
+            <CardHeader
+              action={
+                adverseChecks.length > 0 ? (
+                  <Badge tone="risk">{adverseChecks.length} adverse</Badge>
+                ) : (
+                  <Badge tone="sage">0 adverse</Badge>
+                )
+              }
+              description="Run by the assessment pipeline and re-checked by a reviewer before any decision."
+              title="External checks"
+            />
+            <div className="divide-y divide-hairline">
+              {data.externalChecks.map((check) => (
+                <div
+                  className="px-6 py-4"
+                  key={check.id || `pending-${check.source}`}
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2.5">
+                        <p className="text-sm font-semibold text-ink-900">
+                          {getExternalCheckLabel(check.source)}
+                        </p>
+                        <Badge tone={checkTone(check.status)}>
+                          {getStatusLabel(check.status)}
+                        </Badge>
+                      </div>
+                      <p className="mt-1 text-caption leading-relaxed text-ink-500">
+                        {check.summary ?? "No result recorded."}
+                      </p>
+                      {check.checked_at ? (
+                        <p className="save-numeric mt-1 text-micro text-ink-400">
+                          Checked {formatDate(check.checked_at)}
+                        </p>
+                      ) : null}
+                    </div>
+                    <ExternalCheckForm
+                      applicationId={params.id}
+                      check={{
+                        id: check.id,
+                        score_impact: check.score_impact,
+                        source: check.source,
+                        status: check.status,
+                        summary: check.summary,
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+
+          {/* ------------------------------------------------ Voice alignment */}
+          <Card id="voice">
+            <CardHeader
+              action={
+                <Btn
+                  href={`/applications/${params.id}/voice-alignment`}
+                  size="sm"
+                  variant="secondary"
+                >
+                  Manage references
+                </Btn>
+              }
+              description="What the people around this ministry say, gathered independently from staff and outside references."
+              title="Voice alignment"
+            />
+            <CardBody>
+              <DataList>
+                <DataRow
+                  label="Collection status"
+                  value={<Badge tone="neutral">{voice.status}</Badge>}
+                />
+                <DataRow
+                  label="Internal responses"
+                  value={voice.internalCount}
+                />
+                <DataRow
+                  label="External responses"
+                  value={voice.externalCount}
+                />
+                <DataRow
+                  label="Invitations sent"
+                  value={`${respondedInvites.length} of ${voice.invites.length} returned`}
+                />
+                {voice.alignmentSummary ? (
+                  <DataRow
+                    label="Synthesis"
+                    value={`${voice.alignmentSummary.status} · ${formatDate(
+                      voice.alignmentSummary.generatedAt,
+                    )}`}
+                  />
+                ) : (
+                  <DataRow label="Synthesis" value="Not generated" />
+                )}
+              </DataList>
+            </CardBody>
+          </Card>
+
+          {/* ------------------------------------------------------- Decision */}
+          <Card id="decision">
+            <CardHeader
+              description="Moving an application changes what the ministry sees. Publishing to donors is gated separately."
+              title="Decision"
+            />
+            <CardBody className="space-y-5">
+              {openFlags.length > 0 ? (
+                <Callout
+                  title={`${openFlags.length} unresolved risk ${
+                    openFlags.length === 1 ? "flag" : "flags"
+                  }`}
+                  tone="clay"
+                >
+                  Resolve or record a resolution for each open flag before
+                  approving this application.
+                </Callout>
+              ) : null}
+
+              {data.application.decision ? (
+                <Callout title="Recorded decision" tone="ink">
+                  {getStatusLabel(data.application.decision)} on{" "}
+                  {formatDate(data.application.decision_date)}
+                  {data.application.decision_notes
+                    ? ` — ${data.application.decision_notes}`
+                    : ""}
+                </Callout>
+              ) : null}
+
+              <StatusForm
+                applicationId={params.id}
+                current={data.application.status}
+                options={STATUS_OPTIONS.map((status) => ({
+                  label: getStatusLabel(status),
+                  value: status,
+                }))}
+              />
+            </CardBody>
+            <CardFooter>
+              <span className="text-caption text-ink-400">
+                Last updated {formatDate(data.application.updated_at)}
+              </span>
+              <Btn
+                href={`/applications/${params.id}/brief`}
+                size="sm"
+                variant="secondary"
+              >
+                {data.brief ? "Open donor brief" : "Create donor brief"}
+              </Btn>
+            </CardFooter>
+          </Card>
+        </div>
+
+        {/* ------------------------------------------------------------ Rail */}
+        <aside className="space-y-6">
+          <Card>
+            <CardHeader title="Assignment" />
+            <CardBody>
+              <div className="flex items-center gap-3.5">
+                <Monogram
+                  name={data.assignedReviewer ?? "Unassigned"}
+                  size="md"
+                />
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-semibold text-ink-900">
+                    {data.assignedReviewer ?? "Unassigned"}
+                  </p>
+                  <p className="text-caption text-ink-400">
+                    {data.assignedReviewer
+                      ? "Assigned reviewer"
+                      : "No reviewer carrying this yet"}
+                  </p>
+                </div>
+              </div>
+              <Divider className="my-4" />
+              <AssignReviewerForm
+                applicationId={params.id}
+                current={data.assignedReviewer}
+                reviewers={data.reviewerOptions}
+              />
+            </CardBody>
+          </Card>
+
+          <Card>
+            <CardHeader
+              action={
+                data.notes.length > 0 ? (
+                  <Badge tone="neutral">{data.notes.length}</Badge>
+                ) : null
+              }
+              title="Reviewer notes"
+            />
+            <CardBody>
+              <NoteForm applicationId={params.id} />
+            </CardBody>
+            {data.notes.length > 0 ? (
+              <div className="divide-y divide-hairline border-t border-hairline">
+                {data.notes.map((note) => (
+                  <div className="px-6 py-3.5" key={note.id}>
+                    <div className="flex flex-wrap items-baseline justify-between gap-2">
+                      <p className="text-caption font-semibold text-ink-900">
+                        {note.reviewerEmail ?? "Unknown reviewer"}
+                      </p>
+                      <span className="save-numeric text-micro text-ink-400">
+                        {formatDate(note.created_at)}
+                      </span>
+                    </div>
+                    {note.section ? (
+                      <p className="mt-0.5 text-micro uppercase tracking-[0.08em] text-ink-400">
+                        {note.section}
+                      </p>
+                    ) : null}
+                    <p className="mt-1.5 text-caption leading-relaxed text-ink-600">
+                      {note.note}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </Card>
+
+          <Card>
+            <CardHeader title="Donor brief" />
+            <CardBody>
+              {data.brief ? (
+                <div className="space-y-2.5">
+                  <p className="text-sm font-semibold text-ink-900">
+                    {data.brief.headline ?? "Untitled brief"}
+                  </p>
+                  <p className="text-caption leading-relaxed text-ink-500">
+                    {data.brief.ministry_description ??
+                      "No description written yet."}
+                  </p>
+                  <Badge tone={data.brief.published ? "sage" : "neutral"}>
+                    {data.brief.published ? "Published" : "Draft"}
+                  </Badge>
+                </div>
+              ) : (
+                <p className="text-caption leading-relaxed text-ink-500">
+                  No donor brief has been generated for this application yet.
+                </p>
+              )}
+              <Btn
+                className="mt-3.5 w-full"
+                href={`/applications/${params.id}/brief`}
+                size="sm"
+                variant="secondary"
+              >
+                {data.brief ? "Open brief editor" : "Create brief"}
+              </Btn>
+            </CardBody>
+          </Card>
+
+          <Card className="p-6" tone="sunken">
+            <p className="text-sm font-semibold text-ink-900">Organization</p>
+            <div className="mt-3">
+              <DataList>
+                <DataRow
+                  label="Entity type"
+                  value={data.organization.entity_type ?? "—"}
+                />
+                <DataRow label="EIN" value={data.organization.ein ?? "—"} />
+                <DataRow
+                  label="Founded"
+                  value={data.organization.year_founded ?? "—"}
+                />
+                <DataRow
+                  label="Website"
+                  value={
+                    data.organization.website_url ? (
+                      <Link
+                        className="underline decoration-hairline underline-offset-4"
+                        href={data.organization.website_url}
+                        rel="noreferrer"
+                        target="_blank"
+                      >
+                        Visit
+                      </Link>
+                    ) : (
+                      "—"
+                    )
+                  }
+                />
+              </DataList>
+            </div>
+          </Card>
+        </aside>
       </div>
-    </main>
+    </StaffShell>
   );
 }
