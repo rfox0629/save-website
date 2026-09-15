@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { requireReviewerPageAccess } from "@/lib/review";
+import { getRequestBaseUrl } from "@/lib/site-url";
 import {
   parseVoiceAlignmentInsight,
   type VoiceAlignmentInsight,
@@ -169,7 +170,7 @@ export async function getBriefEditorData(
   }
 
   const resolvedBrief = brief as DonorBrief | null;
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const baseUrl = getRequestBaseUrl();
 
   return {
     application: resolvedApplication,

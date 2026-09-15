@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { requireReviewerMutationAccess } from "@/lib/review";
+import { getRequestBaseUrl } from "@/lib/site-url";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   Applications,
@@ -121,7 +122,7 @@ export async function POST(request: Request) {
       throw new Error(error.message);
     }
 
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+    const baseUrl = getRequestBaseUrl();
     const publicSlug = payload.slug ?? resolvedExistingBrief?.slug ?? null;
 
     return NextResponse.json({
