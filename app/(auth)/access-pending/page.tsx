@@ -37,24 +37,43 @@ export default async function AccessPendingPage() {
         </p>
 
         <div className="mx-auto mt-6 flex h-14 w-14 items-center justify-center rounded-full border border-[#C09A45]/40 bg-[#FFF8E8]">
-          <span className="relative flex h-3.5 w-3.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#C09A45]/30" />
-            <span className="relative inline-flex h-3.5 w-3.5 rounded-full bg-[#C09A45]" />
-          </span>
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            className="h-6 w-6 text-[#C09A45]"
+          >
+            <rect
+              x="5"
+              y="10.5"
+              width="14"
+              height="9"
+              rx="2"
+              stroke="currentColor"
+              strokeWidth="1.6"
+            />
+            <path
+              d="M8 10.5V8a4 4 0 1 1 8 0v2.5"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            />
+          </svg>
         </div>
 
         <h1
           className="mt-6 text-3xl leading-tight text-[#1A4480]"
           style={{ fontFamily: "var(--font-auth-serif)" }}
         >
-          Your access is being set up
+          SAVE access not yet assigned
         </h1>
 
         <p className="mt-4 text-[15px] leading-7 text-[#4F6357]">
           You&rsquo;re signed in as{" "}
           <span className="font-semibold text-[#1A4480]">{user.email}</span>.
-          Your SAVE account is verified, and the team is finishing your access.
-          You&rsquo;ll be able to continue as soon as your role is assigned.
+          Your account is verified, but it doesn&rsquo;t have a SAVE role yet. If
+          you were invited to SAVE, you&rsquo;ll be able to continue once an
+          administrator assigns your role.
         </p>
 
         <div className="mt-8 flex flex-col gap-3">
