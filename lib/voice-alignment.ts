@@ -1,5 +1,6 @@
 import "server-only";
 
+import { headers } from "next/headers";
 import { z } from "zod";
 
 import { completeJson, extractJsonObject } from "@/lib/ai/openai";
@@ -164,8 +165,33 @@ export function getVoiceAlignmentStatus(
   return "Collecting Responses";
 }
 
+/**
+ * Origin used to build reference invitation links. Derived from the live
+ * request so invitations never embed a localhost URL in production (the same
+ * failure class as the magic-link Site URL bug). Falls back to the configured
+ * site URL, then the production origin — never localhost.
+ */
+export function getRequestBaseUrl() {
+  try {
+    const headerList = headers();
+    const origin = headerList.get("origin");
+    if (origin) {
+      return origin;
+    }
+    const protocol = headerList.get("x-forwarded-proto") ?? "https";
+    const host = headerList.get("x-forwarded-host") ?? headerList.get("host");
+    if (host) {
+      return `${protocol}://${host}`;
+    }
+  } catch {
+    // Not inside a request scope; fall through to configured origin.
+  }
+
+  return process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.savestandard.org";
+}
+
 function getBaseUrl() {
-  return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  return getRequestBaseUrl();
 }
 
 function compactValue(value: unknown): unknown {

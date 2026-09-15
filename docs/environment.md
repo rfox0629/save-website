@@ -10,11 +10,16 @@ is consumed by application code — do not add integration-synced variants
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Browser + server clients | Public by design; RLS is the security boundary |
 | `SUPABASE_SERVICE_ROLE_KEY` | Admin client (`lib/supabase/admin.ts`), scoring engine, public brief rendering | Secret — server only, never exposed to the client |
 
-AI reviewer summaries additionally require:
+The AI features (reviewer summaries, voice-alignment synthesis, reputation
+checks, document analysis) additionally require:
 
-| Variable | Used by |
-| --- | --- |
-| `ANTHROPIC_API_KEY` | `lib/ai/reviewerSummary.ts` and the AI summary API routes |
+| Variable | Used by | Notes |
+| --- | --- | --- |
+| `OPENAI_API_KEY` | `lib/ai/openai.ts` and every AI call site | Secret — server only |
+| `OPENAI_MODEL` | `lib/ai/openai.ts` | Optional; defaults to `gpt-4o` |
+
+`ANTHROPIC_API_KEY` is no longer read by any code path — the AI features moved
+to OpenAI in USA-133 Phase A.
 
 ## Backends
 
