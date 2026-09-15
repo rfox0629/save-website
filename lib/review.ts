@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { revokeBriefApprovalForMaterialChange } from "@/lib/brief-approval";
 import { getVoiceAlignmentSummary, type VoiceAlignmentSummary } from "@/lib/voice-alignment";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
@@ -866,6 +867,14 @@ export async function overrideCategoryScore(params: {
   if (error) {
     throw new Error(error.message);
   }
+
+  // A score override moves the composite and therefore the donor-facing tier,
+  // so it is a material donor-facing change: any standing second-reviewer
+  // approval is revoked and must be sought again.
+  await revokeBriefApprovalForMaterialChange(
+    params.applicationId,
+    `the ${params.category} score was overridden`,
+  );
 
   revalidateReviewPaths(params.applicationId);
 }

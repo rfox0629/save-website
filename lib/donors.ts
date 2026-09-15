@@ -204,10 +204,15 @@ export async function requireDonorBriefs() {
     ),
   );
 
+  // Founder decision: library_visible gates the DONOR LIBRARY only. It is not a
+  // global public-visibility flag — the public brief page stays gated solely by
+  // published + second-reviewer approval, so listing a ministry in the library
+  // and publishing its brief remain distinct actions.
   const { data: organizations } = await admin
     .from("organizations")
     .select("*")
-    .in("id", orgIds);
+    .in("id", orgIds)
+    .eq("library_visible", true);
 
   const organizationMap = new Map(
     ((organizations ?? []) as Organizations[]).map((organization) => [

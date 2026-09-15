@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+import {
+  getMaterialBriefChanges,
+  revokeBriefApprovalForMaterialChange,
+} from "@/lib/brief-approval";
 import { requireReviewerMutationAccess } from "@/lib/review";
 import { getRequestBaseUrl } from "@/lib/site-url";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -83,15 +87,12 @@ export async function POST(request: Request) {
 
     const { data: existingBrief } = await admin
       .from("donor_briefs")
-      .select("id, slug, approved_by, approved_at, generated_by")
+      .select("*")
       .eq("application_id", body.application_id)
       .order("generated_at", { ascending: false })
       .limit(1)
       .maybeSingle();
-    const resolvedExistingBrief = existingBrief as Pick<
-      DonorBrief,
-      "approved_at" | "approved_by" | "generated_by" | "id" | "slug"
-    > | null;
+    const resolvedExistingBrief = existingBrief as DonorBrief | null;
 
     // Founder decision B3: nothing becomes donor-visible on one reviewer's say-so.
     if (body.published) {
@@ -134,6 +135,21 @@ export async function POST(request: Request) {
       slug: resolvedExistingBrief?.slug ?? generatedSlug,
     };
 
+    // Founder decision: a material donor-facing edit after second-reviewer
+    // approval revokes that approval. Work out what actually changed BEFORE
+    // writing, and never treat the publish action itself as a material edit.
+    const materialChanges =
+      resolvedExistingBrief && !body.published
+        ? getMaterialBriefChanges(resolvedExistingBrief, {
+            cautions: filteredCautions,
+            commendations: filteredCommendations,
+            headline: payload.headline,
+            include_voice_alignment: payload.include_voice_alignment,
+            ministry_description: payload.ministry_description,
+            recommendation_level: payload.recommendation_level,
+          })
+        : [];
+
     const query = resolvedExistingBrief?.id
       ? db
           .from("donor_briefs")
@@ -147,15 +163,34 @@ export async function POST(request: Request) {
       throw new Error(error.message);
     }
 
+    let revocation = null;
+    if (materialChanges.length > 0) {
+      const result = await revokeBriefApprovalForMaterialChange(
+        body.application_id,
+        `donor-facing content changed (${materialChanges.join(", ")})`,
+      );
+      if (result.revoked) {
+        revocation = {
+          changed: materialChanges,
+          message:
+            "This edit changed donor-facing content, so the second-reviewer approval was revoked and the brief is no longer live to donors. It needs approving again.",
+          wasPublished: result.wasPublished,
+        };
+      }
+    }
+
     const baseUrl = getRequestBaseUrl();
     const publicSlug = payload.slug ?? resolvedExistingBrief?.slug ?? null;
 
     return NextResponse.json({
       ok: true,
-      published: payload.published,
+      published: revocation ? false : payload.published,
       public_slug: publicSlug,
       public_url:
-        payload.published && publicSlug ? `${baseUrl}/donors/${publicSlug}` : null,
+        payload.published && publicSlug && !revocation
+          ? `${baseUrl}/donors/${publicSlug}`
+          : null,
+      revocation,
     });
   } catch (error) {
     return NextResponse.json(
