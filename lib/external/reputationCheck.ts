@@ -1,7 +1,10 @@
 import "server-only";
 
-import Anthropic from "@anthropic-ai/sdk";
-
+import {
+  completeWithWebSearch,
+  extractJsonObject,
+  OPENAI_MODEL,
+} from "@/lib/ai/openai";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Database } from "@/lib/supabase/types";
 
@@ -18,34 +21,9 @@ type ReputationCheckResult = ReputationResult & {
   status: "flag" | "pass";
 };
 
-const DEFAULT_MODEL = "claude-sonnet-4-6";
-
-function extractTextContent(content: Anthropic.Messages.ContentBlock[]) {
-  return content
-    .filter(
-      (block): block is Anthropic.Messages.TextBlock => block.type === "text",
-    )
-    .map((block) => block.text)
-    .join("\n")
-    .trim();
-}
-
-function extractJsonObject(text: string) {
-  const fencedMatch = text.match(/```json\s*([\s\S]*?)```/i);
-  const raw = fencedMatch?.[1] ?? text;
-  const start = raw.indexOf("{");
-  const end = raw.lastIndexOf("}");
-
-  if (start === -1 || end === -1 || end <= start) {
-    throw new Error("Claude response did not contain valid JSON.");
-  }
-
-  return raw.slice(start, end + 1);
-}
-
 function normalizeResult(value: unknown): ReputationResult {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
-    throw new Error("Claude reputation response could not be parsed.");
+    throw new Error("The AI reputation response could not be parsed.");
   }
 
   const result = value as Record<string, unknown>;
@@ -76,15 +54,6 @@ export async function checkReputation(
   ein: string,
   applicationId: string,
 ): Promise<ReputationCheckResult> {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-
-  if (!apiKey) {
-    throw new Error(
-      "ANTHROPIC_API_KEY is not set. Add it to your environment before running reputation checks.",
-    );
-  }
-
-  const anthropic = new Anthropic({ apiKey });
   const admin = createAdminClient();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = admin as any;
@@ -101,12 +70,8 @@ export async function checkReputation(
     .eq("application_id", applicationId)
     .eq("source", "ecfa_search");
 
-  const response = await anthropic.messages.create({
-    max_tokens: 1024,
-    messages: [
-      {
-        role: "user",
-        content: `Research the Christian ministry named "${orgName}" (EIN: ${ein}).
+  const responseText = await completeWithWebSearch(
+    `Research the Christian ministry named "${orgName}" (EIN: ${ein}).
 Search for: any news articles, controversies, lawsuits, leadership scandals,
 financial fraud allegations, or doctrinal concerns.
 Also check if they appear in ministry watchdog sites like MinistryWatch or ECFA.
@@ -119,20 +84,11 @@ Respond ONLY with a JSON object:
   "watchdog_listed": boolean,
   "watchdog_notes": "string"
 }`,
-      },
-    ],
-    model: DEFAULT_MODEL,
-    tools: [
-      {
-        type: "web_search_20250305",
-        name: "web_search",
-        max_uses: 5,
-      },
-    ],
-  });
+    1024,
+  );
 
   const parsed = normalizeResult(
-    JSON.parse(extractJsonObject(extractTextContent(response.content))),
+    JSON.parse(extractJsonObject(responseText)),
   );
   const status = parsed.concerns_found ? "flag" : "pass";
 
@@ -140,7 +96,7 @@ Respond ONLY with a JSON object:
     application_id: applicationId,
     raw_result: {
       ...parsed,
-      anthropic_model: DEFAULT_MODEL,
+      model: OPENAI_MODEL,
     },
     score_impact: parsed.concerns_found ? -1 : 1,
     source: "news_search",
@@ -148,12 +104,8 @@ Respond ONLY with a JSON object:
     summary: parsed.concern_summary,
   } satisfies Database["public"]["Tables"]["external_checks"]["Insert"]);
 
-  const ecfaResponse = await anthropic.messages.create({
-    max_tokens: 512,
-    messages: [
-      {
-        role: "user",
-        content: `Search: "${orgName} ECFA member site:ecfa.org"
+  const ecfaResponseText = await completeWithWebSearch(
+    `Search: "${orgName} ECFA member site:ecfa.org"
 Check whether this organization appears on ECFA's site as a current or historical member.
 
 Respond ONLY with a JSON object:
@@ -162,21 +114,10 @@ Respond ONLY with a JSON object:
   "summary": "string",
   "sources": ["url1", "url2"]
 }`,
-      },
-    ],
-    model: DEFAULT_MODEL,
-    tools: [
-      {
-        type: "web_search_20250305",
-        name: "web_search",
-        max_uses: 3,
-      },
-    ],
-  });
+    512,
+  );
 
-  const ecfaRaw = JSON.parse(
-    extractJsonObject(extractTextContent(ecfaResponse.content)),
-  ) as {
+  const ecfaRaw = JSON.parse(extractJsonObject(ecfaResponseText)) as {
     ecfa_found?: boolean;
     sources?: string[];
     summary?: string;

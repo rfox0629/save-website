@@ -1,8 +1,8 @@
 import "server-only";
 
-import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 
+import { completeJson, extractJsonObject } from "@/lib/ai/openai";
 import { requireReviewerMutationAccess } from "@/lib/review";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type {
@@ -15,7 +15,6 @@ import type {
   VoiceAlignmentSummaryRecord,
 } from "@/lib/supabase/types";
 
-const DEFAULT_MODEL = "claude-sonnet-4-6";
 const MIN_EXTERNAL_RESPONSES = 2;
 const MIN_INTERNAL_RESPONSES = 3;
 
@@ -169,18 +168,6 @@ function getBaseUrl() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 }
 
-function getAnthropicClient() {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-
-  if (!apiKey) {
-    throw new Error(
-      "ANTHROPIC_API_KEY is not set. Add it to your environment before generating alignment summaries.",
-    );
-  }
-
-  return new Anthropic({ apiKey });
-}
-
 function compactValue(value: unknown): unknown {
   if (value === null || value === undefined) {
     return undefined;
@@ -209,31 +196,6 @@ function compactRecord(record: Record<string, unknown>) {
       return compacted === undefined ? [] : [[key, compacted]];
     }),
   );
-}
-
-function extractTextContent(content: Anthropic.Messages.ContentBlock[]) {
-  return content
-    .filter(
-      (block): block is Anthropic.Messages.TextBlock => block.type === "text",
-    )
-    .map((block) => block.text)
-    .join("\n")
-    .trim();
-}
-
-function extractJsonObject(text: string) {
-  const fencedMatch = text.match(/```json\s*([\s\S]*?)```/i);
-  const raw = fencedMatch?.[1] ?? text;
-  const start = raw.indexOf("{");
-  const end = raw.lastIndexOf("}");
-
-  if (start === -1 || end === -1 || end <= start) {
-    throw new Error(
-      "Claude response did not contain valid voice alignment summary JSON.",
-    );
-  }
-
-  return raw.slice(start, end + 1);
 }
 
 function buildOrganizationPayload(organization: Organizations | null) {
@@ -604,7 +566,6 @@ export async function generateVoiceAlignmentSummary(
 ): Promise<GenerateVoiceAlignmentResult> {
   await requireReviewerMutationAccess();
 
-  const anthropic = getAnthropicClient();
   const admin = createAdminClient();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = admin as any;
@@ -635,21 +596,10 @@ export async function generateVoiceAlignmentSummary(
     internal_responses: buildInternalResponsesPayload(internalResponses),
   });
 
-  const response = await anthropic.messages.create({
-    max_tokens: 1200,
-    messages: [
-      {
-        content: buildAlignmentPrompt(payload),
-        role: "user",
-      },
-    ],
-    model: DEFAULT_MODEL,
-  });
-
-  const text = extractTextContent(response.content);
+  const text = await completeJson(buildAlignmentPrompt(payload), 1200);
 
   if (!text) {
-    throw new Error("Claude did not return a voice alignment summary.");
+    throw new Error("The AI service did not return a voice alignment summary.");
   }
 
   let summary: VoiceAlignmentInsight;
@@ -659,7 +609,9 @@ export async function generateVoiceAlignmentSummary(
       JSON.parse(extractJsonObject(text)),
     );
   } catch {
-    throw new Error("Claude returned invalid voice alignment summary JSON.");
+    throw new Error(
+      "The AI service returned invalid voice alignment summary JSON.",
+    );
   }
 
   const { error } = await db
