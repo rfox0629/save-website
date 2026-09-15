@@ -196,6 +196,9 @@ export async function getPublishedBriefBySlug(
     .select("*")
     .eq("slug", slug)
     .eq("published", true)
+    // B3: the public brief page is donor-facing, so it carries the same
+    // second-reviewer gate as the donor library.
+    .not("approved_by", "is", null)
     .maybeSingle();
   const resolvedBrief = brief as DonorBrief | null;
 

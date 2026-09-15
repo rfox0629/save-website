@@ -168,8 +168,11 @@ export function StatusForm({
 
 export function RunAssessmentButton({
   applicationId,
+  blockedReason = null,
 }: {
   applicationId: string;
+  /** When set, the pipeline cannot run and this explains why. */
+  blockedReason?: string | null;
 }) {
   const { error, pending, run } = useAction();
   const [started, setStarted] = useState(false);
@@ -177,7 +180,7 @@ export function RunAssessmentButton({
   return (
     <div className="flex flex-col items-end">
       <Btn
-        disabled={pending}
+        disabled={pending || Boolean(blockedReason)}
         onClick={async () => {
           const ok = await run(
             () => postJson(`/api/vetting/${applicationId}/run`),
@@ -190,7 +193,11 @@ export function RunAssessmentButton({
       >
         {pending ? "Starting…" : "Run assessment pipeline"}
       </Btn>
-      {started ? (
+      {blockedReason ? (
+        <p className="mt-2 max-w-xs text-right text-caption text-clay-700">
+          {blockedReason}
+        </p>
+      ) : started ? (
         <p className="mt-2 text-caption text-ink-500">
           Running in the background — scoring, external checks and document
           analysis. Refresh in a moment.

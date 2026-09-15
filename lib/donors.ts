@@ -153,6 +153,8 @@ export async function requireDonorBriefs() {
     .from("donor_briefs")
     .select("*")
     .eq("published", true)
+    // B3: a brief reaches donors only after a second reviewer has approved it.
+    .not("approved_by", "is", null)
     .order("published_at", { ascending: false });
 
   const resolvedBriefs = ((briefs ?? []) as DonorBrief[]).filter((brief) =>
