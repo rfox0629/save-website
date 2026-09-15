@@ -10,7 +10,14 @@ export function getPathForRole(role: Profile["role"] | null | undefined) {
     return "/dashboard";
   }
 
-  return "/portal";
+  if (role === "ministry") {
+    return "/portal";
+  }
+
+  // Authenticated but no profile/role yet (e.g. provisioned out of band).
+  // Send them to a holding page instead of a role area that would bounce
+  // them back to /login.
+  return "/access-pending";
 }
 
 export async function getCurrentUserRole() {
