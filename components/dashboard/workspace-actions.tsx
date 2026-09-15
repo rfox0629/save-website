@@ -16,7 +16,7 @@ import { Badge, Btn, Field, Input, Select, Textarea } from "@/components/save/pr
 
 type ApiResult = { error?: string };
 
-async function postJson(url: string, body: Record<string, unknown> = {}) {
+export async function postJson(url: string, body: Record<string, unknown> = {}) {
   const response = await fetch(url, {
     body: JSON.stringify(body),
     headers: { "Content-Type": "application/json" },
@@ -31,7 +31,7 @@ async function postJson(url: string, body: Record<string, unknown> = {}) {
   return data;
 }
 
-function useAction() {
+export function useAction() {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [pending, setPending] = useState(false);
@@ -55,7 +55,7 @@ function useAction() {
   return { error, pending, run };
 }
 
-function ErrorText({ children }: { children: string | null }) {
+export function ErrorText({ children }: { children: string | null }) {
   if (!children) return null;
   return <p className="mt-2 text-caption text-risk-700">{children}</p>;
 }

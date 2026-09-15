@@ -9,6 +9,19 @@ export type SaveTier =
 type SaveTierInput = {
   categoryConfidences?: Array<string | null | undefined>;
   recommendation?: string | null;
+  /**
+   * Founder decision B4: the top tier requires that SAVE has actually spent
+   * in-person time with this leadership, unless a SAVE admin has recorded a
+   * documented exception.
+   *
+   * Omit this field and the gate does not apply — callers that have not yet
+   * been wired to relational diligence keep their existing behaviour rather
+   * than silently losing the top tier.
+   */
+  relationalDiligence?: {
+    exception: string | null;
+    met: boolean;
+  } | null;
   strengths?: string[] | null;
   risks?: string[] | null;
   voiceAlignmentStatus?: PublicVoiceAlignmentData["status"] | "insufficient_data" | null;
@@ -49,6 +62,13 @@ export function getSaveTier(input: SaveTierInput): SaveTier {
     input.categoryConfidences?.filter((value) => value === "low").length ?? 0;
   const voiceStatus = input.voiceAlignmentStatus ?? null;
 
+  const relationalDiligence = input.relationalDiligence;
+  // Only gate when the caller actually supplied relational-diligence context.
+  const relationalDiligenceBlocksTopTier =
+    relationalDiligence !== undefined &&
+    relationalDiligence !== null &&
+    !relationalDiligence.met;
+
   const heavyNegative =
     recommendationState === "negative" ||
     risksCount >= 4 ||
@@ -65,7 +85,10 @@ export function getSaveTier(input: SaveTierInput): SaveTier {
     lowRisk &&
     voiceStatus === "aligned"
   ) {
-    return "Ready for partnership";
+    // Decision B4: no ministry reaches the top tier on paperwork alone.
+    return relationalDiligenceBlocksTopTier
+      ? "Strong and worth knowing"
+      : "Ready for partnership";
   }
 
   if (
