@@ -860,8 +860,24 @@ export function formatMoney(
   }).format(amount);
 }
 
-export function formatDate(iso: string) {
-  return new Date(`${iso}T12:00:00`).toLocaleDateString("en-US", {
+/**
+ * Accepts either a date-only string ("2026-07-24") or a full timestamp
+ * ("2026-09-15T16:09:05.6+00:00", as Postgres/Supabase returns). Date-only
+ * values are pinned to midday so they don't drift a day across time zones.
+ */
+export function formatDate(value: string | null | undefined) {
+  if (!value) {
+    return "—";
+  }
+
+  const isDateOnly = /^\d{4}-\d{2}-\d{2}$/.test(value);
+  const parsed = new Date(isDateOnly ? `${value}T12:00:00` : value);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return "—";
+  }
+
+  return parsed.toLocaleDateString("en-US", {
     day: "numeric",
     month: "short",
     year: "numeric",
