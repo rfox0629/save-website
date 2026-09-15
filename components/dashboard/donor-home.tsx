@@ -51,13 +51,13 @@ function tightenSignal(text: string, maxWords = 8) {
 
 function getFinalRecommendationMessage(brief: PublishedBriefCard) {
   switch (brief.saveTier) {
-    case "High Confidence Opportunity":
-    case "Strong Opportunity":
-      return "Suitable for meaningful capital investment.";
-    case "Proceed with Discernment":
-      return "Worth considering with focused diligence.";
+    case "Ready for partnership":
+    case "Strong and worth knowing":
+      return "Ready for a meaningful giving relationship.";
+    case "Worth a conversation":
+      return "Worth exploring through continued conversation with SAVE.";
     default:
-      return "Not suited for capital deployment now.";
+      return "Not ready for partnership at this time.";
   }
 }
 

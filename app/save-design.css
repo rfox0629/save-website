@@ -1,0 +1,162 @@
+/* ============================================================================
+   THE SAVE DESIGN LANGUAGE
+   ----------------------------------------------------------------------------
+   SAVE connects affluent donors with ministries they can trust.
+   The interface has one job: make trust legible.
+
+   Principles
+   1. Warm paper, not cold gray. Every neutral carries warmth.
+   2. Ink is navy. Navy is authority, not decoration.
+   3. Brass is earned. It marks verification and nothing else.
+   4. Whitespace is the premium signal. Density is the enemy.
+   5. Numbers are typeset, not printed. Tabular figures, always.
+   ========================================================================== */
+
+:root {
+  /* --- Ink: warm navy. Text, primary actions, authority. --------------- */
+  --save-ink-950: #0a1a33;
+  --save-ink-900: #0f2647;
+  --save-ink-800: #16345f;
+  --save-ink-700: #1d4378;
+  --save-ink-600: #2a5691;
+  --save-ink-500: #4a6e9b;
+  --save-ink-400: #5b7291;
+  --save-ink-300: #a3b4c9;
+  --save-ink-200: #c9d4e2;
+  --save-ink-100: #e2e9f1;
+  --save-ink-50: #eff3f8;
+
+  /* --- Paper: the signature warm neutral. Surfaces and rules. ---------- */
+  --save-paper-50: #fdfcfa;
+  --save-paper-100: #faf8f4;
+  --save-paper-200: #f4f1ea;
+  --save-paper-300: #eae5da;
+  --save-paper-400: #d9d2c4;
+  --save-paper-500: #b9b0a0;
+
+  /* --- Brass: verification only. Never a generic accent. --------------- */
+  /* 700 is the lightest brass clearing 4.5:1 on paper, so it carries every
+     brass text use and the brass button fill; 600 and lighter are surfaces. */
+  --save-brass-800: #6b4b12;
+  --save-brass-700: #8a6318;
+  --save-brass-600: #a87a22;
+  --save-brass-500: #c4952f;
+  --save-brass-400: #d9b15c;
+  --save-brass-200: #efdca8;
+  --save-brass-100: #f7ead0;
+  --save-brass-50: #fbf4e3;
+
+  /* --- Sage: healthy, approved, on track. ------------------------------ */
+  --save-sage-700: #2c5340;
+  --save-sage-600: #3b6b53;
+  --save-sage-500: #54876b;
+  --save-sage-100: #dceae1;
+  --save-sage-50: #eef5f0;
+
+  /* --- Clay: attention, in progress, needs work. ----------------------- */
+  --save-clay-700: #8c4520;
+  --save-clay-600: #a85a2e;
+  --save-clay-500: #c2764a;
+  --save-clay-100: #f6e3d6;
+  --save-clay-50: #fbf1ea;
+
+  /* --- Rose: risk, declined, hard stop. Warm, never neon. -------------- */
+  --save-rose-700: #8e2f2f;
+  --save-rose-600: #a94040;
+  --save-rose-100: #f4dede;
+  --save-rose-50: #faefef;
+
+  /* --- Semantic surfaces ----------------------------------------------- */
+  --save-bg: var(--save-paper-100);
+  --save-surface: #ffffff;
+  --save-surface-raised: var(--save-paper-50);
+  --save-surface-sunken: var(--save-paper-200);
+  --save-hairline: rgba(15, 38, 71, 0.09);
+  --save-hairline-strong: rgba(15, 38, 71, 0.16);
+
+  --save-text: var(--save-ink-900);
+  --save-text-secondary: var(--save-ink-500);
+  --save-text-muted: var(--save-ink-400);
+  --save-text-inverse: var(--save-paper-50);
+
+  /* --- Elevation: warm-tinted, close to the page. ---------------------- */
+  --save-e1: 0 1px 2px rgba(15, 38, 71, 0.05);
+  --save-e2:
+    0 1px 2px rgba(15, 38, 71, 0.04), 0 6px 16px -8px rgba(15, 38, 71, 0.12);
+  --save-e3:
+    0 1px 3px rgba(15, 38, 71, 0.05), 0 12px 32px -12px rgba(15, 38, 71, 0.16);
+  --save-e4:
+    0 2px 4px rgba(15, 38, 71, 0.05), 0 24px 56px -20px rgba(15, 38, 71, 0.2);
+
+  /* --- Focus ----------------------------------------------------------- */
+  --save-focus: var(--save-ink-600);
+}
+
+/* ============================================================================
+   Scoped typography. The `save-root` class turns on the SAVE design language
+   without disturbing legacy surfaces still running the old three-font system.
+   ========================================================================== */
+
+.save-root {
+  font-family:
+    var(--font-save-sans),
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-feature-settings:
+    "cv02" 1,
+    "cv03" 1,
+    "cv04" 1;
+  background-color: var(--save-bg);
+  color: var(--save-text);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.save-root .save-display {
+  font-family: var(--font-save-display), ui-serif, Georgia, serif;
+  font-optical-sizing: auto;
+  font-variation-settings:
+    "SOFT" 20,
+    "WONK" 0;
+  letter-spacing: -0.018em;
+}
+
+/* Money, scores, dates, counts. Anything a donor might compare column-wise. */
+.save-root .save-numeric {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings:
+    "tnum" 1,
+    "ss01" 1;
+  letter-spacing: -0.01em;
+}
+
+/* Section eyebrow: the small uppercase label above a heading. */
+.save-eyebrow {
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Hairline rule that reads as paper fold rather than a border. */
+.save-rule {
+  border-color: var(--save-hairline);
+}
+
+.save-focus-ring:focus-visible {
+  outline: 2px solid var(--save-focus);
+  outline-offset: 2px;
+}
+
+/* Subtle woven paper texture for large empty fields of color. */
+.save-texture {
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(15, 38, 71, 0.035) 1px,
+    transparent 0
+  );
+  background-size: 22px 22px;
+}

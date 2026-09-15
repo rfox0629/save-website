@@ -645,7 +645,7 @@ export default async function PublicHomePage() {
           <ProcessStep
             description="30–45 minute deep dive with document upload. Six full categories of structured review."
             label="Complete Application unlocked"
-            status="Vetting in progress"
+            status="Assessment in progress"
             statusTone="green"
             value="03"
           />
