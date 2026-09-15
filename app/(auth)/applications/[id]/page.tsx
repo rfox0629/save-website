@@ -23,6 +23,11 @@ import {
   LibraryVisibilityToggle,
 } from "@/components/dashboard/publishing-actions";
 import {
+  AddRoadmapItemForm,
+  RoadmapStatusControl,
+  ShareFindingsControl,
+} from "@/components/dashboard/roadmap-actions";
+import {
   Badge,
   type BadgeTone,
   Btn,
@@ -55,6 +60,12 @@ import {
   getDiligenceEngagements,
   getRelationalDiligenceStatus,
 } from "@/lib/diligence";
+import {
+  ROADMAP_STATUS_LABELS,
+  type RoadmapStatus,
+  getRoadmapItems,
+  getRoadmapProgress,
+} from "@/lib/roadmap";
 import {
   getApplicationDetail,
   getExternalCheckLabel,
@@ -151,6 +162,8 @@ export default async function ApplicationWorkspacePage({
   const engagements = await getDiligenceEngagements(params.id);
   const relational = getRelationalDiligenceStatus(engagements, data.application);
   const isAdmin = viewer.realRole === "admin";
+  const roadmapItems = await getRoadmapItems(params.id);
+  const roadmapProgress = getRoadmapProgress(roadmapItems);
 
   const scoreByCategory: Record<string, number> = {
     doctrine: data.scoreSummary.doctrine,
@@ -252,6 +265,11 @@ export default async function ApplicationWorkspacePage({
               label: "Time with leadership",
             },
             { href: "#voice", label: "Voice alignment" },
+            {
+              count: roadmapItems.length,
+              href: "#roadmap",
+              label: "Roadmap",
+            },
             { href: "#decision", label: "Decision" },
           ]}
         />
@@ -821,6 +839,102 @@ export default async function ApplicationWorkspacePage({
                   <DataRow label="Synthesis" value="Not generated" />
                 )}
               </DataList>
+            </CardBody>
+          </Card>
+
+          {/* -------------------------------------------------------- Roadmap */}
+          <Card id="roadmap">
+            <CardHeader
+              action={<AddRoadmapItemForm applicationId={params.id} />}
+              description="What we are asking this ministry to close, with an owner and a date. This is the shortest path from where they are to the assessment they want — not a punishment list."
+              title="Roadmap"
+            />
+
+            {roadmapItems.length > 0 ? (
+              <CardBody>
+                <Meter
+                  label="Verified by SAVE"
+                  tone="sage"
+                  value={roadmapProgress.verifiedPct}
+                  valueLabel={`${roadmapProgress.verified} of ${roadmapProgress.total} verified · ${roadmapProgress.open} open`}
+                />
+              </CardBody>
+            ) : null}
+
+            {roadmapItems.length > 0 ? (
+              <div className="divide-y divide-hairline border-t border-hairline">
+                {roadmapItems.map((item) => (
+                  <div
+                    className="flex flex-wrap items-start gap-4 px-6 py-4"
+                    key={item.id}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-ink-900">
+                        {item.title}
+                      </p>
+                      {item.detail ? (
+                        <p className="mt-1 max-w-prose text-caption leading-relaxed text-ink-500">
+                          {item.detail}
+                        </p>
+                      ) : null}
+                      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-caption text-ink-400">
+                        {item.category ? (
+                          <span className="capitalize">{item.category}</span>
+                        ) : null}
+                        {item.owner ? <span>Owner · {item.owner}</span> : null}
+                        {item.due_date ? (
+                          <span className="save-numeric">
+                            Due {formatDate(item.due_date)}
+                          </span>
+                        ) : null}
+                        <Badge
+                          tone={
+                            item.status === "verified"
+                              ? "sage"
+                              : item.status === "waived"
+                                ? "neutral"
+                                : item.status === "in_progress"
+                                  ? "ink"
+                                  : "clay"
+                          }
+                        >
+                          {ROADMAP_STATUS_LABELS[item.status as RoadmapStatus]}
+                        </Badge>
+                      </div>
+                    </div>
+                    <RoadmapStatusControl
+                      applicationId={params.id}
+                      current={item.status}
+                      itemId={item.id}
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                description="Nothing has been asked of this ministry yet. Roadmap items usually come from the gaps a reviewer records against a category."
+                title="No roadmap items"
+              />
+            )}
+
+            <CardBody className="border-t border-hairline">
+              {data.application.findings_shared_at ? (
+                <Callout title="Findings are with the ministry" tone="sage">
+                  Shared {formatDate(data.application.findings_shared_at)}. The
+                  ministry can see its findings and this roadmap.
+                </Callout>
+              ) : (
+                <Callout title="Findings are internal" tone="ink">
+                  The ministry cannot see its findings or this roadmap yet.
+                  Nothing reaches them until a reviewer shares it.
+                </Callout>
+              )}
+              <div className="mt-3.5">
+                <ShareFindingsControl
+                  applicationId={params.id}
+                  sharedAt={data.application.findings_shared_at}
+                />
+              </div>
             </CardBody>
           </Card>
 
