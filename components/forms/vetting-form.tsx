@@ -651,6 +651,23 @@ export function VettingForm({
             <div className="space-y-6">
               {(readOnly || currentStep === 0) && (
                 <div className="grid gap-5 md:grid-cols-2">
+                  <div className="rounded-[24px] border border-[#D8D1C3] bg-[#FFFDF8] px-5 py-4 md:col-span-2">
+                    <p className="text-sm font-semibold text-[#1A4480]">
+                      How SAVE uses your answers
+                    </p>
+                    <p className="mt-2 text-sm leading-7 text-[#4F6357]">
+                      SAVE staff review everything you submit here. Your answers
+                      inform SAVE&apos;s assessment across six categories and
+                      may identify areas for reviewer follow-up. SAVE also uses
+                      AI-assisted analysis to help summarize submitted materials
+                      for reviewers; an AI summary is not the assessment itself.
+                      SAVE may contact the references you provide and conducts
+                      independent checks using public information. Your
+                      submitted information, findings, and reviewer notes remain
+                      within the SAVE review process unless information is
+                      included in an approved donor-facing SAVE Brief.
+                    </p>
+                  </div>
                   <div className="space-y-2 md:col-span-2">
                     <label className="text-sm font-medium">
                       Briefly describe the lead pastor or executive
@@ -1407,6 +1424,14 @@ export function VettingForm({
                     {vettingDocumentTypes.map((field) =>
                       renderDocumentField(field),
                     )}
+                  </div>
+                  <div className="rounded-[24px] border border-[#D8D1C3] bg-[#FFFDF8] px-5 py-4">
+                    <p className="text-sm leading-7 text-[#4F6357]">
+                      SAVE staff review everything you submit here, and your
+                      answers inform SAVE&apos;s assessment. Your submitted
+                      information stays within the SAVE review process unless it
+                      is included in an approved donor-facing SAVE Brief.
+                    </p>
                   </div>
                   <div className="grid gap-5 md:grid-cols-2">
                     <CheckboxCard

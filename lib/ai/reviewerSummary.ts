@@ -136,11 +136,6 @@ function buildVettingPayload(vetting: VettingResponse | null) {
     leader_accountability: vetting.leader_accountability,
     leader_conversion_narrative: vetting.leader_conversion_narrative,
     leadership_conflict_notes: vetting.leadership_conflict_notes,
-    public_controversy_notes: vetting.public_controversy_notes,
-    statement_of_faith_alignment: vetting.statement_of_faith_alignment,
-    doctrinal_distinctives: vetting.doctrinal_distinctives,
-    sacramental_practice: vetting.sacramental_practice,
-    governance_model: vetting.governance_model,
     decision_making_model: vetting.decision_making_model,
     board_meeting_frequency: vetting.board_meeting_frequency,
     board_confrontation_willingness: vetting.board_confrontation_willingness,
@@ -157,12 +152,6 @@ function buildVettingPayload(vetting: VettingResponse | null) {
     reserve_fund_level: vetting.reserve_fund_level,
     restricted_funds_tracked: vetting.restricted_funds_tracked,
     restricted_funds_misused: vetting.restricted_funds_misused,
-    attests_doctrinal_alignment: vetting.attests_doctrinal_alignment,
-    attests_financial_integrity: vetting.attests_financial_integrity,
-    ministry_fruit_evidence: vetting.ministry_fruit_evidence,
-    discipleship_outcomes: vetting.discipleship_outcomes,
-    reference_check_summary: vetting.reference_check_summary,
-    reputation_summary: vetting.reputation_summary,
   });
 }
 
@@ -311,40 +300,47 @@ export async function generateReviewerSummary(applicationId: string) {
 
   const [inquiryResponse, vettingResponse, externalChecks, reviewerNotes] =
     await Promise.all([
-    admin
-      .from("inquiry_responses")
-      .select("*")
-      .eq("application_id", applicationId)
-      .maybeSingle(),
-    admin
-      .from("vetting_responses")
-      .select("*")
-      .eq("application_id", applicationId)
-      .maybeSingle(),
-    admin
-      .from("external_checks")
-      .select("*")
-      .eq("application_id", applicationId)
-      .order("checked_at", { ascending: false }),
-    admin
-      .from("reviewer_notes")
-      .select("*")
-      .eq("application_id", applicationId)
-      .order("created_at", { ascending: false }),
-  ]);
+      admin
+        .from("inquiry_responses")
+        .select("*")
+        .eq("application_id", applicationId)
+        .maybeSingle(),
+      admin
+        .from("vetting_responses")
+        .select("*")
+        .eq("application_id", applicationId)
+        .maybeSingle(),
+      admin
+        .from("external_checks")
+        .select("*")
+        .eq("application_id", applicationId)
+        .order("checked_at", { ascending: false }),
+      admin
+        .from("reviewer_notes")
+        .select("*")
+        .eq("application_id", applicationId)
+        .order("created_at", { ascending: false }),
+    ]);
 
   const inquiry = inquiryResponse.data as InquiryResponse | null;
   const vetting = vettingResponse.data as VettingResponse | null;
   const checks = (externalChecks.data ?? []) as ExternalCheck[];
   const notes = (reviewerNotes.data ?? []) as ReviewerNote[];
 
+  // The payload separates what the ministry itself submitted from context SAVE
+  // gathered or wrote, so the model cannot present SAVE's own material — or a
+  // reviewer's note — as the ministry's testimony.
   const payload = compactRecord({
-    organization: buildOrganizationPayload(resolvedApplication.organizations),
-    inquiry: buildInquiryPayload(inquiry),
-    vetting: buildVettingPayload(vetting),
-    external_checks: buildChecksPayload(checks),
-    reviewer_notes:
-      notes.length > 0 ? buildReviewerNotesPayload(notes) : undefined,
+    ministry_submitted: compactRecord({
+      organization: buildOrganizationPayload(resolvedApplication.organizations),
+      inquiry: buildInquiryPayload(inquiry),
+      complete_application: buildVettingPayload(vetting),
+    }),
+    save_derived_context: compactRecord({
+      external_checks: buildChecksPayload(checks),
+      reviewer_notes:
+        notes.length > 0 ? buildReviewerNotesPayload(notes) : undefined,
+    }),
   });
 
   const text = await completeJson(buildPrompt(payload), 1200);
@@ -356,9 +352,7 @@ export async function generateReviewerSummary(applicationId: string) {
   let summary: ReviewerSummary;
 
   try {
-    summary = reviewerSummarySchema.parse(
-      JSON.parse(extractJsonObject(text)),
-    );
+    summary = reviewerSummarySchema.parse(JSON.parse(extractJsonObject(text)));
   } catch {
     throw new Error("The AI service returned invalid reviewer summary JSON.");
   }
