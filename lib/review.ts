@@ -2,7 +2,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { revokeBriefApprovalForMaterialChange } from "@/lib/brief-approval";
-import { getVoiceAlignmentSummary, type VoiceAlignmentSummary } from "@/lib/voice-alignment";
+import {
+  getVoiceAlignmentSummary,
+  type VoiceAlignmentSummary,
+} from "@/lib/voice-alignment";
+import { buildStatusUpdate } from "@/lib/cycle-year";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type {
@@ -338,10 +342,7 @@ export async function requireReviewerPageAccess() {
     redirect("/portal");
   }
 
-  if (
-    context.profile.role !== "admin" &&
-    context.profile.role !== "reviewer"
-  ) {
+  if (context.profile.role !== "admin" && context.profile.role !== "reviewer") {
     redirect("/login");
   }
 
@@ -765,9 +766,23 @@ export async function updateApplicationStatus(params: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = admin as any;
 
+  // Advancing an inquiry into assessment is the one transition that assigns the
+  // SAVE assessment cycle year. Reading the current value first means an
+  // application that already carries one keeps it through every later status
+  // change, including a re-advance or a status correction.
+  const { data: existingApplication } = await admin
+    .from("applications")
+    .select("cycle_year")
+    .eq("id", params.applicationId)
+    .maybeSingle();
+
+  const existingCycleYear =
+    (existingApplication as Pick<Applications, "cycle_year"> | null)
+      ?.cycle_year ?? null;
+
   const { error } = await db
     .from("applications")
-    .update({ status: params.status })
+    .update(buildStatusUpdate(params.status, existingCycleYear))
     .eq("id", params.applicationId);
 
   if (error) {
