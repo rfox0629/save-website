@@ -53,6 +53,10 @@ import {
 import { TopBar } from "@/components/save/shell";
 import { parseReviewerSummary } from "@/lib/ai/reviewerSummary";
 import {
+  buildInquirySections,
+  getInquirySubmittedAt,
+} from "@/lib/staff-inquiry";
+import {
   DILIGENCE_KIND_LABELS,
   DILIGENCE_STATUS_LABELS,
   type DiligenceKind,
@@ -160,7 +164,10 @@ export default async function ApplicationWorkspacePage({
   ]);
   // Read after the access gate above, never alongside it.
   const engagements = await getDiligenceEngagements(params.id);
-  const relational = getRelationalDiligenceStatus(engagements, data.application);
+  const relational = getRelationalDiligenceStatus(
+    engagements,
+    data.application,
+  );
   const isAdmin = viewer.realRole === "admin";
   const roadmapItems = await getRoadmapItems(params.id);
   const roadmapProgress = getRoadmapProgress(roadmapItems);
@@ -248,6 +255,10 @@ export default async function ApplicationWorkspacePage({
           items={[
             {
               active: true,
+              href: "#inquiry",
+              label: "Submitted inquiry",
+            },
+            {
               count: data.documents.length,
               href: "#evidence",
               label: "Evidence",
@@ -277,6 +288,69 @@ export default async function ApplicationWorkspacePage({
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_360px]">
         <div className="min-w-0 space-y-6">
+          {/* --------------------------------------------- Submitted inquiry */}
+          <Card id="inquiry">
+            <CardHeader
+              action={
+                <Badge
+                  tone={
+                    getInquirySubmittedAt(data.inquiry) ? "sage" : "neutral"
+                  }
+                >
+                  {getInquirySubmittedAt(data.inquiry)
+                    ? `Submitted ${formatDate(getInquirySubmittedAt(data.inquiry))}`
+                    : "Not yet submitted"}
+                </Badge>
+              }
+              description="What the ministry told SAVE, in its own words and exactly as submitted. Read-only, and the basis for the inquiry decision."
+              title="Submitted inquiry"
+            />
+            {buildInquirySections(data.organization, data.inquiry).length ===
+            0 ? (
+              <EmptyState
+                description="This ministry has not submitted its inquiry yet. There is nothing to review until it does."
+                title="No inquiry submitted yet"
+              />
+            ) : (
+              <CardBody className="space-y-7">
+                {buildInquirySections(data.organization, data.inquiry).map(
+                  (inquirySection) => (
+                    <section key={inquirySection.title}>
+                      <p className="save-eyebrow text-ink-400">
+                        {inquirySection.title}
+                      </p>
+                      <div className="mt-3">
+                        <DataList>
+                          {inquirySection.rows.map((inquiryRow) =>
+                            inquiryRow.narrative ? (
+                              <div
+                                className="py-3 first:pt-0 last:pb-0"
+                                key={inquiryRow.label}
+                              >
+                                <p className="text-sm text-ink-500">
+                                  {inquiryRow.label}
+                                </p>
+                                <p className="mt-1.5 text-sm leading-relaxed text-ink-900">
+                                  {inquiryRow.value}
+                                </p>
+                              </div>
+                            ) : (
+                              <DataRow
+                                key={inquiryRow.label}
+                                label={inquiryRow.label}
+                                value={inquiryRow.value}
+                              />
+                            ),
+                          )}
+                        </DataList>
+                      </div>
+                    </section>
+                  ),
+                )}
+              </CardBody>
+            )}
+          </Card>
+
           {/* ------------------------------------------------------ Evidence */}
           <Card id="evidence">
             <CardHeader
@@ -487,8 +561,8 @@ export default async function ApplicationWorkspacePage({
           <Card id="summary">
             <CardHeader
               action={<AiSummaryButton applicationId={params.id} />}
-              description="A reviewer-facing synthesis grounded in the application materials, external checks and existing notes. Advisory only — it never sets a score."
-              title="AI review summary"
+              description="SAVE-assisted analysis, generated from the ministry's submitted answers, external checks and reviewer notes. This is SAVE's synthesis, not the ministry's testimony — read the submitted inquiry above for what the ministry actually said. Advisory only: it never sets a score."
+              title="AI review summary — SAVE-assisted analysis"
             />
             <CardBody>
               {summaryOutdated ? (
@@ -710,7 +784,11 @@ export default async function ApplicationWorkspacePage({
                   <div className="px-6 py-5" key={engagement.id}>
                     <div className="flex flex-wrap items-center gap-2.5">
                       <Badge tone="ink">
-                        {DILIGENCE_KIND_LABELS[engagement.kind as DiligenceKind]}
+                        {
+                          DILIGENCE_KIND_LABELS[
+                            engagement.kind as DiligenceKind
+                          ]
+                        }
                       </Badge>
                       <Badge
                         tone={

@@ -7,6 +7,10 @@ import {
   type VoiceAlignmentSummary,
 } from "@/lib/voice-alignment";
 import { buildStatusUpdate } from "@/lib/cycle-year";
+import {
+  selectInquiryForApplication,
+  type InquiryQueryBuilder,
+} from "@/lib/staff-inquiry";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type {
@@ -78,6 +82,12 @@ export type ApplicationDetailData = {
    * rather than starting a pipeline that will fail out of sight.
    */
   hasVettingResponse: boolean;
+  /**
+   * The ministry's submitted inquiry, read from the canonical record. Staff
+   * review what the ministry actually submitted — never a copy of it, and
+   * never the AI summary standing in for it.
+   */
+  inquiry: Database["public"]["Tables"]["inquiry_responses"]["Row"] | null;
   latestScore: Score | null;
   organization: Organizations;
   reviewerOptions: ReviewerOption[];
@@ -608,6 +618,14 @@ export async function getApplicationDetail(
     redirect("/dashboard");
   }
 
+  // Scoped to this application, so one ministry's inquiry can never be shown
+  // against another's assessment. The scoping itself is covered by tests around
+  // `selectInquiryForApplication`; the cast is only to reach that tested seam.
+  const { data: inquiryResponse } = await selectInquiryForApplication(
+    (table) => admin.from(table as "inquiry_responses") as InquiryQueryBuilder,
+    applicationId,
+  );
+
   const { data: vettingResponse } = await admin
     .from("vetting_responses")
     .select("application_id")
@@ -701,6 +719,7 @@ export async function getApplicationDetail(
     ],
     flags: resolvedFlags,
     hasVettingResponse: Boolean(vettingResponse),
+    inquiry: (inquiryResponse as ApplicationDetailData["inquiry"]) ?? null,
     latestScore,
     notes: resolvedNotes.map((note) => ({
       ...note,
