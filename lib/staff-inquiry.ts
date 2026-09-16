@@ -108,6 +108,13 @@ function count(value: number | null | undefined): string | undefined {
     : undefined;
 }
 
+/** A year is written plainly: 2025, never grouped as a count would be. */
+function year(value: number | null | undefined): string | undefined {
+  return typeof value === "number" && Number.isFinite(value)
+    ? String(Math.trunc(value))
+    : undefined;
+}
+
 function rawRecord(raw: InquiryRow["raw_data"]): Record<string, unknown> {
   return raw && typeof raw === "object" && !Array.isArray(raw)
     ? (raw as Record<string, unknown>)
@@ -193,7 +200,7 @@ export function buildInquirySections(
       row("Legal name", text(organization.legal_name)),
       row("Also known as", text(organization.dba_name)),
       row("EIN", text(organization.ein)),
-      row("Year founded", count(organization.year_founded)),
+      row("Year founded", year(organization.year_founded)),
       row("State of incorporation", text(organization.state_of_incorporation)),
       row("Entity type", entityType(organization.entity_type)),
       row("Primary focus", list(organization.primary_focus)),
