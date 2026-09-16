@@ -5,13 +5,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { InquiryForm } from "@/components/forms/inquiry-form";
 import type { InquiryFormValues } from "@/lib/inquiry";
 
+// The mocks echo both arguments back so the parameters are genuinely used and
+// `mock.calls` stays typed for the assertions below.
 const saveInquiryDraft = vi.fn(
-  async (_values: unknown, _applicationId: string | null) => ({
-    applicationId: "app-pilot",
+  async (values: unknown, applicationId: string | null) => ({
+    applicationId: applicationId ?? "app-pilot",
+    receivedValues: values,
   }),
 );
 const submitInquiry = vi.fn(
-  async (_values: unknown, _applicationId: string | null) => ({ ok: true }),
+  async (values: unknown, applicationId: string | null) => ({
+    applicationId,
+    ok: true,
+    receivedValues: values,
+  }),
 );
 
 vi.mock("@/app/actions/inquiry", () => ({
