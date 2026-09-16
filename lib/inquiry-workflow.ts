@@ -139,11 +139,15 @@ export function planInquiryAction(
 
 /**
  * How long staff have been holding this inquiry: measured from the latest
- * submission or resubmission, never from when the record was created.
+ * submission or resubmission.
+ *
+ * An inquiry has no age until a ministry has actually submitted one (founder
+ * ruling). There is deliberately no fallback to the record's creation date — a
+ * row that was never submitted shows no age at all rather than an age that
+ * means something else.
  */
 export function getInquiryAgeAnchor(
   submittedAt: string | null | undefined,
-  fallbackCreatedAt: string | null | undefined,
 ): string | null {
-  return submittedAt ?? fallbackCreatedAt ?? null;
+  return submittedAt ?? null;
 }
