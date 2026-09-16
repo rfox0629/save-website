@@ -59,6 +59,10 @@ import {
   getInquirySubmittedAt,
 } from "@/lib/staff-inquiry";
 import {
+  buildVettingSections,
+  getVettingSubmittedAt,
+} from "@/lib/staff-vetting";
+import {
   DILIGENCE_KIND_LABELS,
   DILIGENCE_STATUS_LABELS,
   type DiligenceKind,
@@ -264,6 +268,7 @@ export default async function ApplicationWorkspacePage({
               href: "#inquiry",
               label: "Submitted inquiry",
             },
+            { href: "#application", label: "Complete Application" },
             {
               count: data.documents.length,
               href: "#evidence",
@@ -353,6 +358,66 @@ export default async function ApplicationWorkspacePage({
                     </section>
                   ),
                 )}
+              </CardBody>
+            )}
+          </Card>
+
+          {/* ------------------------------------- Complete Application */}
+          <Card id="application">
+            <CardHeader
+              action={
+                <Badge
+                  tone={
+                    getVettingSubmittedAt(data.vetting) ? "sage" : "neutral"
+                  }
+                >
+                  {getVettingSubmittedAt(data.vetting)
+                    ? `Submitted ${formatDate(getVettingSubmittedAt(data.vetting))}`
+                    : "Not yet submitted"}
+                </Badge>
+              }
+              description="The ministry's answers to the eight-section SAVE Standard, in its own words and exactly as submitted. Read-only ministry evidence — scoring, risk flags and SAVE-assisted analysis appear separately below."
+              title="Complete Application"
+            />
+            {buildVettingSections(data.vetting).length === 0 ? (
+              <EmptyState
+                description="This ministry has not submitted its Complete Application yet. There is nothing to review until it does."
+                title="No Complete Application submitted yet"
+              />
+            ) : (
+              <CardBody className="space-y-7">
+                {buildVettingSections(data.vetting).map((vettingSection) => (
+                  <section key={vettingSection.title}>
+                    <p className="save-eyebrow text-ink-400">
+                      {vettingSection.title}
+                    </p>
+                    <div className="mt-3">
+                      <DataList>
+                        {vettingSection.rows.map((vettingRow) =>
+                          vettingRow.narrative ? (
+                            <div
+                              className="py-3 first:pt-0 last:pb-0"
+                              key={vettingRow.label}
+                            >
+                              <p className="text-sm text-ink-500">
+                                {vettingRow.label}
+                              </p>
+                              <p className="mt-1.5 text-sm leading-relaxed text-ink-900">
+                                {vettingRow.value}
+                              </p>
+                            </div>
+                          ) : (
+                            <DataRow
+                              key={vettingRow.label}
+                              label={vettingRow.label}
+                              value={vettingRow.value}
+                            />
+                          ),
+                        )}
+                      </DataList>
+                    </div>
+                  </section>
+                ))}
               </CardBody>
             )}
           </Card>

@@ -17,6 +17,10 @@ import type {
 import { getViewerContext } from "@/lib/view-mode";
 import type { ViewMode } from "@/lib/view-mode-shared";
 import { vettingFormSchema, type VettingFormValues } from "@/lib/vetting";
+import {
+  buildAttestationColumns,
+  readAttestation,
+} from "@/lib/vetting-attestation";
 
 type VettingLoadResult = {
   applicationId: string | null;
@@ -61,7 +65,10 @@ async function getMinistryApplicationContext() {
   const isPreviewMinistry =
     viewer.canPreview && viewer.currentViewMode === "ministry";
 
-  if (!isPreviewMinistry && (!viewer.organizationId || viewer.realRole !== "ministry")) {
+  if (
+    !isPreviewMinistry &&
+    (!viewer.organizationId || viewer.realRole !== "ministry")
+  ) {
     redirect("/portal");
   }
 
@@ -180,9 +187,10 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
     currentViewMode,
     initialValues: {
       annual_ed_review: resolvedVetting?.annual_ed_review ?? undefined,
-      attestation_complete: asFormValue(
-        rawData.attestation_complete as boolean | undefined,
-      ),
+      // The columns are canonical; raw_data is read as a fallback so drafts
+      // saved before the columns existed still resume correctly.
+      attestation_complete: readAttestation(resolvedVetting, rawData)
+        .attestation_complete,
       attestation_research: asFormValue(
         rawData.attestation_research as boolean | undefined,
       ),
@@ -342,12 +350,11 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
       restricted_funds_tracked:
         resolvedVetting?.restricted_funds_tracked ?? undefined,
       signed_at:
-        asFormValue(rawData.signed_at as string | undefined) ??
+        readAttestation(resolvedVetting, rawData).signed_at ??
         new Date().toISOString().slice(0, 10),
-      signatory_name: asFormValue(rawData.signatory_name as string | undefined),
-      signatory_title: asFormValue(
-        rawData.signatory_title as string | undefined,
-      ),
+      signatory_name: readAttestation(resolvedVetting, rawData).signatory_name,
+      signatory_title: readAttestation(resolvedVetting, rawData)
+        .signatory_title,
       strategic_clarity_self_score: asFormValue(
         rawData.strategic_clarity_self_score as number | undefined,
       ),
@@ -377,7 +384,10 @@ export async function loadVettingDraft(): Promise<VettingLoadResult> {
     readOnly:
       currentViewMode === "ministry" && canPreview
         ? true
-        : isReadOnlyStatus(applicationStatus, resolvedVetting?.submitted_at ?? null),
+        : isReadOnlyStatus(
+            applicationStatus,
+            resolvedVetting?.submitted_at ?? null,
+          ),
     submittedAt: resolvedVetting?.submitted_at ?? null,
     uploadedDocuments,
   };
@@ -388,6 +398,10 @@ function mapVettingToPersistence(values: VettingFormValues) {
     direct: {
       annual_ed_review: values.annual_ed_review,
       application_id: "",
+      // The signed attestation belongs in its own columns, not only in
+      // raw_data. The mapping lives in `buildAttestationColumns` so the write
+      // and the read are covered by tests against this exact code.
+      ...buildAttestationColumns(values),
       board_confrontation_willingness: values.board_confrontation_willingness,
       board_meeting_frequency: values.board_meeting_frequency,
       compensation_set_by_board: values.compensation_set_by_board,
@@ -548,8 +562,11 @@ export async function submitVetting(
     return draft;
   }
 
-  const { applicationId: contextApplicationId, organizationId, supabase } =
-    await getMinistryApplicationContext();
+  const {
+    applicationId: contextApplicationId,
+    organizationId,
+    supabase,
+  } = await getMinistryApplicationContext();
   const resolvedApplicationId = draft.applicationId ?? contextApplicationId;
 
   if (!resolvedApplicationId) {
@@ -583,17 +600,16 @@ export async function submitVetting(
     {
       headers: {
         "Content-Type": "application/json",
-        "x-save-background-token":
-          process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
+        "x-save-background-token": process.env.SUPABASE_SERVICE_ROLE_KEY ?? "",
       },
       method: "POST",
     },
   );
 
   if (!response.ok) {
-    const body = (await response.json().catch(() => null)) as
-      | { error?: string }
-      | null;
+    const body = (await response.json().catch(() => null)) as {
+      error?: string;
+    } | null;
     return {
       error: body?.error ?? "Unable to start background evaluation checks.",
     };

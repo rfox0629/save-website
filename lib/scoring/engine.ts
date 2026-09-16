@@ -120,10 +120,14 @@ function normalizeVetting(
     reserve_fund_level: vetting.reserve_fund_level,
     restricted_funds_misused: vetting.restricted_funds_misused,
     restricted_funds_tracked: vetting.restricted_funds_tracked,
-    staff_doctrinal_affirmation: getOptionalBoolean(
-      raw,
-      "staff_doctrinal_affirmation",
-    ),
+    // The application asks this as `doctrinal_affirmation_required`, which is
+    // the key persistence writes. Scoring previously read
+    // `staff_doctrinal_affirmation`, which nothing ever wrote, so the three
+    // doctrine points were unearnable however a ministry answered. The legacy
+    // key is still read as a fallback for any row written under it.
+    staff_doctrinal_affirmation:
+      getOptionalBoolean(raw, "doctrinal_affirmation_required") ??
+      getOptionalBoolean(raw, "staff_doctrinal_affirmation"),
     spiritual_measurement_method: getOptionalString(
       raw,
       "spiritual_measurement_method",

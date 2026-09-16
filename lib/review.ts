@@ -16,6 +16,10 @@ import {
   selectInquiryForApplication,
   type InquiryQueryBuilder,
 } from "@/lib/staff-inquiry";
+import {
+  selectVettingForApplication,
+  type VettingQueryBuilder,
+} from "@/lib/staff-vetting";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 import type {
@@ -96,6 +100,11 @@ export type ApplicationDetailData = {
    */
   inquiry: Database["public"]["Tables"]["inquiry_responses"]["Row"] | null;
   latestScore: Score | null;
+  /**
+   * The ministry's submitted Complete Application, read from the canonical
+   * record so reviewers read what the ministry actually submitted.
+   */
+  vetting: Database["public"]["Tables"]["vetting_responses"]["Row"] | null;
   organization: Organizations;
   reviewerOptions: ReviewerOption[];
   scoreComponents: ScoreComponent[];
@@ -648,11 +657,12 @@ export async function getApplicationDetail(
     applicationId,
   );
 
-  const { data: vettingResponse } = await admin
-    .from("vetting_responses")
-    .select("application_id")
-    .eq("application_id", applicationId)
-    .maybeSingle();
+  // The full row, scoped to this application, so reviewers can read the
+  // ministry's Complete Application rather than only learn that one exists.
+  const { data: vettingResponse } = await selectVettingForApplication(
+    (table) => admin.from(table as "vetting_responses") as VettingQueryBuilder,
+    applicationId,
+  );
 
   const latestScore = ((scores ?? []) as Score[])[0] ?? null;
   const scoreComponents = latestScore
@@ -772,6 +782,7 @@ export async function getApplicationDetail(
       { color: SCORE_SEGMENT_COLORS[5], max: 10, score: scoreSummary.external },
     ],
     scoreSummary,
+    vetting: (vettingResponse as ApplicationDetailData["vetting"]) ?? null,
     voiceAlignment,
   };
 }
