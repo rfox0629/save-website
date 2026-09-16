@@ -181,13 +181,11 @@ export default async function DashboardPage({
                 </thead>
                 <tbody>
                   {data.rows.map((row) => {
-                    // How long SAVE has been holding it: measured from the
-                    // ministry's latest submission, not the record's creation.
+                    // How long SAVE has been holding it, measured from the
+                    // ministry's latest submission. An application that has
+                    // never been submitted has no age and shows none.
                     const days = daysSince(
-                      getInquiryAgeAnchor(
-                        row.latestSubmittedAt,
-                        row.application.created_at,
-                      ),
+                      getInquiryAgeAnchor(row.latestSubmittedAt),
                     );
                     const score = row.latestScore?.total_score ?? null;
                     return (

@@ -169,16 +169,22 @@ describe("decline", () => {
 });
 
 describe("staff ageing", () => {
-  it("measures from the latest submission, not the record's creation", () => {
-    expect(
-      getInquiryAgeAnchor("2026-09-16T14:46:26.476Z", "2026-09-15T18:49:53Z"),
-    ).toBe("2026-09-16T14:46:26.476Z");
+  it("measures from the latest submission", () => {
+    expect(getInquiryAgeAnchor("2026-09-16T14:46:26.476Z")).toBe(
+      "2026-09-16T14:46:26.476Z",
+    );
   });
 
-  it("falls back to creation only when nothing has been submitted", () => {
-    expect(getInquiryAgeAnchor(null, "2026-09-15T18:49:53Z")).toBe(
-      "2026-09-15T18:49:53Z",
-    );
-    expect(getInquiryAgeAnchor(null, null)).toBeNull();
+  it("gives an application that was never submitted no age at all", () => {
+    // Founder ruling: an inquiry age exists only after a real submission, and
+    // never falls back to when the record happened to be created.
+    expect(getInquiryAgeAnchor(null)).toBeNull();
+    expect(getInquiryAgeAnchor(undefined)).toBeNull();
+  });
+
+  it("uses the resubmission once a ministry answers a request", () => {
+    const resubmitted = "2026-10-02T09:15:00.000Z";
+
+    expect(getInquiryAgeAnchor(resubmitted)).toBe(resubmitted);
   });
 });
