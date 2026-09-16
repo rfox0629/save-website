@@ -8,6 +8,11 @@ import {
 } from "@/lib/voice-alignment";
 import { buildStatusUpdate } from "@/lib/cycle-year";
 import {
+  isBlockedInquiryTransition,
+  planInquiryAction,
+  type InquiryAction,
+} from "@/lib/inquiry-workflow";
+import {
   selectInquiryForApplication,
   type InquiryQueryBuilder,
 } from "@/lib/staff-inquiry";
@@ -43,6 +48,8 @@ export type DashboardFilters = {
 };
 
 export type DashboardApplicationRow = {
+  /** The ministry's latest inquiry submission or resubmission, if any. */
+  latestSubmittedAt: string | null;
   application: Applications;
   assignedReviewer: string | null;
   flagCount: number;
@@ -460,6 +467,20 @@ export async function getDashboardData(
     admin.from("risk_flags").select("*"),
   ]);
 
+  // Staff ageing runs from the ministry's latest submission, so the queue needs
+  // each application's submission timestamp rather than its creation date.
+  const { data: submissions } = await admin
+    .from("inquiry_responses")
+    .select("application_id, submitted_at");
+  const submittedAtMap = new Map(
+    (
+      (submissions ?? []) as Array<{
+        application_id: string;
+        submitted_at: string | null;
+      }>
+    ).map((row) => [row.application_id, row.submitted_at]),
+  );
+
   const applicationRows = (applications ?? []) as Applications[];
   const organizationRows = (organizations ?? []) as Organizations[];
   const scoreRows = (scores ?? []) as Score[];
@@ -511,6 +532,7 @@ export async function getDashboardData(
         flagCount: appFlags.length,
         highestSeverity,
         latestScore,
+        latestSubmittedAt: submittedAtMap.get(application.id) ?? null,
         organization,
       };
     })
@@ -799,6 +821,23 @@ export async function updateApplicationStatus(params: {
     (existingApplication as Pick<Applications, "cycle_year"> | null)
       ?.cycle_year ?? null;
 
+  // An inquiry leaves its stage through the inquiry actions, never by picking a
+  // later status here — `inquiry_approved` is the required gateway into
+  // assessment. Enforced server-side, so hiding options is not what protects it.
+  const { data: statusRow } = await admin
+    .from("applications")
+    .select("status")
+    .eq("id", params.applicationId)
+    .maybeSingle();
+  const currentStatus =
+    (statusRow as Pick<Applications, "status"> | null)?.status ?? null;
+
+  if (isBlockedInquiryTransition(currentStatus, params.status)) {
+    throw new Error(
+      "An inquiry must be approved before it can move into assessment. Use the inquiry actions to approve, request more information, or decline.",
+    );
+  }
+
   const { error } = await db
     .from("applications")
     .update(buildStatusUpdate(params.status, existingCycleYear))
@@ -808,6 +847,67 @@ export async function updateApplicationStatus(params: {
     throw new Error(error.message);
   }
 
+  revalidateReviewPaths(params.applicationId);
+}
+
+/**
+ * The inquiry stage's three staff actions. Each records what SAVE decided in
+ * `inquiry_events`, which is append-only: a later request, approval or decline
+ * never overwrites the evidence of an earlier one.
+ */
+export async function recordInquiryDecision(params: {
+  action: InquiryAction;
+  applicationId: string;
+  ministryMessage?: string | null;
+  staffNote?: string | null;
+}) {
+  const { user } = await requireReviewerMutationAccess();
+  const admin = createAdminClient();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const db = admin as any;
+
+  const { data: application } = await admin
+    .from("applications")
+    .select("cycle_year, status")
+    .eq("id", params.applicationId)
+    .maybeSingle();
+  const resolvedApplication = application as Pick<
+    Applications,
+    "cycle_year" | "status"
+  > | null;
+
+  if (!resolvedApplication) {
+    throw new Error("This application could not be found.");
+  }
+
+  // Throws with a reviewer-readable message when the action does not apply.
+  const plan = planInquiryAction(resolvedApplication.status, params.action, {
+    ministryMessage: params.ministryMessage,
+    staffNote: params.staffNote,
+  });
+
+  const { error: statusError } = await db
+    .from("applications")
+    .update(buildStatusUpdate(plan.status, resolvedApplication.cycle_year))
+    .eq("id", params.applicationId);
+
+  if (statusError) {
+    throw new Error(statusError.message);
+  }
+
+  const { error: eventError } = await db.from("inquiry_events").insert({
+    actor_id: user.id,
+    application_id: params.applicationId,
+    kind: plan.eventKind,
+    ministry_message: plan.ministryMessage,
+    staff_note: plan.staffNote,
+  });
+
+  if (eventError) {
+    throw new Error(eventError.message);
+  }
+
+  revalidatePath("/portal");
   revalidateReviewPaths(params.applicationId);
 }
 

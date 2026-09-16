@@ -14,6 +14,23 @@ export type MinistryPortalContext = {
   application: Applications | null;
   canPreview: boolean;
   currentViewMode: "admin" | "donor" | "ministry";
+  /**
+   * SAVE's ministry-facing explanation for declining to take the inquiry into
+   * assessment, if one was written.
+   */
+  latestInquiryDecline: {
+    message: string | null;
+    occurredAt: string;
+  } | null;
+  /**
+   * SAVE's most recent request for more information, if one is outstanding.
+   * Only the ministry-facing columns are ever read — the internal staff note
+   * on the same record is never loaded here.
+   */
+  latestInquiryRequest: {
+    message: string | null;
+    occurredAt: string;
+  } | null;
   documents: Array<
     Document & {
       signedUrl: string | null;
@@ -106,12 +123,43 @@ export async function requireMinistryContext(): Promise<MinistryPortalContext> {
       canPreview: viewer.canPreview,
       currentViewMode: viewer.currentViewMode,
       documents: [],
+      latestInquiryDecline: null,
+      latestInquiryRequest: null,
       organization: resolvedOrganization,
       publishedBrief: null,
       realRole: viewer.realRole,
       userId: viewer.userId,
     };
   }
+
+  // Ministry-facing columns only: `staff_note` is deliberately not selected, so
+  // internal reviewer reasoning cannot reach a ministry through this path.
+  const [{ data: inquiryRequest }, { data: inquiryDecline }] =
+    await Promise.all([
+      admin
+        .from("inquiry_events")
+        .select("ministry_message, occurred_at")
+        .eq("application_id", resolvedApplication.id)
+        .eq("kind", "more_info_requested")
+        .order("occurred_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      admin
+        .from("inquiry_events")
+        .select("ministry_message, occurred_at")
+        .eq("application_id", resolvedApplication.id)
+        .eq("kind", "rejected")
+        .order("occurred_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
+
+  type MinistryFacingEvent = {
+    ministry_message: string | null;
+    occurred_at: string;
+  } | null;
+  const resolvedInquiryRequest = inquiryRequest as MinistryFacingEvent;
+  const resolvedInquiryDecline = inquiryDecline as MinistryFacingEvent;
 
   const { data: documents } = await admin
     .from("documents")
@@ -139,6 +187,18 @@ export async function requireMinistryContext(): Promise<MinistryPortalContext> {
     canPreview: viewer.canPreview,
     currentViewMode: viewer.currentViewMode,
     documents: signedDocuments,
+    latestInquiryDecline: resolvedInquiryDecline
+      ? {
+          message: resolvedInquiryDecline.ministry_message,
+          occurredAt: resolvedInquiryDecline.occurred_at,
+        }
+      : null,
+    latestInquiryRequest: resolvedInquiryRequest
+      ? {
+          message: resolvedInquiryRequest.ministry_message,
+          occurredAt: resolvedInquiryRequest.occurred_at,
+        }
+      : null,
     organization: resolvedOrganization,
     publishedBrief: briefForApplication,
     realRole: viewer.realRole,
@@ -150,6 +210,12 @@ export function getPortalTimelineStatus(status: string | null) {
   const normalized = status ?? "inquiry_submitted";
 
   if (normalized === "inquiry_submitted") {
+    return 1;
+  }
+
+  // Answering a request for information is still the inquiry stage: a ministry
+  // asked for more never sees its progress move backwards.
+  if (normalized === "more_info_requested") {
     return 1;
   }
 

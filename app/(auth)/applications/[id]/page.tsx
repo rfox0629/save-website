@@ -51,7 +51,9 @@ import {
   formatDate,
 } from "@/components/save/primitives";
 import { TopBar } from "@/components/save/shell";
+import { InquiryDecisionActions } from "@/components/dashboard/inquiry-actions";
 import { parseReviewerSummary } from "@/lib/ai/reviewerSummary";
+import { isInquiryStageStatus } from "@/lib/inquiry-workflow";
 import {
   buildInquirySections,
   getInquirySubmittedAt,
@@ -239,7 +241,11 @@ export default async function ApplicationWorkspacePage({
             description={[
               data.organization.entity_type ?? "Entity type not recorded",
               data.organization.ein ? `EIN ${data.organization.ein}` : null,
-              `Submitted ${formatDate(data.application.created_at)}`,
+              // The ministry's latest submission or resubmission — never the
+              // date the record happened to be created.
+              getInquirySubmittedAt(data.inquiry)
+                ? `Submitted ${formatDate(getInquirySubmittedAt(data.inquiry))}`
+                : "Not yet submitted",
             ]
               .filter(Boolean)
               .join(" · ")}
@@ -1045,14 +1051,20 @@ export default async function ApplicationWorkspacePage({
                 </Callout>
               ) : null}
 
-              <StatusForm
-                applicationId={params.id}
-                current={data.application.status}
-                options={STATUS_OPTIONS.map((status) => ({
-                  label: getStatusLabel(status),
-                  value: status,
-                }))}
-              />
+              {isInquiryStageStatus(data.application.status) ? (
+                // At the inquiry stage SAVE approves, asks for more, or
+                // declines — not a pick from every status in the lifecycle.
+                <InquiryDecisionActions applicationId={params.id} />
+              ) : (
+                <StatusForm
+                  applicationId={params.id}
+                  current={data.application.status}
+                  options={STATUS_OPTIONS.map((status) => ({
+                    label: getStatusLabel(status),
+                    value: status,
+                  }))}
+                />
+              )}
             </CardBody>
             <CardFooter>
               <span className="text-caption text-ink-400">
