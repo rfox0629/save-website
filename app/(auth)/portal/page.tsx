@@ -73,6 +73,8 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
     canPreview,
     currentViewMode,
     documents,
+    latestInquiryDecline,
+    latestInquiryRequest,
     organization,
     publishedBrief,
   } = await requireMinistryContext();
@@ -104,14 +106,38 @@ export default async function PortalPage({ searchParams }: PortalPageProps) {
       };
     }
 
+    if (status === "more_info_requested") {
+      return {
+        action: (
+          <div className="space-y-4">
+            {latestInquiryRequest?.message ? (
+              <p className="rounded-2xl bg-[#FFF8E8] px-4 py-3 text-sm leading-7 text-[#6C5A2F]">
+                {latestInquiryRequest.message}
+              </p>
+            ) : null}
+            <Button
+              asChild
+              className="bg-[#1A4480] text-white hover:bg-[#2A5FA0]"
+            >
+              <Link href="/portal/inquiry">Update your inquiry</Link>
+            </Button>
+          </div>
+        ),
+        body: "SAVE has asked for more information before reviewing your inquiry. Update your answers and submit again.",
+        title: "More information requested",
+      };
+    }
+
     if (status === "inquiry_rejected") {
       return {
-        action: application?.decision_notes ? (
+        // The deliberate ministry-facing explanation, when SAVE wrote one.
+        // Internal reviewer reasoning is never shown here.
+        action: latestInquiryDecline?.message ? (
           <p className="rounded-2xl bg-[#FFF8E8] px-4 py-3 text-sm leading-7 text-[#6C5A2F]">
-            {application.decision_notes}
+            {latestInquiryDecline.message}
           </p>
         ) : null,
-        body: "Your application was not approved at this time.",
+        body: "SAVE is not taking this inquiry into assessment at this time. This is not a completed SAVE assessment, and no assessment result has been recorded for your ministry.",
         title: "Inquiry decision",
       };
     }

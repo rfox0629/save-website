@@ -20,6 +20,7 @@ import {
   formatDate,
 } from "@/components/save/primitives";
 import { TopBar } from "@/components/save/shell";
+import { getInquiryAgeAnchor } from "@/lib/inquiry-workflow";
 import {
   getDashboardData,
   getReviewerOptions,
@@ -180,7 +181,14 @@ export default async function DashboardPage({
                 </thead>
                 <tbody>
                   {data.rows.map((row) => {
-                    const days = daysSince(row.application.created_at);
+                    // How long SAVE has been holding it: measured from the
+                    // ministry's latest submission, not the record's creation.
+                    const days = daysSince(
+                      getInquiryAgeAnchor(
+                        row.latestSubmittedAt,
+                        row.application.created_at,
+                      ),
+                    );
                     const score = row.latestScore?.total_score ?? null;
                     return (
                       <tr
@@ -200,7 +208,9 @@ export default async function DashboardPage({
                               </p>
                               <p className="save-numeric text-caption text-ink-400">
                                 {row.application.id.slice(0, 8)} ·{" "}
-                                {formatDate(row.application.created_at)}
+                                {row.latestSubmittedAt
+                                  ? formatDate(row.latestSubmittedAt)
+                                  : "Not yet submitted"}
                               </p>
                             </div>
                           </div>

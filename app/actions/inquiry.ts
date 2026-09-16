@@ -42,7 +42,10 @@ async function getMinistryContext() {
   const isPreviewMinistry =
     viewer.canPreview && viewer.currentViewMode === "ministry";
 
-  if (!isPreviewMinistry && (!viewer.organizationId || viewer.realRole !== "ministry")) {
+  if (
+    !isPreviewMinistry &&
+    (!viewer.organizationId || viewer.realRole !== "ministry")
+  ) {
     redirect("/dashboard");
   }
 
@@ -169,6 +172,12 @@ function mapDraftToPersistence(values: InquiryFormValues) {
 }
 
 function isReadOnlyStatus(status: string | null, submittedAt: string | null) {
+  // SAVE has asked for more information, so the ministry can edit and resubmit
+  // even though it submitted once already.
+  if (status === "more_info_requested") {
+    return false;
+  }
+
   if (submittedAt) {
     return true;
   }
@@ -536,6 +545,15 @@ export async function submitInquiry(
   if (organizationError) {
     return { error: organizationError.message };
   }
+
+  // `inquiry_responses.submitted_at` holds only the latest submission, so each
+  // submission and resubmission is also recorded as its own event. A ministry
+  // answering a request for information never erases the evidence of what it
+  // submitted the first time.
+  await db.from("inquiry_events").insert({
+    application_id: draftResult.applicationId,
+    kind: "submitted",
+  });
 
   return { applicationId: draftResult.applicationId };
 }
