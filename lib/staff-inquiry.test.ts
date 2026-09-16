@@ -349,6 +349,27 @@ describe("retrieval is scoped to a single application", () => {
   });
 });
 
+describe("numbers read the way a reviewer expects", () => {
+  it("writes a founding year plainly, not as a grouped count", () => {
+    const sections = buildInquirySections(organization, inquiry);
+    const founded = valueOf(sections, "Organization Identity", "Year founded");
+
+    expect(founded).toBe("2025");
+    expect(founded).not.toContain(",");
+  });
+
+  it("still groups large counts", () => {
+    const sections = buildInquirySections(organization, {
+      ...inquiry,
+      annual_reach: 12500,
+    } as InquiryRow);
+
+    expect(valueOf(sections, "Fruit & Reach", "People reached annually")).toBe(
+      "12,500",
+    );
+  });
+});
+
 describe("one ministry's answers never appear against another", () => {
   it("projects only the records it is handed", () => {
     const otherOrganization = {
