@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  forwardRef,
   useEffect,
   useMemo,
   useState,
@@ -12,6 +13,7 @@ import { toast } from "sonner";
 
 import { saveVettingDraft, submitVetting } from "@/app/actions/vetting";
 import { MinistryNav } from "@/components/portal/ministry-nav";
+import { mergeFormDefaults } from "@/lib/form-defaults";
 import { createClient } from "@/lib/supabase/client";
 import type { ViewMode } from "@/lib/view-mode-shared";
 import {
@@ -63,10 +65,7 @@ const PARTNER_ROWS = [1, 2] as const;
 function mergeDefaults(
   initialValues: Partial<VettingFormValues>,
 ): VettingFormValues {
-  return {
-    ...vettingDefaultValues,
-    ...initialValues,
-  };
+  return mergeFormDefaults(vettingDefaultValues, initialValues);
 }
 
 function FieldError({ message }: { message?: string }) {
@@ -77,62 +76,69 @@ function FieldError({ message }: { message?: string }) {
   return <p className="text-sm text-[#9B2C2C]">{message}</p>;
 }
 
-function TextInput({
-  readOnly = false,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement> & {
-  readOnly?: boolean;
-}) {
+// forwardRef is required: react-hook-form's `register()` passes a ref, and a
+// plain function component silently drops it, leaving every registered field
+// unable to receive its value.
+const TextInput = forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement> & {
+    readOnly?: boolean;
+  }
+>(function TextInput({ readOnly = false, ...props }, ref) {
   return (
     <input
       {...props}
+      ref={ref}
       readOnly={readOnly}
       className={`w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition placeholder:text-[#7088A5] focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10 ${readOnly ? "cursor-not-allowed bg-[#F4EFE4] text-[#7088A5]" : ""} ${props.className ?? ""}`}
     />
   );
-}
+});
 
-function SelectInput({
-  disabled = false,
-  ...props
-}: React.SelectHTMLAttributes<HTMLSelectElement>) {
+const SelectInput = forwardRef<
+  HTMLSelectElement,
+  React.SelectHTMLAttributes<HTMLSelectElement>
+>(function SelectInput({ disabled = false, ...props }, ref) {
   return (
     <select
       {...props}
+      ref={ref}
       disabled={disabled}
       className={`w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10 ${disabled ? "cursor-not-allowed bg-[#F4EFE4] text-[#7088A5]" : ""} ${props.className ?? ""}`}
     />
   );
-}
+});
 
-function TextArea({
-  readOnly = false,
-  ...props
-}: React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
-  readOnly?: boolean;
-}) {
+const TextArea = forwardRef<
+  HTMLTextAreaElement,
+  React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
+    readOnly?: boolean;
+  }
+>(function TextArea({ readOnly = false, ...props }, ref) {
   return (
     <textarea
       {...props}
+      ref={ref}
       readOnly={readOnly}
       className={`min-h-[120px] w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition placeholder:text-[#7088A5] focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10 ${readOnly ? "cursor-not-allowed bg-[#F4EFE4] text-[#7088A5]" : ""} ${props.className ?? ""}`}
     />
   );
-}
+});
 
-function SliderInput({
-  disabled = false,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) {
+const SliderInput = forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement>
+>(function SliderInput({ disabled = false, ...props }, ref) {
   return (
     <input
       {...props}
+      ref={ref}
       disabled={disabled}
       type="range"
       className={`w-full accent-[#1A4480] ${disabled ? "cursor-not-allowed opacity-60" : ""}`}
     />
   );
-}
+});
 
 function StepHeader({ currentStep }: { currentStep: number }) {
   const progress = ((currentStep + 1) / vettingStepTitles.length) * 100;
@@ -533,7 +539,8 @@ export function VettingForm({
               <div className="h-full w-1/2 animate-pulse rounded-full bg-[#C09A45]" />
             </div>
             <p className="mt-4 text-sm text-[#7088A5]">
-              Current status: {processingStatus?.replace(/_/g, " ") ?? "pending"}
+              Current status:{" "}
+              {processingStatus?.replace(/_/g, " ") ?? "pending"}
             </p>
           </div>
         </div>
@@ -619,7 +626,9 @@ export function VettingForm({
               className="mt-4 text-4xl leading-tight"
               style={{ fontFamily: "var(--font-auth-serif)" }}
             >
-              {readOnly ? "SAVE Standard Submitted" : vettingStepTitles[currentStep]}
+              {readOnly
+                ? "SAVE Standard Submitted"
+                : vettingStepTitles[currentStep]}
             </h1>
             <p className="mt-4 text-base leading-8 text-[#4F6357]">
               {readOnly

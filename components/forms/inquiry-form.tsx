@@ -1,11 +1,12 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { forwardRef, useMemo, useState, useTransition } from "react";
 import { useForm, type FieldPath, type FieldValues } from "react-hook-form";
 import { toast } from "sonner";
 
 import { saveInquiryDraft, submitInquiry } from "@/app/actions/inquiry";
 import { MinistryNav } from "@/components/portal/ministry-nav";
+import { mergeFormDefaults, toActionableMessage } from "@/lib/form-defaults";
 import {
   ANNUAL_REVENUE_RANGE_OPTIONS,
   AUDIT_LEVEL_OPTIONS,
@@ -42,18 +43,20 @@ type InquiryFormProps = {
   submittedAt: string | null;
 };
 
+/** Field labels used to turn type errors into something a ministry can act on. */
+const FIELD_LABELS: Partial<Record<keyof InquiryFormValues, string>> = {
+  ein: "EIN",
+  key_metric: "Key metric",
+  lead_name: "Lead name",
+  legal_name: "Legal name",
+  ordaining_body: "Ordaining body",
+  year_founded: "Year founded",
+};
+
 function mergeDefaults(
   initialValues: Partial<InquiryFormValues>,
 ): InquiryFormValues {
-  return {
-    ...inquiryDefaultValues,
-    ...initialValues,
-    countries: initialValues.countries ?? inquiryDefaultValues.countries,
-    funding_sources:
-      initialValues.funding_sources ?? inquiryDefaultValues.funding_sources,
-    primary_focus:
-      initialValues.primary_focus ?? inquiryDefaultValues.primary_focus,
-  };
+  return mergeFormDefaults(inquiryDefaultValues, initialValues);
 }
 
 function FieldError({ message }: { message?: string }) {
@@ -64,48 +67,54 @@ function FieldError({ message }: { message?: string }) {
   return <p className="text-sm text-[#9B2C2C]">{message}</p>;
 }
 
-function TextInput({
-  readOnly = false,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement> & {
-  readOnly?: boolean;
-}) {
+// forwardRef is required: react-hook-form's `register()` passes a ref, and a
+// plain function component silently drops it, leaving every registered field
+// unable to receive its value.
+const TextInput = forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement> & {
+    readOnly?: boolean;
+  }
+>(function TextInput({ readOnly = false, ...props }, ref) {
   return (
     <input
       {...props}
+      ref={ref}
       readOnly={readOnly}
       className={`w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition placeholder:text-[#7088A5] focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10 ${readOnly ? "cursor-not-allowed bg-[#F4EFE4] text-[#7088A5]" : ""} ${props.className ?? ""}`}
     />
   );
-}
+});
 
-function TextArea({
-  readOnly = false,
-  ...props
-}: React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
-  readOnly?: boolean;
-}) {
+const TextArea = forwardRef<
+  HTMLTextAreaElement,
+  React.TextareaHTMLAttributes<HTMLTextAreaElement> & {
+    readOnly?: boolean;
+  }
+>(function TextArea({ readOnly = false, ...props }, ref) {
   return (
     <textarea
       {...props}
+      ref={ref}
       readOnly={readOnly}
       className={`min-h-[120px] w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition placeholder:text-[#7088A5] focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10 ${readOnly ? "cursor-not-allowed bg-[#F4EFE4] text-[#7088A5]" : ""} ${props.className ?? ""}`}
     />
   );
-}
+});
 
-function SelectInput({
-  disabled = false,
-  ...props
-}: React.SelectHTMLAttributes<HTMLSelectElement>) {
+const SelectInput = forwardRef<
+  HTMLSelectElement,
+  React.SelectHTMLAttributes<HTMLSelectElement>
+>(function SelectInput({ disabled = false, ...props }, ref) {
   return (
     <select
       {...props}
+      ref={ref}
       disabled={disabled}
       className={`w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480] outline-none transition focus:border-[#1A4480] focus:ring-2 focus:ring-[#1A4480]/10 ${disabled ? "cursor-not-allowed bg-[#F4EFE4] text-[#7088A5]" : ""} ${props.className ?? ""}`}
     />
   );
-}
+});
 
 function StepHeader({ currentStep }: { currentStep: number }) {
   const progress = ((currentStep + 1) / inquiryStepTitles.length) * 100;
@@ -288,7 +297,10 @@ export function InquiryForm({
 
       if (typeof path === "string") {
         form.setError(path as FieldPath<InquiryFormValues>, {
-          message: issue.message,
+          message: toActionableMessage(
+            issue.message,
+            FIELD_LABELS[path as keyof InquiryFormValues],
+          ),
           type: "manual",
         });
       }
@@ -446,7 +458,10 @@ export function InquiryForm({
                   <div className="grid gap-5 md:grid-cols-2">
                     <div className="space-y-2 md:col-span-2">
                       <label className="text-sm font-medium">Legal Name</label>
-                      <TextInput readOnly {...form.register("legal_name")} />
+                      <TextInput
+                        readOnly={readOnly}
+                        {...form.register("legal_name")}
+                      />
                       <FieldError
                         message={form.formState.errors.legal_name?.message}
                       />
@@ -463,7 +478,13 @@ export function InquiryForm({
 
                     <div className="space-y-2">
                       <label className="text-sm font-medium">EIN</label>
-                      <TextInput readOnly {...form.register("ein")} />
+                      <TextInput
+                        readOnly={readOnly}
+                        {...form.register("ein")}
+                      />
+                      <FieldError
+                        message={form.formState.errors.ein?.message}
+                      />
                     </div>
 
                     <div className="space-y-2">
