@@ -18,7 +18,7 @@ import type { ReferenceContact } from "@/lib/scoring/types";
  * imports `server-only` and cannot be loaded from a test.
  */
 
-const VALUES = ["name", "role", "email", "relationship"] as const;
+type ReferenceValue = "name" | "role" | "email" | "relationship";
 
 function getOptionalString(
   raw: Record<string, unknown>,
@@ -31,7 +31,7 @@ export function getReference(
   raw: Record<string, unknown>,
   index: 1 | 2 | 3,
 ): ReferenceContact {
-  const read = (value: (typeof VALUES)[number]) =>
+  const read = (value: ReferenceValue) =>
     getOptionalString(raw, `ref_${index}_${value}`) ??
     getOptionalString(raw, `reference_${index}_${value}`);
 
