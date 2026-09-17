@@ -9,6 +9,7 @@ import { scoreFruit } from "@/lib/scoring/categories/fruit";
 import { scoreGovernance } from "@/lib/scoring/categories/governance";
 import { scoreLeadership } from "@/lib/scoring/categories/leadership";
 import { compileFlags } from "@/lib/scoring/flags";
+import { normalizeReferences } from "@/lib/scoring/references";
 import type {
   NormalizedInquiry,
   NormalizedVetting,
@@ -49,15 +50,6 @@ function getOptionalBoolean(
   key: string,
 ): boolean | null {
   return typeof raw[key] === "boolean" ? (raw[key] as boolean) : null;
-}
-
-function getReference(raw: Record<string, unknown>, index: 1 | 2 | 3) {
-  return {
-    email: getOptionalString(raw, `reference_${index}_email`),
-    name: getOptionalString(raw, `reference_${index}_name`),
-    relationship: getOptionalString(raw, `reference_${index}_relationship`),
-    role: getOptionalString(raw, `reference_${index}_role`),
-  };
 }
 
 function normalizeInquiry(
@@ -112,11 +104,7 @@ function normalizeVetting(
     overhead_expense_pct: vetting.overhead_expense_pct,
     program_expense_pct: vetting.program_expense_pct,
     recent_deficit: vetting.recent_deficit,
-    references: [
-      getReference(raw, 1),
-      getReference(raw, 2),
-      getReference(raw, 3),
-    ],
+    references: normalizeReferences(raw),
     reserve_fund_level: vetting.reserve_fund_level,
     restricted_funds_misused: vetting.restricted_funds_misused,
     restricted_funds_tracked: vetting.restricted_funds_tracked,
