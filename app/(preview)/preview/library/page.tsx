@@ -15,10 +15,41 @@ import { MINISTRIES } from "@/lib/preview/data";
 export const metadata: Metadata = { title: "Ministry library" };
 
 const FILTERS = [
-  { label: "Cause", options: ["All causes", "Church Planting", "Relief & Development", "Theological Education", "Bible Translation", "Urban Ministry"] },
-  { label: "Region", options: ["All regions", "North America", "Africa", "Asia", "Latin America", "Europe"] },
-  { label: "Assessment", options: ["All assessments", "Ready for partnership", "Strong and worth knowing", "Worth a conversation"] },
-  { label: "Budget", options: ["Any size", "Under $1M", "$1M – $5M", "Over $5M"] },
+  {
+    label: "Cause",
+    options: [
+      "All causes",
+      "Church Planting",
+      "Relief & Development",
+      "Theological Education",
+      "Bible Translation",
+      "Urban Ministry",
+    ],
+  },
+  {
+    label: "Region",
+    options: [
+      "All regions",
+      "North America",
+      "Africa",
+      "Asia",
+      "Latin America",
+      "Europe",
+    ],
+  },
+  {
+    label: "Assessment",
+    options: [
+      "All assessments",
+      "Ready for partnership",
+      "Strong and worth knowing",
+      "Worth a conversation",
+    ],
+  },
+  {
+    label: "Budget",
+    options: ["Any size", "Under $1M", "$1M – $5M", "Over $5M"],
+  },
 ];
 
 export default function LibraryPage() {
@@ -163,19 +194,41 @@ export default function LibraryPage() {
                 their confidence alongside the score, so you can see not only
                 what we concluded but how sure we are.
               </p>
-              <Btn className="mt-7" href="/preview/ministry" variant="secondary">
+              <Btn
+                className="mt-7"
+                href="/preview/ministry"
+                variant="secondary"
+              >
                 See what a ministry goes through
               </Btn>
             </div>
 
             <div className="grid gap-px overflow-hidden rounded-lg bg-hairline sm:grid-cols-2">
               {[
-                { body: "What they believe, how publicly they say it, and whether the board affirms it.", title: "Doctrine" },
-                { body: "Board independence, meeting discipline, conflict-of-interest practice.", title: "Governance" },
-                { body: "Audit history, reserves, compensation approval, designated-fund handling.", title: "Financial Integrity" },
-                { body: "Accountability structures around the leader, and succession readiness.", title: "Leadership" },
-                { body: "What actually changed, measured over years rather than campaigns.", title: "Fruit" },
-                { body: "Eight independent sources checked for anything the application did not disclose.", title: "External Signals" },
+                {
+                  body: "What they believe, how publicly they say it, and whether the board affirms it.",
+                  title: "Doctrine",
+                },
+                {
+                  body: "Board independence, meeting discipline, conflict-of-interest practice.",
+                  title: "Governance",
+                },
+                {
+                  body: "Audit history, reserves, compensation approval, designated-fund handling.",
+                  title: "Financial Integrity",
+                },
+                {
+                  body: "Accountability structures around the leader, and succession readiness.",
+                  title: "Leadership",
+                },
+                {
+                  body: "What actually changed, measured over years rather than campaigns.",
+                  title: "Fruit",
+                },
+                {
+                  body: "Eight independent sources checked for anything the application did not disclose.",
+                  title: "External Signals",
+                },
               ].map((category) => (
                 <div className="bg-surface px-6 py-6" key={category.title}>
                   <h3 className="text-sm font-semibold text-ink-900">
@@ -219,7 +272,11 @@ export default function LibraryPage() {
                 the roadmap whether or not you are listed, and you never pay for
                 placement.
               </p>
-              <Btn className="mt-6" href="/preview/ministry" variant="secondary">
+              <Btn
+                className="mt-6"
+                href="/preview/ministry"
+                variant="secondary"
+              >
                 Start an application
               </Btn>
             </div>

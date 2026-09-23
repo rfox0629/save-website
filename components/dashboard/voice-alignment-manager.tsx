@@ -282,7 +282,9 @@ function RequestForm({
           />
         </Field>
         <Btn
-          disabled={pending || !respondentName.trim() || !respondentEmail.trim()}
+          disabled={
+            pending || !respondentName.trim() || !respondentEmail.trim()
+          }
           onClick={() => void submit()}
           size="sm"
           variant="secondary"
@@ -346,9 +348,7 @@ function InviteRow({
     <div className="px-6 py-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-ink-900">
-            {respondentName}
-          </p>
+          <p className="text-sm font-semibold text-ink-900">{respondentName}</p>
           <p className="text-caption text-ink-500">{respondentEmail}</p>
           <p className="mt-0.5 text-caption text-ink-400">
             {requestType === "internal" ? "Internal" : "External"}
@@ -428,7 +428,9 @@ function InviteGroup({
             ? "People with direct internal context and lived experience."
             : "People outside the organization who can speak to reputation."
         }
-        title={requestType === "internal" ? "Internal requests" : "External requests"}
+        title={
+          requestType === "internal" ? "Internal requests" : "External requests"
+        }
       />
       {filtered.length > 0 ? (
         <div className="divide-y divide-hairline">
@@ -666,7 +668,9 @@ export function VoiceAlignmentManager({
     <div className="space-y-6">
       <Card>
         <CardHeader
-          action={<Badge tone={sampleQuality.tone}>{sampleQuality.label}</Badge>}
+          action={
+            <Badge tone={sampleQuality.tone}>{sampleQuality.label}</Badge>
+          }
           description="Collect internal and external perspective through private invite links, then synthesize it into one reviewer-only summary. Reference feedback is never attributed back to the person who gave it."
           title="Voice alignment"
         />

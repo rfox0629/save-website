@@ -42,7 +42,9 @@ export default async function PortalDocumentsPage() {
           applicationId={context.application?.id ?? null}
           documents={context.documents}
           organizationId={context.organization.id}
-          readOnly={context.canPreview && context.currentViewMode === "ministry"}
+          readOnly={
+            context.canPreview && context.currentViewMode === "ministry"
+          }
           userId={context.userId}
         />
       </div>

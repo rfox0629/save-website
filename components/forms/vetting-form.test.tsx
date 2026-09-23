@@ -47,7 +47,9 @@ const insert = vi.fn(async () => ({ error: null }));
 
 vi.mock("@/lib/supabase/client", () => ({
   createClient: () => ({
-    から: undefined,
+    auth: {
+      getUser: async () => ({ data: { user: { id: "ministry-user-1" } } }),
+    },
     from: () => ({ insert }),
     storage: { from: () => ({ upload }) },
   }),
@@ -144,6 +146,12 @@ describe("a chosen document persists immediately", () => {
     await waitFor(() => expect(upload).toHaveBeenCalled());
     await waitFor(() => expect(insert).toHaveBeenCalled());
     expect(submitVetting).not.toHaveBeenCalled();
+
+    // Evidence provenance: the uploader comes from the authenticated session,
+    // not from a prop the client could set.
+    expect(insert).toHaveBeenCalledWith(
+      expect.objectContaining({ uploaded_by: "ministry-user-1" }),
+    );
   });
 });
 

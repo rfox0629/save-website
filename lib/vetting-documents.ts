@@ -38,6 +38,7 @@ export type DocumentUploadDeps = {
     file_size_bytes: number;
     reviewed: boolean;
     storage_path: string;
+    uploaded_by: string | null;
   }) => Promise<StorageResult> | StorageResult;
 };
 
@@ -62,12 +63,18 @@ export async function uploadVettingDocument({
   field,
   file,
   organizationId,
+  uploadedBy,
 }: {
   applicationId: string;
   deps: DocumentUploadDeps;
   field: VettingDocumentType;
   file: File;
   organizationId: string;
+  /**
+   * The authenticated uploader. The database trigger overrides this with the
+   * session's own user, so a client-supplied value cannot claim someone else.
+   */
+  uploadedBy?: string | null;
 }): Promise<UploadedDocument> {
   if (file.type !== DOCUMENT_CONTENT_TYPE) {
     throw new DocumentUploadError("Only PDF files are allowed.");
@@ -93,6 +100,7 @@ export async function uploadVettingDocument({
     file_size_bytes: file.size,
     reviewed: false,
     storage_path: storagePath,
+    uploaded_by: uploadedBy ?? null,
   });
 
   if (inserted?.error) {

@@ -381,6 +381,9 @@ export function VettingForm({
     setUploading((current) => ({ ...current, [field]: true }));
 
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       const uploaded = await uploadVettingDocument({
         applicationId,
         deps: {
@@ -396,6 +399,7 @@ export function VettingForm({
         field,
         file,
         organizationId,
+        uploadedBy: user?.id ?? null,
       });
 
       setUploadedDocuments((current) => ({ ...current, [field]: uploaded }));

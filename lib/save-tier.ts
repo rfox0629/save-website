@@ -24,7 +24,10 @@ type SaveTierInput = {
   } | null;
   strengths?: string[] | null;
   risks?: string[] | null;
-  voiceAlignmentStatus?: PublicVoiceAlignmentData["status"] | "insufficient_data" | null;
+  voiceAlignmentStatus?:
+    | PublicVoiceAlignmentData["status"]
+    | "insufficient_data"
+    | null;
 };
 
 function normalizeRecommendation(recommendation: string | null | undefined) {
@@ -57,7 +60,8 @@ function normalizeRecommendation(recommendation: string | null | undefined) {
 export function getSaveTier(input: SaveTierInput): SaveTier {
   const recommendationState = normalizeRecommendation(input.recommendation);
   const risksCount = input.risks?.filter((item) => item.trim()).length ?? 0;
-  const strengthsCount = input.strengths?.filter((item) => item.trim()).length ?? 0;
+  const strengthsCount =
+    input.strengths?.filter((item) => item.trim()).length ?? 0;
   const lowConfidenceCount =
     input.categoryConfidences?.filter((value) => value === "low").length ?? 0;
   const voiceStatus = input.voiceAlignmentStatus ?? null;

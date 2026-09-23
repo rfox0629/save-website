@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+import { buildActorSnapshot, toActorIdentity } from "@/lib/attribution";
+import { canApproveBrief } from "@/lib/brief-author";
+
 import { requireReviewerMutationAccess } from "@/lib/review";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { DonorBrief } from "@/lib/supabase/types";
@@ -32,7 +35,7 @@ export async function POST(request: Request) {
 
     const { data: brief } = await admin
       .from("donor_briefs")
-      .select("id, generated_by, published")
+      .select("id, generated_by, generated_actor_id, published")
       .eq("application_id", body.application_id)
       .order("generated_at", { ascending: false })
       .limit(1)
@@ -63,14 +66,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ approved: false, ok: true });
     }
 
-    if (resolvedBrief.generated_by === user.id) {
-      return NextResponse.json(
-        {
-          error:
-            "You wrote this brief, so you cannot be its second reviewer. Another reviewer must approve it.",
-        },
-        { status: 400 },
-      );
+    // Fails closed: an authorless brief has no independent second reviewer to
+    // be, and the snapshot keeps the gate standing once the live identity goes.
+    const decision = canApproveBrief(
+      resolvedBrief as {
+        generated_actor_id?: string | null;
+        generated_by?: string | null;
+      },
+      user.id,
+    );
+
+    if (!decision.allowed) {
+      return NextResponse.json({ error: decision.reason }, { status: 400 });
     }
 
     const { error } = await db
@@ -78,6 +85,7 @@ export async function POST(request: Request) {
       .update({
         approved_at: new Date().toISOString(),
         approved_by: user.id,
+        ...buildActorSnapshot("approved", toActorIdentity(user)),
       })
       .eq("id", resolvedBrief.id);
 
@@ -90,9 +98,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          error instanceof Error
-            ? error.message
-            : "Unable to record approval.",
+          error instanceof Error ? error.message : "Unable to record approval.",
       },
       { status: 400 },
     );

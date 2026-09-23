@@ -63,13 +63,15 @@ export async function runFullVetting(applicationId: string) {
   // fails — most often because the ministry has not submitted vetting answers —
   // say so loudly. This runs inside waitUntil, where a bare rejection reaches
   // nobody and the reviewer is left watching "Running in the background…".
-  const score = await scoreApplication(applicationId).catch((error: unknown) => {
-    console.error(
-      `Scoring failed for application ${applicationId}. External checks were saved; no score was written.`,
-      error,
-    );
-    throw error;
-  });
+  const score = await scoreApplication(applicationId).catch(
+    (error: unknown) => {
+      console.error(
+        `Scoring failed for application ${applicationId}. External checks were saved; no score was written.`,
+        error,
+      );
+      throw error;
+    },
+  );
 
   const { data: hardStops } = await db
     .from("risk_flags")

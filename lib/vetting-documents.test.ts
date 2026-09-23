@@ -34,6 +34,35 @@ const base = {
   organizationId: "org-1",
 };
 
+describe("evidence provenance", () => {
+  it("records the authenticated uploader with the document", async () => {
+    const d = deps();
+
+    await uploadVettingDocument({
+      ...base,
+      deps: d,
+      file: pdf(),
+      uploadedBy: "ministry-user-1",
+    });
+
+    expect(d.insertDocument).toHaveBeenCalledWith(
+      expect.objectContaining({ uploaded_by: "ministry-user-1" }),
+    );
+  });
+
+  it("still records the document when no uploader is supplied", async () => {
+    // The database trigger overrides this with the session's own user, so a
+    // client-supplied value can never claim someone else.
+    const d = deps();
+
+    await uploadVettingDocument({ ...base, deps: d, file: pdf() });
+
+    expect(d.insertDocument).toHaveBeenCalledWith(
+      expect.objectContaining({ uploaded_by: null }),
+    );
+  });
+});
+
 describe("persisting a supplied document", () => {
   it("stores the file and records the row in one step", async () => {
     const d = deps();
@@ -51,6 +80,7 @@ describe("persisting a supplied document", () => {
       file_size_bytes: 1024,
       reviewed: false,
       storage_path: "org-1/vetting/form_990/Form-990-2025.pdf",
+      uploaded_by: null,
     });
     expect(result).toEqual({
       fileName: "Form-990-2025.pdf",

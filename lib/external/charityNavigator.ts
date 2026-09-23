@@ -37,7 +37,11 @@ type CharityNavigatorCheckResult = {
   cn_subject: string | null;
   financial_score: number | null;
   found: boolean;
-  integration_status: "found" | "manual_review" | "not_configured" | "not_found";
+  integration_status:
+    | "found"
+    | "manual_review"
+    | "not_configured"
+    | "not_found";
   note: string | null;
   overall_rating: number | null;
   overall_score: number | null;
@@ -252,7 +256,8 @@ export async function checkCharityNavigator(
       score_impact: null,
       source: "charity_navigator",
       status: "flag",
-      summary: "Charity Navigator lookup failed. Manual reviewer check required.",
+      summary:
+        "Charity Navigator lookup failed. Manual reviewer check required.",
     } satisfies Database["public"]["Tables"]["external_checks"]["Insert"]);
 
     return {

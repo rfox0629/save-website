@@ -56,8 +56,8 @@ export default async function VoiceAlignmentPublicPage({
             Share Your Perspective
           </h1>
           <p className="mt-4 text-base leading-8 text-[#4F6357]">
-            Your input helps us understand how {invite.organization.legal_name} is
-            experienced both internally and externally.
+            Your input helps us understand how {invite.organization.legal_name}{" "}
+            is experienced both internally and externally.
           </p>
           <p className="mt-3 text-sm leading-7 text-[#7088A5]">
             This is a private, relational process intended to surface patterns

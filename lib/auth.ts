@@ -35,14 +35,23 @@ export async function getCurrentUserRole() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("role")
+    .select("role, deactivated_at")
     .eq("id", user.id)
     .maybeSingle();
 
+  const resolved = profile as
+    | (Pick<Profile, "role"> & { deactivated_at?: string | null })
+    | null;
+
+  // A deactivated staff profile keeps its history and loses its capability.
+  // Resolving no role here also withdraws preview access, which is derived
+  // from the role rather than checked separately.
+  if (resolved?.deactivated_at) {
+    return { role: null, user };
+  }
+
   return {
-    role: ((profile as Pick<Profile, "role"> | null)?.role ?? null) as
-      | Profile["role"]
-      | null,
+    role: (resolved?.role ?? null) as Profile["role"] | null,
     user,
   };
 }

@@ -59,7 +59,11 @@ export default function DonorUpdatesPage() {
           <Stat caption="All time" label="Published" value={published.length} />
           <Stat caption="Currently following you" label="Reach" value="214" />
           <Stat caption="Trailing 6 updates" label="Open rate" value="78%" />
-          <Stat caption="Resets 1 August" label="Remaining this month" value="1" />
+          <Stat
+            caption="Resets 1 August"
+            label="Remaining this month"
+            value="1"
+          />
         </StatRow>
       </div>
 
@@ -170,7 +174,10 @@ export default function DonorUpdatesPage() {
                 />
               </Field>
 
-              <Field help="Optional. One image, at least 1200px wide." label="Photograph">
+              <Field
+                help="Optional. One image, at least 1200px wide."
+                label="Photograph"
+              >
                 <Btn className="w-full" size="sm" variant="secondary">
                   Attach a photograph
                 </Btn>

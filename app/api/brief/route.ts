@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { buildActorSnapshot, toActorIdentity } from "@/lib/attribution";
 
 import {
   getMaterialBriefChanges,
@@ -125,6 +126,7 @@ export async function POST(request: Request) {
       commendations: filteredCommendations,
       generated_at: now,
       generated_by: user.id,
+      ...buildActorSnapshot("generated", toActorIdentity(user)),
       headline: body.headline ?? null,
       include_voice_alignment: Boolean(body.include_voice_alignment),
       ministry_description: body.ministry_description ?? null,

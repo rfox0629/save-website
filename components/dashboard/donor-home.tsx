@@ -10,7 +10,10 @@ type DonorHomeProps = {
   briefs: PublishedBriefCard[];
 };
 
-function getSummarySentences(text: string | null | undefined, maxSentences = 2) {
+function getSummarySentences(
+  text: string | null | undefined,
+  maxSentences = 2,
+) {
   if (!text) {
     return "No executive summary available yet.";
   }
@@ -131,7 +134,9 @@ function getRiskFlagClass(severity: PublishedBriefCard["highestRiskSeverity"]) {
   return "border-blue-200 bg-blue-50 text-blue-900";
 }
 
-function getAlignmentClass(status: NonNullable<PublishedBriefCard["voiceAlignment"]>["status"]) {
+function getAlignmentClass(
+  status: NonNullable<PublishedBriefCard["voiceAlignment"]>["status"],
+) {
   if (status === "aligned") {
     return "border-blue-200 bg-blue-50 text-blue-900";
   }
@@ -203,10 +208,15 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                 brief.aiSummary?.top_risks.filter((item) => item.trim()) ??
                 brief.cautions.filter((item) => item.trim());
               const executiveSummary = getSummarySentences(
-                brief.aiSummary?.executive_summary || brief.ministry_description,
+                brief.aiSummary?.executive_summary ||
+                  brief.ministry_description,
               );
-              const keyStrengths = strengths.slice(0, 2).map((item) => tightenSignal(item));
-              const keyRisks = risks.slice(0, 2).map((item) => tightenSignal(item));
+              const keyStrengths = strengths
+                .slice(0, 2)
+                .map((item) => tightenSignal(item));
+              const keyRisks = risks
+                .slice(0, 2)
+                .map((item) => tightenSignal(item));
 
               return (
                 <article key={brief.id} className="bg-white">
@@ -318,7 +328,8 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                                     Final Recommendation
                                   </p>
                                   <p className="mt-2 text-[28px] leading-tight text-[#1A4480]">
-                                    {scoreValue ?? "—"} — {brief.recommendationLabel}
+                                    {scoreValue ?? "—"} —{" "}
+                                    {brief.recommendationLabel}
                                   </p>
                                   <p className="mt-2 text-sm text-[#4F6357]">
                                     {getFinalRecommendationMessage(brief)}
@@ -358,7 +369,9 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                                       key={`strength-${item}`}
                                       className="text-sm font-medium text-[#1A4480]"
                                     >
-                                      <span className="mr-2 text-[#2F7A53]">✔</span>
+                                      <span className="mr-2 text-[#2F7A53]">
+                                        ✔
+                                      </span>
                                       {item}
                                     </p>
                                   ))}
@@ -367,11 +380,14 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                                       key={`risk-${item}`}
                                       className="text-sm font-medium text-[#1A4480]"
                                     >
-                                      <span className="mr-2 text-[#B7791F]">⚠</span>
+                                      <span className="mr-2 text-[#B7791F]">
+                                        ⚠
+                                      </span>
                                       {item}
                                     </p>
                                   ))}
-                                  {keyStrengths.length === 0 && keyRisks.length === 0 ? (
+                                  {keyStrengths.length === 0 &&
+                                  keyRisks.length === 0 ? (
                                     <p className="text-sm text-[#7A867D]">
                                       No key signals available.
                                     </p>
@@ -391,7 +407,8 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                                       brief.voiceAlignment.status,
                                     )}`}
                                   >
-                                    Leadership Alignment: {getAlignmentLabel(brief)}
+                                    Leadership Alignment:{" "}
+                                    {getAlignmentLabel(brief)}
                                   </span>
                                 ) : null}
                               </div>
@@ -411,7 +428,9 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                                         Internal Perspective
                                       </p>
                                       <ul className="mt-3 space-y-2 text-sm text-[#4F6357]">
-                                        {brief.voiceAlignment.summary.internal_summary.themes.length > 0 ? (
+                                        {brief.voiceAlignment.summary
+                                          .internal_summary.themes.length >
+                                        0 ? (
                                           brief.voiceAlignment.summary.internal_summary.themes.map(
                                             (item) => (
                                               <li key={item}>
@@ -429,7 +448,9 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                                         External Perspective
                                       </p>
                                       <ul className="mt-3 space-y-2 text-sm text-[#4F6357]">
-                                        {brief.voiceAlignment.summary.external_summary.themes.length > 0 ? (
+                                        {brief.voiceAlignment.summary
+                                          .external_summary.themes.length >
+                                        0 ? (
                                           brief.voiceAlignment.summary.external_summary.themes.map(
                                             (item) => (
                                               <li key={item}>
@@ -460,7 +481,9 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                                   <li key={item}>{tightenSignal(item, 10)}</li>
                                 ))
                               ) : (
-                                <li className="text-[#7A867D]">No data available</li>
+                                <li className="text-[#7A867D]">
+                                  No data available
+                                </li>
                               )}
                             </ul>
                           </details>
@@ -475,7 +498,9 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                                   <li key={item}>{tightenSignal(item, 10)}</li>
                                 ))
                               ) : (
-                                <li className="text-[#7A867D]">No data available</li>
+                                <li className="text-[#7A867D]">
+                                  No data available
+                                </li>
                               )}
                             </ul>
                           </details>
@@ -486,18 +511,32 @@ export function DonorHome({ briefs }: DonorHomeProps) {
                             </summary>
                             <div className="mt-4 grid gap-3">
                               {[
-                                ["Leadership", brief.score?.leadership_score ?? 0],
+                                [
+                                  "Leadership",
+                                  brief.score?.leadership_score ?? 0,
+                                ],
                                 ["Doctrine", brief.score?.doctrine_score ?? 0],
-                                ["Governance", brief.score?.governance_score ?? 0],
-                                ["Financial Stewardship", brief.score?.financial_score ?? 0],
+                                [
+                                  "Governance",
+                                  brief.score?.governance_score ?? 0,
+                                ],
+                                [
+                                  "Financial Stewardship",
+                                  brief.score?.financial_score ?? 0,
+                                ],
                                 ["Fruit", brief.score?.fruit_score ?? 0],
-                                ["External Signals", brief.score?.external_trust_score ?? 0],
+                                [
+                                  "External Signals",
+                                  brief.score?.external_trust_score ?? 0,
+                                ],
                               ].map(([label, value]) => (
                                 <div
                                   key={label}
                                   className="flex items-center justify-between rounded-2xl bg-[#FBF8F2] px-4 py-3"
                                 >
-                                  <p className="text-sm text-[#7088A5]">{label}</p>
+                                  <p className="text-sm text-[#7088A5]">
+                                    {label}
+                                  </p>
                                   <p className="text-lg font-semibold text-[#1A4480]">
                                     {value}
                                   </p>

@@ -51,8 +51,16 @@ export default function TestimoniesPage() {
 
       <div className="mt-8">
         <StatRow>
-          <Stat caption="Live on your profile" label="Published" value={ministry.testimonies.length} />
-          <Stat caption="Awaiting reviewer" label="In review" value={pending.length} />
+          <Stat
+            caption="Live on your profile"
+            label="Published"
+            value={ministry.testimonies.length}
+          />
+          <Stat
+            caption="Awaiting reviewer"
+            label="In review"
+            value={pending.length}
+          />
           <Stat caption="Consent recorded" label="With permission" value="3" />
           <Stat caption="Recommended minimum" label="Target" value="3" />
         </StatRow>
@@ -159,7 +167,9 @@ export default function TestimoniesPage() {
               What makes a good one
             </p>
             <ul className="mt-3 space-y-2.5 text-caption leading-relaxed text-ink-500">
-              <li>One specific thing that changed, not a general endorsement.</li>
+              <li>
+                One specific thing that changed, not a general endorsement.
+              </li>
               <li>Their voice, not your marketing voice.</li>
               <li>A name and a role, so a donor knows who is speaking.</li>
               <li>Recent. Anything older than three years reads as archive.</li>

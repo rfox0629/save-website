@@ -1031,7 +1031,11 @@ export type Database = {
           generated_at: string;
           id: string;
           organization_id: string;
-          status: "aligned" | "insufficient_data" | "misaligned" | "partially_aligned";
+          status:
+            | "aligned"
+            | "insufficient_data"
+            | "misaligned"
+            | "partially_aligned";
           summary: Json;
         };
         Insert: {
@@ -1039,7 +1043,11 @@ export type Database = {
           generated_at?: string;
           id?: string;
           organization_id: string;
-          status: "aligned" | "insufficient_data" | "misaligned" | "partially_aligned";
+          status:
+            | "aligned"
+            | "insufficient_data"
+            | "misaligned"
+            | "partially_aligned";
           summary: Json;
         };
         Update: {
@@ -1047,7 +1055,11 @@ export type Database = {
           generated_at?: string;
           id?: string;
           organization_id?: string;
-          status?: "aligned" | "insufficient_data" | "misaligned" | "partially_aligned";
+          status?:
+            | "aligned"
+            | "insufficient_data"
+            | "misaligned"
+            | "partially_aligned";
           summary?: Json;
         };
         Relationships: [

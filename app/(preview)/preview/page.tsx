@@ -20,7 +20,10 @@ const SURFACES = [
     persona: "Public",
     routes: [
       { href: "/preview/library", label: "Ministry library" },
-      { href: "/preview/ministry-profile/new-city-fellowship", label: "Ministry profile" },
+      {
+        href: "/preview/ministry-profile/new-city-fellowship",
+        label: "Ministry profile",
+      },
     ],
     tone: "brass" as const,
   },
@@ -32,7 +35,10 @@ const SURFACES = [
       { href: "/preview/donor", label: "Home" },
       { href: "/preview/donor/following", label: "Following" },
       { href: "/preview/donor/giving", label: "Giving & annual statements" },
-      { href: "/preview/donor/ministry/new-city-fellowship", label: "Ministry detail" },
+      {
+        href: "/preview/donor/ministry/new-city-fellowship",
+        label: "Ministry detail",
+      },
       { href: "/preview/donor/updates", label: "Updates" },
       { href: "/preview/donor/prayer", label: "Prayer" },
     ],
@@ -75,7 +81,7 @@ const SURFACES = [
 export default function PreviewIndexPage() {
   return (
     <div className="min-h-screen bg-paper-100">
-      <header className="border-b border-hairline bg-paper-200 save-texture">
+      <header className="save-texture border-b border-hairline bg-paper-200">
         <div className="mx-auto max-w-content px-5 py-14 md:px-8">
           <SaveWordmark sublabel="Design preview" />
           <p className="save-eyebrow mt-9 text-brass-700">USA-133</p>
@@ -106,7 +112,9 @@ export default function PreviewIndexPage() {
           {SURFACES.map((surface) => (
             <Card key={surface.persona}>
               <CardHeader
-                action={<Badge tone={surface.tone}>{surface.routes.length}</Badge>}
+                action={
+                  <Badge tone={surface.tone}>{surface.routes.length}</Badge>
+                }
                 description={surface.description}
                 title={surface.persona}
               />

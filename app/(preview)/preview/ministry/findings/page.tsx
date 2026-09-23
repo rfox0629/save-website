@@ -67,10 +67,18 @@ export default function FindingsPage() {
 
       <div className="mt-6">
         <StatRow>
-          <Stat caption="Above standard" label="Strengths" value={strengths.length} />
+          <Stat
+            caption="Above standard"
+            label="Strengths"
+            value={strengths.length}
+          />
           <Stat caption="Worth closing" label="Gaps" value={gaps.length} />
           <Stat caption="Needs a decision" label="Risks" value={risks.length} />
-          <Stat caption="Noted, no action" label="Observations" value={observations.length} />
+          <Stat
+            caption="Noted, no action"
+            label="Observations"
+            value={observations.length}
+          />
         </StatRow>
       </div>
 
@@ -79,8 +87,17 @@ export default function FindingsPage() {
           <div>
             <Tabs
               items={[
-                { active: true, count: FINDINGS.length, href: "#all", label: "All" },
-                { count: strengths.length, href: "#strengths", label: "Strengths" },
+                {
+                  active: true,
+                  count: FINDINGS.length,
+                  href: "#all",
+                  label: "All",
+                },
+                {
+                  count: strengths.length,
+                  href: "#strengths",
+                  label: "Strengths",
+                },
                 { count: gaps.length, href: "#gaps", label: "Gaps" },
                 { count: risks.length, href: "#risks", label: "Risks" },
               ]}
@@ -145,9 +162,9 @@ export default function FindingsPage() {
             <CardBody className="border-t border-hairline">
               <Callout tone="clay" title="How this affects your assessment">
                 Concentrated decision authority does not stop an approval, but
-                it caps the Leadership category until it is addressed. Ministries
-                that separate the roles typically gain six to nine points at
-                reassessment.
+                it caps the Leadership category until it is addressed.
+                Ministries that separate the roles typically gain six to nine
+                points at reassessment.
               </Callout>
             </CardBody>
           </Card>
@@ -170,7 +187,10 @@ export default function FindingsPage() {
           <Card>
             <CardHeader title="By category" />
             <CardBody>
-              <CategoryBreakdown scores={ministry.categoryScores} showNotes={false} />
+              <CategoryBreakdown
+                scores={ministry.categoryScores}
+                showNotes={false}
+              />
             </CardBody>
           </Card>
 

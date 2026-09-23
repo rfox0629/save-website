@@ -30,10 +30,34 @@ import { getMinistry } from "@/lib/preview/data";
 export const metadata: Metadata = { title: "Reports" };
 
 const REPORTS = [
-  { due: "2026-08-31", id: "rp1", period: "H1 2026", status: "in-progress", title: "Mid-year report" },
-  { due: "2026-02-28", id: "rp2", period: "FY2025", status: "published", title: "Annual report" },
-  { due: "2025-08-31", id: "rp3", period: "H1 2025", status: "published", title: "Mid-year report" },
-  { due: "2025-02-28", id: "rp4", period: "FY2024", status: "published", title: "Annual report" },
+  {
+    due: "2026-08-31",
+    id: "rp1",
+    period: "H1 2026",
+    status: "in-progress",
+    title: "Mid-year report",
+  },
+  {
+    due: "2026-02-28",
+    id: "rp2",
+    period: "FY2025",
+    status: "published",
+    title: "Annual report",
+  },
+  {
+    due: "2025-08-31",
+    id: "rp3",
+    period: "H1 2025",
+    status: "published",
+    title: "Mid-year report",
+  },
+  {
+    due: "2025-02-28",
+    id: "rp4",
+    period: "FY2024",
+    status: "published",
+    title: "Annual report",
+  },
 ];
 
 export default function ReportsPage() {
@@ -72,9 +96,17 @@ export default function ReportsPage() {
       <div className="mt-8">
         <StatRow>
           <Stat caption="Since 2024" label="Reports published" value="3" />
-          <Stat caption="Days before deadline" label="Average submission" value="6" />
+          <Stat
+            caption="Days before deadline"
+            label="Average submission"
+            value="6"
+          />
           <Stat caption="Of followers open it" label="Read rate" value="84%" />
-          <Stat caption="Mid-year 2026" label="Next due" value={formatDate("2026-08-31")} />
+          <Stat
+            caption="Mid-year 2026"
+            label="Next due"
+            value={formatDate("2026-08-31")}
+          />
         </StatRow>
       </div>
 
@@ -92,8 +124,16 @@ export default function ReportsPage() {
                 steps={[
                   { label: "Narrative", meta: "Complete", state: "done" },
                   { label: "Impact figures", meta: "Complete", state: "done" },
-                  { label: "Financials", meta: "In progress", state: "current" },
-                  { label: "Roadmap progress", meta: "Not started", state: "todo" },
+                  {
+                    label: "Financials",
+                    meta: "In progress",
+                    state: "current",
+                  },
+                  {
+                    label: "Roadmap progress",
+                    meta: "Not started",
+                    state: "todo",
+                  },
                 ]}
               />
             </CardBody>
@@ -134,7 +174,11 @@ export default function ReportsPage() {
               <tbody>
                 {[
                   { current: 862_000, label: "Total revenue", prior: 741_000 },
-                  { current: 694_000, label: "Program expense", prior: 602_000 },
+                  {
+                    current: 694_000,
+                    label: "Program expense",
+                    prior: 602_000,
+                  },
                   { current: 108_000, label: "Administration", prior: 96_000 },
                   { current: 61_000, label: "Fundraising", prior: 54_000 },
                 ].map((row) => {
@@ -169,7 +213,10 @@ export default function ReportsPage() {
               <DataList>
                 <DataRow label="Program expense ratio" value="80.1%" />
                 <DataRow label="Months of operating reserve" value="12" />
-                <DataRow label="Designated funds held" value={formatMoney(214_000)} />
+                <DataRow
+                  label="Designated funds held"
+                  value={formatMoney(214_000)}
+                />
               </DataList>
             </CardBody>
           </Card>

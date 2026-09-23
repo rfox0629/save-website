@@ -28,7 +28,11 @@ function SaveMark() {
   );
 }
 
-function getExternalSignal(checks: ExternalCheck[], source: string, label: string) {
+function getExternalSignal(
+  checks: ExternalCheck[],
+  source: string,
+  label: string,
+) {
   const check = checks.find((item) => item.source === source);
 
   if (!check) {
@@ -75,14 +79,18 @@ function formatConfidence(confidence: string) {
   return confidence.charAt(0).toUpperCase() + confidence.slice(1);
 }
 
-function formatVoiceAlignmentStatus(status: PublicVoiceAlignmentData["status"]) {
+function formatVoiceAlignmentStatus(
+  status: PublicVoiceAlignmentData["status"],
+) {
   return status
     .split("_")
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
 }
 
-function getVoiceAlignmentBadgeClass(status: PublicVoiceAlignmentData["status"]) {
+function getVoiceAlignmentBadgeClass(
+  status: PublicVoiceAlignmentData["status"],
+) {
   if (status === "aligned") {
     return "border-blue-200 bg-blue-50 text-blue-900";
   }
@@ -106,14 +114,18 @@ function BulletList({
   tone?: "default" | "warm";
 }) {
   if (items.length === 0) {
-    return <p className="text-[15px] leading-8 text-[#7088A5]">No data available.</p>;
+    return (
+      <p className="text-[15px] leading-8 text-[#7088A5]">No data available.</p>
+    );
   }
 
   return (
     <ul className="space-y-3 text-[15px] leading-8 text-[#475A4F]">
       {items.map((item, index) => (
         <li className="ml-5 list-disc pl-1" key={`${item}-${index}`}>
-          <span className={tone === "warm" ? "text-[#6C5A2F]" : undefined}>{item}</span>
+          <span className={tone === "warm" ? "text-[#6C5A2F]" : undefined}>
+            {item}
+          </span>
         </li>
       ))}
     </ul>
@@ -182,9 +194,8 @@ export function SaveBriefV1({
   const risks =
     summary?.top_risks.filter((item) => item.trim()) ??
     brief.cautions.filter((item) => item.trim());
-  const followUpQuestions = summary?.follow_up_questions.filter((item) =>
-    item.trim(),
-  ) ?? [];
+  const followUpQuestions =
+    summary?.follow_up_questions.filter((item) => item.trim()) ?? [];
   const saveTier = getSaveTier({
     categoryConfidences: summary
       ? [
@@ -276,21 +287,23 @@ export function SaveBriefV1({
           <section className="print:break-inside-avoid-page">
             <SectionTitle>Key Areas of Assessment</SectionTitle>
             <div className="mt-5 grid gap-4 md:grid-cols-2">
-              {([
-                ["Leadership Integrity", summary.leadership_integrity],
-                ["Doctrine", summary.doctrine],
-                ["Governance", summary.governance],
-                ["Financial Stewardship", summary.financial_stewardship],
-                ["Fruit", summary.fruit],
-              ] as Array<
+              {(
                 [
-                  string,
-                  {
-                    assessment: string;
-                    confidence: "high" | "low" | "medium";
-                  },
-                ]
-              >).map(([label, value]) => (
+                  ["Leadership Integrity", summary.leadership_integrity],
+                  ["Doctrine", summary.doctrine],
+                  ["Governance", summary.governance],
+                  ["Financial Stewardship", summary.financial_stewardship],
+                  ["Fruit", summary.fruit],
+                ] as Array<
+                  [
+                    string,
+                    {
+                      assessment: string;
+                      confidence: "high" | "low" | "medium";
+                    },
+                  ]
+                >
+              ).map(([label, value]) => (
                 <div
                   className="rounded-[24px] border border-[#E3DCCF] bg-[#FCFAF5] p-5 print:break-inside-avoid-page"
                   key={label}
@@ -335,7 +348,9 @@ export function SaveBriefV1({
                       Themes
                     </p>
                     <div className="mt-3">
-                      <BulletList items={voiceAlignment.summary.internal_summary.themes} />
+                      <BulletList
+                        items={voiceAlignment.summary.internal_summary.themes}
+                      />
                     </div>
                   </div>
                   <div>
@@ -343,7 +358,11 @@ export function SaveBriefV1({
                       Strengths
                     </p>
                     <div className="mt-3">
-                      <BulletList items={voiceAlignment.summary.internal_summary.strengths} />
+                      <BulletList
+                        items={
+                          voiceAlignment.summary.internal_summary.strengths
+                        }
+                      />
                     </div>
                   </div>
                   <div>
@@ -351,7 +370,9 @@ export function SaveBriefV1({
                       Concerns
                     </p>
                     <div className="mt-3">
-                      <BulletList items={voiceAlignment.summary.internal_summary.concerns} />
+                      <BulletList
+                        items={voiceAlignment.summary.internal_summary.concerns}
+                      />
                     </div>
                   </div>
                 </div>
@@ -367,7 +388,9 @@ export function SaveBriefV1({
                       Themes
                     </p>
                     <div className="mt-3">
-                      <BulletList items={voiceAlignment.summary.external_summary.themes} />
+                      <BulletList
+                        items={voiceAlignment.summary.external_summary.themes}
+                      />
                     </div>
                   </div>
                   <div>
@@ -375,7 +398,11 @@ export function SaveBriefV1({
                       Strengths
                     </p>
                     <div className="mt-3">
-                      <BulletList items={voiceAlignment.summary.external_summary.strengths} />
+                      <BulletList
+                        items={
+                          voiceAlignment.summary.external_summary.strengths
+                        }
+                      />
                     </div>
                   </div>
                   <div>
@@ -383,7 +410,9 @@ export function SaveBriefV1({
                       Concerns
                     </p>
                     <div className="mt-3">
-                      <BulletList items={voiceAlignment.summary.external_summary.concerns} />
+                      <BulletList
+                        items={voiceAlignment.summary.external_summary.concerns}
+                      />
                     </div>
                   </div>
                 </div>
@@ -414,7 +443,9 @@ export function SaveBriefV1({
                       Follow-Up Considerations
                     </h3>
                     <div className="mt-4">
-                      <BulletList items={voiceAlignment.summary.follow_up_questions} />
+                      <BulletList
+                        items={voiceAlignment.summary.follow_up_questions}
+                      />
                     </div>
                   </div>
                 ) : null}

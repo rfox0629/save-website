@@ -142,7 +142,11 @@ export function LibraryVisibilityToggle({
           size="sm"
           variant={visible ? "ghost" : "secondary"}
         >
-          {pending ? "Saving…" : visible ? "Remove from library" : "List in library"}
+          {pending
+            ? "Saving…"
+            : visible
+              ? "Remove from library"
+              : "List in library"}
         </Btn>
       </div>
       <ErrorText>{error}</ErrorText>

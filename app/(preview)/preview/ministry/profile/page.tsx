@@ -83,7 +83,8 @@ export default function MinistryProfilePage() {
                     Upload logo
                   </Btn>
                   <p className="mt-2 text-caption text-ink-400">
-                    Square, at least 400×400. We use a monogram until you add one.
+                    Square, at least 400×400. We use a monogram until you add
+                    one.
                   </p>
                 </div>
               </div>
@@ -228,7 +229,14 @@ export default function MinistryProfilePage() {
                 You control
               </p>
               <ul className="space-y-2 text-caption text-ink-500">
-                {["Your story and tagline", "Impact figures", "Leadership bios", "Testimonies", "Prayer requests", "Donor updates"].map((item) => (
+                {[
+                  "Your story and tagline",
+                  "Impact figures",
+                  "Leadership bios",
+                  "Testimonies",
+                  "Prayer requests",
+                  "Donor updates",
+                ].map((item) => (
                   <li className="flex items-center gap-2" key={item}>
                     <span className="h-1 w-1 rounded-full bg-sage-500" />
                     {item}

@@ -61,9 +61,21 @@ export default function LeaderHealthPage() {
 
       <div className="mt-6">
         <StatRow>
-          <Stat caption="Under active care" label="Leaders tracked" value={LEADER_HEALTH.length} />
-          <Stat caption="Needing a conversation" label="On watch" value={watch.length} />
-          <Stat caption="Target is 90 days" label="Median days since check-in" value="41" />
+          <Stat
+            caption="Under active care"
+            label="Leaders tracked"
+            value={LEADER_HEALTH.length}
+          />
+          <Stat
+            caption="Needing a conversation"
+            label="On watch"
+            value={watch.length}
+          />
+          <Stat
+            caption="Target is 90 days"
+            label="Median days since check-in"
+            value="41"
+          />
           <Stat caption="Overdue check-ins" label="Past 120 days" value="1" />
         </StatRow>
       </div>
@@ -136,10 +148,22 @@ export default function LeaderHealthPage() {
           />
           <CardBody className="space-y-4">
             {[
-              { body: "Who can tell this leader something they do not want to hear, and when did that last happen?", title: "Accountability" },
-              { body: "Is the marriage and family in a sustainable place? We ask, we do not investigate.", title: "Household" },
-              { body: "Is there a written, board-adopted plan for what happens if they stop tomorrow?", title: "Succession" },
-              { body: "What is the hardest thing right now that they have not told anyone?", title: "Load" },
+              {
+                body: "Who can tell this leader something they do not want to hear, and when did that last happen?",
+                title: "Accountability",
+              },
+              {
+                body: "Is the marriage and family in a sustainable place? We ask, we do not investigate.",
+                title: "Household",
+              },
+              {
+                body: "Is there a written, board-adopted plan for what happens if they stop tomorrow?",
+                title: "Succession",
+              },
+              {
+                body: "What is the hardest thing right now that they have not told anyone?",
+                title: "Load",
+              },
             ].map((item) => (
               <div key={item.title}>
                 <p className="text-sm font-semibold text-ink-900">
@@ -164,10 +188,10 @@ export default function LeaderHealthPage() {
                 <p className="text-sm font-semibold text-clay-700">
                   {item.leader}
                 </p>
-                <p className="mt-0.5 text-caption text-clay-700/70">
+                <p className="text-clay-700/70 mt-0.5 text-caption">
                   {item.ministry}
                 </p>
-                <p className="mt-2.5 text-sm leading-relaxed text-clay-700/90">
+                <p className="text-clay-700/90 mt-2.5 text-sm leading-relaxed">
                   {item.flag}
                 </p>
                 <div className="mt-3.5 flex gap-2.5">

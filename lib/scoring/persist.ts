@@ -46,14 +46,12 @@ export async function scoreApplication(applicationId: string) {
   }
 
   if (score.components.length > 0) {
-    const { error: componentsError } = await db
-      .from("score_components")
-      .insert(
-        score.components.map((component) => ({
-          ...component,
-          score_id: insertedScore.id,
-        })),
-      );
+    const { error: componentsError } = await db.from("score_components").insert(
+      score.components.map((component) => ({
+        ...component,
+        score_id: insertedScore.id,
+      })),
+    );
 
     if (componentsError) {
       throw new Error(componentsError.message);

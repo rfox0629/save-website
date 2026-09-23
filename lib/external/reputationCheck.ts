@@ -87,9 +87,7 @@ Respond ONLY with a JSON object:
     1024,
   );
 
-  const parsed = normalizeResult(
-    JSON.parse(extractJsonObject(responseText)),
-  );
+  const parsed = normalizeResult(JSON.parse(extractJsonObject(responseText)));
   const status = parsed.concerns_found ? "flag" : "pass";
 
   await db.from("external_checks").insert({

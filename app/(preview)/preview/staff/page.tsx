@@ -101,7 +101,11 @@ export default function StaffQueuePage() {
           <Tabs
             items={[
               { active: true, count: QUEUE.length, href: "#all", label: "All" },
-              { count: unassigned.length, href: "#unassigned", label: "Unassigned" },
+              {
+                count: unassigned.length,
+                href: "#unassigned",
+                label: "Unassigned",
+              },
               { count: 4, href: "#mine", label: "Mine" },
               { count: breached.length, href: "#sla", label: "Past SLA" },
             ]}
@@ -261,7 +265,9 @@ export default function StaffQueuePage() {
                     </div>
                     <div className="mt-2">
                       <Meter
-                        tone={load >= 100 ? "clay" : load >= 80 ? "brass" : "sage"}
+                        tone={
+                          load >= 100 ? "clay" : load >= 80 ? "brass" : "sage"
+                        }
                         value={load}
                       />
                     </div>

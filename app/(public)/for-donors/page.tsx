@@ -73,8 +73,8 @@ export default function ForDonorsPage() {
                 Outcome
               </div>
               <p className="mt-3 text-[15px] leading-[1.8] text-[rgba(255,255,255,0.76)]">
-                You get a fast read on whether a ministry is trustworthy,
-                well governed, and strategically compelling before deeper
+                You get a fast read on whether a ministry is trustworthy, well
+                governed, and strategically compelling before deeper
                 philanthropic conversations begin.
               </p>
             </div>

@@ -44,8 +44,7 @@ const EMAIL_IN_USE_MESSAGE =
   "An account already exists for this email. Try signing in instead.";
 const INVALID_MAGIC_LINK_MESSAGE =
   "This sign-in link is invalid or has expired. Please request a new one.";
-const PASSWORD_TOO_SHORT_MESSAGE =
-  "Password must be at least 8 characters.";
+const PASSWORD_TOO_SHORT_MESSAGE = "Password must be at least 8 characters.";
 const GENERIC_AUTH_FAILURE_MESSAGE =
   "We couldn't complete that sign-in request. Please try again.";
 

@@ -34,9 +34,7 @@ export const metadata: Metadata = {
 
 export default function PreviewLayout({ children }: { children: ReactNode }) {
   return (
-    <div
-      className={`${saveDisplay.variable} ${saveSans.variable} save-root`}
-    >
+    <div className={`${saveDisplay.variable} ${saveSans.variable} save-root`}>
       {children}
     </div>
   );

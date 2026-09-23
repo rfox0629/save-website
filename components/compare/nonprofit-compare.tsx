@@ -77,12 +77,13 @@ function CompareRow({
   right: React.ReactNode;
   theme: "dark" | "light";
 }) {
-  const labelClass =
-    theme === "light" ? "text-[#7088A5]" : "text-[#C09A45]";
+  const labelClass = theme === "light" ? "text-[#7088A5]" : "text-[#C09A45]";
 
   return (
     <section className="space-y-3">
-      <p className={`text-xs font-semibold uppercase tracking-[0.28em] ${labelClass}`}>
+      <p
+        className={`text-xs font-semibold uppercase tracking-[0.28em] ${labelClass}`}
+      >
         {label}
       </p>
       <div className="grid gap-4 xl:grid-cols-2">
@@ -122,7 +123,8 @@ export function NonprofitCompare({
       ? "w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480]"
       : "w-full rounded-2xl border border-white/10 bg-[#0B1622] px-4 py-3 text-white";
   const bodyTextClass = theme === "light" ? "text-[#4F6357]" : "text-slate-200";
-  const mutedTextClass = theme === "light" ? "text-[#7088A5]" : "text-slate-400";
+  const mutedTextClass =
+    theme === "light" ? "text-[#7088A5]" : "text-slate-400";
   const pillClass =
     theme === "light"
       ? "border-[#D8D1C3] bg-white text-[#1A4480]"
@@ -181,7 +183,9 @@ export function NonprofitCompare({
             left ? (
               <div className="space-y-4">
                 <div className="flex flex-wrap items-start justify-between gap-4">
-                  <h2 className="text-2xl font-semibold">{left.organizationName}</h2>
+                  <h2 className="text-2xl font-semibold">
+                    {left.organizationName}
+                  </h2>
                   <div className="flex flex-col items-end gap-2">
                     <span
                       className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${getSaveTierClass(
@@ -191,7 +195,9 @@ export function NonprofitCompare({
                     >
                       {left.saveTier}
                     </span>
-                    <span className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${pillClass}`}>
+                    <span
+                      className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${pillClass}`}
+                    >
                       {formatRecommendation(left.recommendation)}
                     </span>
                   </div>
@@ -208,7 +214,9 @@ export function NonprofitCompare({
             right ? (
               <div className="space-y-4">
                 <div className="flex flex-wrap items-start justify-between gap-4">
-                  <h2 className="text-2xl font-semibold">{right.organizationName}</h2>
+                  <h2 className="text-2xl font-semibold">
+                    {right.organizationName}
+                  </h2>
                   <div className="flex flex-col items-end gap-2">
                     <span
                       className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${getSaveTierClass(
@@ -218,7 +226,9 @@ export function NonprofitCompare({
                     >
                       {right.saveTier}
                     </span>
-                    <span className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${pillClass}`}>
+                    <span
+                      className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] ${pillClass}`}
+                    >
                       {formatRecommendation(right.recommendation)}
                     </span>
                   </div>

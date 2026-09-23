@@ -91,7 +91,12 @@ export default function StaffReviewPage() {
       <div className="mt-7">
         <Tabs
           items={[
-            { active: true, count: EVIDENCE.length, href: "#evidence", label: "Evidence" },
+            {
+              active: true,
+              count: EVIDENCE.length,
+              href: "#evidence",
+              label: "Evidence",
+            },
             { href: "#scoring", label: "Scoring" },
             { count: FINDINGS.length, href: "#findings", label: "Findings" },
             { count: 8, href: "#external", label: "External checks" },

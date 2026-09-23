@@ -68,7 +68,10 @@ export async function POST(
   const access = await verifyAccess(params.applicationId);
 
   if ("error" in access) {
-    return NextResponse.json({ error: access.error }, { status: access.status });
+    return NextResponse.json(
+      { error: access.error },
+      { status: access.status },
+    );
   }
 
   waitUntil(

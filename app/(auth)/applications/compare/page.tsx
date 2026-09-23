@@ -28,9 +28,7 @@ export default async function ReviewerComparePage({
           >
             Back to dashboard
           </Link>
-          <h1 className="mt-3 text-3xl font-semibold">
-            Compare Nonprofits
-          </h1>
+          <h1 className="mt-3 text-3xl font-semibold">Compare Nonprofits</h1>
           <p className="mt-2 max-w-3xl text-sm text-slate-300">
             Review two nonprofit applications side by side using the existing AI
             summary and external review data.

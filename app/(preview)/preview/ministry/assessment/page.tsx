@@ -92,9 +92,7 @@ export default function AssessmentPage() {
                     <button
                       className={cn(
                         "save-focus-ring flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left transition",
-                        active
-                          ? "bg-ink-100"
-                          : "hover:bg-paper-200",
+                        active ? "bg-ink-100" : "hover:bg-paper-200",
                       )}
                       key={section.key}
                       type="button"
@@ -214,12 +212,20 @@ export default function AssessmentPage() {
                     <option>The executive director</option>
                   </Select>
                 </Field>
-                <Callout className="mt-3.5" tone="clay" title="Hannah asked about this">
+                <Callout
+                  className="mt-3.5"
+                  tone="clay"
+                  title="Hannah asked about this"
+                >
                   You answered that the full board approves it, which is what we
                   want to see — but the minute you attached is from 2023. Could
                   you attach the most recent one?
                   <div className="mt-3">
-                    <Btn href="/preview/ministry/evidence" size="sm" variant="secondary">
+                    <Btn
+                      href="/preview/ministry/evidence"
+                      size="sm"
+                      variant="secondary"
+                    >
                       Attach the minute
                     </Btn>
                   </div>

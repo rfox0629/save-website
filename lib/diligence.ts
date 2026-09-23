@@ -1,3 +1,4 @@
+import { buildActorSnapshot, toActorIdentity } from "@/lib/attribution";
 import "server-only";
 
 import { revalidatePath } from "next/cache";
@@ -61,9 +62,7 @@ function assertOneOf<T extends string>(
   field: string,
 ): T {
   if (typeof value !== "string" || !allowed.includes(value as T)) {
-    throw new Error(
-      `${field} must be one of: ${allowed.join(", ")}.`,
-    );
+    throw new Error(`${field} must be one of: ${allowed.join(", ")}.`);
   }
 
   return value as T;
@@ -241,6 +240,7 @@ export async function createDiligenceEngagement(
     ...buildPayload(input),
     application_id: applicationId,
     created_by: user.id,
+    ...buildActorSnapshot("created", toActorIdentity(user)),
     organization_id: organizationId,
   });
 

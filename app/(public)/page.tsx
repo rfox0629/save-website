@@ -237,8 +237,8 @@ export default async function PublicHomePage() {
         </h2>
         <p className="mt-5 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5576]">
           Every ministry presented through the SAVE Standard has gone through
-          the same clear and consistent evaluation. No exceptions. No
-          shortcuts. No pay-to-play.
+          the same clear and consistent evaluation. No exceptions. No shortcuts.
+          No pay-to-play.
         </p>
 
         <div className="mt-14 grid gap-6 md:grid-cols-3">
@@ -285,9 +285,9 @@ export default async function PublicHomePage() {
                 Documents reveal structure. Conversations reveal intention.
                 Proximity reveals character. The most important things about a
                 leader cannot be captured in a form or an interview. For select
-                organizations, the SAVE Standard includes time in proximity
-                with ministry leadership, observing the consistency between
-                what is presented and what is lived.
+                organizations, the SAVE Standard includes time in proximity with
+                ministry leadership, observing the consistency between what is
+                presented and what is lived.
               </p>
               <div className="mb-5 rounded-[8px] border-l-[3px] border-l-[#1A4480] bg-[#E8F0FA] px-[18px] py-[14px] text-[13px] leading-[1.7] text-[#7088A5]">
                 This step is mutual and invitational. It is never entered
@@ -398,8 +398,7 @@ export default async function PublicHomePage() {
           <p className="mt-5 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5576]">
             Billions of dollars flow to Christian ministries every year. Very
             little of it is clearly understood. Most donors give based on
-            relationship,
-            reputation, or a compelling story.
+            relationship, reputation, or a compelling story.
           </p>
           <p className="mt-4 max-w-[540px] text-[16px] leading-[1.8] text-[#3D5576]">
             Those are not bad starting points. But they are not enough.
@@ -440,9 +439,8 @@ export default async function PublicHomePage() {
 
         <div className="border-t border-[rgba(26,68,128,0.2)] pt-10 md:border-l md:border-t-0 md:pl-[60px] md:pt-0">
           <blockquote className="font-public-serif mb-4 border-l-[3px] border-l-[#E8A020] pl-5 text-[22px] italic leading-[1.5] text-[#1A4480]">
-            &quot;Faithful stewardship starts with honest information, about
-            the mission, the leadership, and the evidence of lasting
-            fruit.&quot;
+            &quot;Faithful stewardship starts with honest information, about the
+            mission, the leadership, and the evidence of lasting fruit.&quot;
           </blockquote>
           <p className="mb-11 pl-5 text-[12px] font-semibold uppercase tracking-[0.1em] text-[#7088A5]">
             SAVE Foundation
@@ -455,8 +453,8 @@ export default async function PublicHomePage() {
             </div>
             <p className="text-[14px] leading-[1.7] text-[#3D5576]">
               No ministry pays to be recommended. No brief is issued without
-              human review. Every recommendation reflects the data,
-              nothing else.
+              human review. Every recommendation reflects the data, nothing
+              else.
             </p>
           </div>
         </div>
@@ -543,8 +541,8 @@ export default async function PublicHomePage() {
           </h2>
           <p className="mb-8 mt-4 max-w-[400px] text-[15px] leading-[1.8] text-[#3D5576]">
             The SAVE Standard gives your ministry credibility with serious
-            donors. It signals accountability. It connects you to givers
-            aligned with what you have built.
+            donors. It signals accountability. It connects you to givers aligned
+            with what you have built.
           </p>
           <ul className="mb-10 space-y-2.5">
             {[
@@ -584,8 +582,7 @@ export default async function PublicHomePage() {
           </h2>
           <p className="mb-8 mt-4 max-w-[400px] text-[15px] leading-[1.8] text-[#3D5576]">
             You&apos;ve built something. You want it to matter beyond your
-            lifetime. The SAVE Standard brings clarity and documents every
-            step.
+            lifetime. The SAVE Standard brings clarity and documents every step.
           </p>
           <ul className="mb-10 space-y-2.5">
             {[
@@ -706,8 +703,8 @@ export default async function PublicHomePage() {
             </Link>
           </div>
           <p className="relative text-[12px] font-medium tracking-[0.06em] text-[#7088A5]">
-            No ministry pays to be recommended. All briefs include human
-            review. Annual evaluation required.
+            No ministry pays to be recommended. All briefs include human review.
+            Annual evaluation required.
           </p>
         </div>
       </section>

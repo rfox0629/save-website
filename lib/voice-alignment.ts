@@ -1,3 +1,4 @@
+import { buildActorSnapshot, toActorIdentity } from "@/lib/attribution";
 import "server-only";
 
 import { headers } from "next/headers";
@@ -102,9 +103,7 @@ export type InternalVoiceAlignmentResponseInput = z.infer<
 export type ExternalVoiceAlignmentResponseInput = z.infer<
   typeof externalResponseSchema
 >;
-export type VoiceAlignmentInsight = z.infer<
-  typeof voiceAlignmentInsightSchema
->;
+export type VoiceAlignmentInsight = z.infer<typeof voiceAlignmentInsightSchema>;
 
 export type VoiceAlignmentCollectionStatus =
   | "Collecting Responses"
@@ -445,6 +444,7 @@ export async function createVoiceAlignmentRequest(
     {
       application_id: resolvedApplication.id,
       invited_by: user.id,
+      ...buildActorSnapshot("invited", toActorIdentity(user)),
       organization_id: resolvedApplication.organization_id,
       relationship: parsed.relationship?.trim() || null,
       request_type: parsed.requestType,
@@ -535,16 +535,17 @@ export async function submitVoiceAlignmentResponse(
   const payload = {
     additional_comments:
       "additionalComments" in parsed
-        ? (parsed.additionalComments?.trim() || null)
+        ? parsed.additionalComments?.trim() || null
         : null,
     application_id: invite.application.id,
-    concerns: "concerns" in parsed ? (parsed.concerns?.trim() || null) : null,
+    concerns: "concerns" in parsed ? parsed.concerns?.trim() || null : null,
     concerns_inconsistencies:
       "concernsInconsistencies" in parsed
         ? parsed.concernsInconsistencies
         : null,
     growth_areas: "growthAreas" in parsed ? parsed.growthAreas : null,
-    internal_culture: "internalCulture" in parsed ? parsed.internalCulture : null,
+    internal_culture:
+      "internalCulture" in parsed ? parsed.internalCulture : null,
     leader_character:
       "leaderCharacter" in parsed ? parsed.leaderCharacter : null,
     org_leader_description:
@@ -640,18 +641,16 @@ export async function generateVoiceAlignmentSummary(
     );
   }
 
-  const { error } = await db
-    .from("voice_alignment_summaries")
-    .upsert(
-      {
-        application_id: application.id,
-        generated_at: new Date().toISOString(),
-        organization_id: application.organization_id,
-        status: summary.alignment_status,
-        summary: summary as Json,
-      },
-      { onConflict: "application_id" },
-    );
+  const { error } = await db.from("voice_alignment_summaries").upsert(
+    {
+      application_id: application.id,
+      generated_at: new Date().toISOString(),
+      organization_id: application.organization_id,
+      status: summary.alignment_status,
+      summary: summary as Json,
+    },
+    { onConflict: "application_id" },
+  );
 
   if (error) {
     throw new Error(error.message);

@@ -7,7 +7,13 @@ import {
   postJson,
   useAction,
 } from "@/components/dashboard/workspace-actions";
-import { Btn, Field, Input, Select, Textarea } from "@/components/save/primitives";
+import {
+  Btn,
+  Field,
+  Input,
+  Select,
+  Textarea,
+} from "@/components/save/primitives";
 import {
   ROADMAP_CATEGORIES,
   ROADMAP_STATUSES,
@@ -146,10 +152,9 @@ export function RoadmapStatusControl({
         onChange={(event) =>
           run(
             () =>
-              postJson(
-                `/api/applications/${applicationId}/roadmap/${itemId}`,
-                { status: event.target.value },
-              ),
+              postJson(`/api/applications/${applicationId}/roadmap/${itemId}`, {
+                status: event.target.value,
+              }),
             "Unable to update the item.",
           )
         }

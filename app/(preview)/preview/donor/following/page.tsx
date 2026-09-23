@@ -118,7 +118,10 @@ export default function DonorFollowingPage() {
                 ministry={ministry}
               />
             ))}
-            <Card className="flex items-center justify-center border-dashed p-8" tone="flat">
+            <Card
+              className="flex items-center justify-center border-dashed p-8"
+              tone="flat"
+            >
               <div className="text-center">
                 <p className="text-sm font-semibold text-ink-800">
                   Looking for something specific?

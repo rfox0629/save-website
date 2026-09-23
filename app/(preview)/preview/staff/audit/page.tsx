@@ -26,15 +26,49 @@ export const metadata: Metadata = { title: "Audit history" };
 // A few more entries so the log reads like a real week of activity.
 const EXTENDED_LOG = [
   ...AUDIT_LOG,
-  { action: "Brief published", actor: "Tom Reyes", detail: "Bright Path Foster Care — live to 164 donors", id: "a7", timestamp: "2026-07-28 11:15" },
-  { action: "Ministry sign-off received", actor: "Bright Path Foster Care", detail: "Public profile approved", id: "a8", timestamp: "2026-07-28 09:02" },
-  { action: "Second reviewer sign-off", actor: "Dana Kim", detail: "APP-2026-0142", id: "a9", timestamp: "2026-07-27 15:47" },
-  { action: "Leader check-in logged", actor: "Hannah Bradley", detail: "Andre Whitfield — accountability team lapsed", id: "a10", timestamp: "2026-07-27 10:20" },
-  { action: "Donor access granted", actor: "Dana Kim", detail: "2 new donor accounts", id: "a11", timestamp: "2026-07-26 16:33" },
+  {
+    action: "Brief published",
+    actor: "Tom Reyes",
+    detail: "Bright Path Foster Care — live to 164 donors",
+    id: "a7",
+    timestamp: "2026-07-28 11:15",
+  },
+  {
+    action: "Ministry sign-off received",
+    actor: "Bright Path Foster Care",
+    detail: "Public profile approved",
+    id: "a8",
+    timestamp: "2026-07-28 09:02",
+  },
+  {
+    action: "Second reviewer sign-off",
+    actor: "Dana Kim",
+    detail: "APP-2026-0142",
+    id: "a9",
+    timestamp: "2026-07-27 15:47",
+  },
+  {
+    action: "Leader check-in logged",
+    actor: "Hannah Bradley",
+    detail: "Andre Whitfield — accountability team lapsed",
+    id: "a10",
+    timestamp: "2026-07-27 10:20",
+  },
+  {
+    action: "Donor access granted",
+    actor: "Dana Kim",
+    detail: "2 new donor accounts",
+    id: "a11",
+    timestamp: "2026-07-26 16:33",
+  },
 ];
 
 const ACTION_TONE = (action: string) => {
-  if (action.includes("published") || action.includes("accepted") || action.includes("sign-off")) {
+  if (
+    action.includes("published") ||
+    action.includes("accepted") ||
+    action.includes("sign-off")
+  ) {
     return "sage" as const;
   }
   if (action.includes("returned") || action.includes("override")) {
@@ -84,8 +118,16 @@ export default function AuditPage() {
 
       <div className="mt-6">
         <StatRow>
-          <Stat caption="Last 7 days" label="Entries" value={EXTENDED_LOG.length} />
-          <Stat caption="With written reasons" label="Score overrides" value="1" />
+          <Stat
+            caption="Last 7 days"
+            label="Entries"
+            value={EXTENDED_LOG.length}
+          />
+          <Stat
+            caption="With written reasons"
+            label="Score overrides"
+            value="1"
+          />
           <Stat caption="This week" label="Documents returned" value="1" />
           <Stat caption="Retention" label="Kept for" value="Forever" />
         </StatRow>
