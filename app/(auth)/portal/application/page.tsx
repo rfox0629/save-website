@@ -1,4 +1,5 @@
 import { loadVettingDraft } from "@/app/actions/vetting";
+import { resolveResumeStep } from "@/lib/vetting-resume";
 import { VettingForm } from "@/components/forms/vetting-form";
 import { MinistryNav } from "@/components/portal/ministry-nav";
 import Link from "next/link";
@@ -50,6 +51,7 @@ export default async function ApplicationPage() {
       applicationStatus={draft.applicationStatus}
       canPreview={draft.canPreview}
       currentViewMode={draft.currentViewMode}
+      initialStep={resolveResumeStep(draft.initialValues)}
       initialValues={draft.initialValues}
       organizationId={draft.organizationId}
       readOnly={draft.readOnly}

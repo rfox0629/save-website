@@ -14,6 +14,10 @@ import { toast } from "sonner";
 import { saveVettingDraft, submitVetting } from "@/app/actions/vetting";
 import { MinistryNav } from "@/components/portal/ministry-nav";
 import { mergeFormDefaults } from "@/lib/form-defaults";
+import {
+  DocumentUploadError,
+  uploadVettingDocument,
+} from "@/lib/vetting-documents";
 import { createClient } from "@/lib/supabase/client";
 import type { ViewMode } from "@/lib/view-mode-shared";
 import {
@@ -36,6 +40,7 @@ type VettingFormProps = {
   applicationStatus: string | null;
   canPreview: boolean;
   currentViewMode: ViewMode;
+  initialStep?: number;
   initialValues: Partial<VettingFormValues>;
   organizationId: string | null;
   readOnly: boolean;
@@ -183,6 +188,7 @@ function RadioGroup({
               ? "bg-[#1A4480] text-white"
               : "text-[#7088A5] hover:bg-[#F4EFE4]"
           } ${disabled ? "cursor-not-allowed opacity-70" : ""}`}
+          aria-pressed={value === option}
           disabled={disabled}
           key={String(option)}
           onClick={() => onChange(option)}
@@ -263,6 +269,7 @@ export function VettingForm({
   applicationStatus,
   canPreview,
   currentViewMode,
+  initialStep = 0,
   initialValues,
   organizationId,
   readOnly,
@@ -272,7 +279,7 @@ export function VettingForm({
   const supabase = useMemo(() => createClient(), []);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const db = supabase as any;
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(initialStep);
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [confirmationVisible, setConfirmationVisible] = useState(false);
   const [processingVisible, setProcessingVisible] = useState(false);
@@ -366,6 +373,49 @@ export function VettingForm({
     return false;
   };
 
+  const uploadDocument = async (field: VettingDocumentType, file: File) => {
+    if (!applicationId || !organizationId) {
+      return;
+    }
+
+    setUploading((current) => ({ ...current, [field]: true }));
+
+    try {
+      const uploaded = await uploadVettingDocument({
+        applicationId,
+        deps: {
+          insertDocument: (row) => db.from("documents").insert(row),
+          uploadToStorage: (storagePath, pdf) =>
+            supabase.storage
+              .from("ministry-documents")
+              .upload(storagePath, pdf, {
+                cacheControl: "3600",
+                upsert: true,
+              }),
+        },
+        field,
+        file,
+        organizationId,
+      });
+
+      setUploadedDocuments((current) => ({ ...current, [field]: uploaded }));
+      setPendingFiles((current) => ({ ...current, [field]: null }));
+      toast.success("Document saved.");
+    } catch (error) {
+      const message =
+        error instanceof DocumentUploadError || error instanceof Error
+          ? error.message
+          : "Unable to upload files.";
+      setGlobalError(message);
+      toast.error(message);
+    } finally {
+      setUploading((current) => ({ ...current, [field]: false }));
+    }
+  };
+
+  // A document persists as soon as it is chosen. Step 8 has no Next button, so
+  // waiting for a step advance meant nothing on that step reached SAVE until
+  // final Submit, and a reload discarded it.
   const updatePendingFile =
     (field: VettingDocumentType) => (event: ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0] ?? null;
@@ -373,7 +423,27 @@ export function VettingForm({
         ...current,
         [field]: file,
       }));
+
+      if (file) {
+        void uploadDocument(field, file);
+      }
     };
+
+  const handleSaveDraft = () => {
+    startTransition(async () => {
+      setGlobalError(null);
+
+      const result = await saveVettingDraft(form.getValues(), applicationId);
+
+      if (result.error) {
+        setGlobalError(result.error);
+        toast.error(result.error);
+        return;
+      }
+
+      toast.success("SAVE Standard draft saved.");
+    });
+  };
 
   const uploadStepFiles = async () => {
     const fields = STEP_DOCUMENT_FIELDS[currentStep] ?? [];
@@ -1509,13 +1579,25 @@ export function VettingForm({
                     {isPending ? "Saving..." : "Next"}
                   </button>
                 ) : (
-                  <button
-                    className="rounded-2xl bg-[#1A4480] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2A5FA0] disabled:cursor-not-allowed disabled:opacity-70"
-                    disabled={isPending}
-                    type="submit"
-                  >
-                    {isPending ? "Submitting..." : "Submit Vetting"}
-                  </button>
+                  <div className="flex flex-wrap items-center gap-3">
+                    {/* The last step has no Next, which is what used to leave
+                        the attestation and signatory unsaved until Submit. */}
+                    <button
+                      className="rounded-2xl border border-[#D8D1C3] px-5 py-3 text-sm font-semibold text-[#1A4480] transition hover:bg-[#F4EFE4] disabled:cursor-not-allowed disabled:opacity-70"
+                      disabled={isPending}
+                      onClick={handleSaveDraft}
+                      type="button"
+                    >
+                      {isPending ? "Saving..." : "Save draft"}
+                    </button>
+                    <button
+                      className="rounded-2xl bg-[#1A4480] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2A5FA0] disabled:cursor-not-allowed disabled:opacity-70"
+                      disabled={isPending}
+                      type="submit"
+                    >
+                      {isPending ? "Submitting..." : "Submit Vetting"}
+                    </button>
+                  </div>
                 )}
               </div>
             ) : null}
