@@ -204,6 +204,7 @@ function RadioGroup({
               ? "bg-[#1A4480] text-white"
               : "text-[#7088A5] hover:bg-[#F4EFE4]"
           } ${disabled ? "cursor-not-allowed opacity-70" : ""}`}
+          aria-pressed={value === option}
           disabled={disabled}
           key={String(option)}
           onClick={() => onChange(option)}
