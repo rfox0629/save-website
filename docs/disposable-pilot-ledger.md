@@ -363,3 +363,67 @@ mechanical **78/100**:
 So: materially **supported** on character and disclosure, **incomplete** on
 durability, and **not improved** on external verification. Recorded as evidence,
 not converted into a score.
+
+---
+
+## Records carried forward (2026-09-23)
+
+### `MISSING IMPLEMENTATION` — outbound invitation delivery
+
+The product generates invitation links but sends no email. There is no mail
+provider, no SMTP configuration and no send call anywhere in the codebase;
+`createVoiceAlignmentRequest` inserts a row and returns a URL. Staff must
+deliver every link by hand, and the interface language of invitations being
+"sent" describes that manual delivery.
+
+Deliberately **not solved here.** Controlled links are sufficient to finish the
+disposable assessment, and introducing an email provider inside an integrity
+repair would be the wrong change at the wrong time.
+
+### Correction to an earlier claim in this ledger
+
+The relational diligence entry above recorded "no reference → diligence link" as
+a missing capability. That was wrong at the data layer:
+`diligence_engagements.linked_voice_alignment_request_id` exists and the API
+accepts `linkedVoiceAlignmentRequestId`. What is missing is only the
+reviewer-facing field, so in this pilot the connection was written into free
+text. Recorded as a UI gap, not an absent contract.
+
+### The scoring position, preserved deliberately
+
+The corrected mechanical score is **78/100**, and relational diligence surfaced
+material evidence that sits outside the scoring model entirely:
+
+- leadership character and disclosure are strongly corroborated;
+- fruit substance is independently corroborated even though the mechanical
+  method that scored it is weak;
+- the family-on-board concern is corroborated;
+- external verification remains weak;
+- succession and key-person risk were raised independently by four voices plus
+  SAVE's own Time With Leadership evidence;
+- **no scoring component represents organizational durability or key-person
+  risk.**
+
+No succession score has been added. The 78 is unchanged. The twelve narrative
+points are not recalibrated. This is held as evidence for the later rubric
+review rather than converted into a number now — the gap is the finding, and
+scoring it immediately would hide the fact that the model could not see it.
+
+### Proposed correction for the leaked pilot row
+
+Reported before any change and still unmodified:
+
+- **row** `56770ed7-a9bd-4031-914e-7a99e986e122`
+- kind `reference_conversation`, visibility `internal_only`, occurred 2026-09-19
+- **value** "SAVE shared a meal in a volunteer's home. The people this ministry
+  serves know its leader personally, and its volunteers speak for themselves."
+
+The value is demonstrably inherited: it is byte-identical to the `shared_meal`
+engagement's excerpt, it was never entered against this engagement, and it is
+the only internal-only row in the pilot carrying donor copy.
+
+**Smallest correction:** set `donor_excerpt` to null on that one row by id. No
+other column changes, no other row touched, and no migration — the code fix
+prevents recurrence, so this is a one-row cleanup of a value that should never
+have been written rather than a schema concern. Awaiting direction; the rest of
+the pilot evidence stays exactly as entered, imperfect internal answers included.
