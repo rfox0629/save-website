@@ -3,7 +3,10 @@ import "server-only";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 import { scoreDoctrine } from "@/lib/scoring/categories/doctrine";
-import { scoreExternal } from "@/lib/scoring/categories/external";
+import {
+  scoreExternal,
+  type ExternalCheckEvidence,
+} from "@/lib/scoring/categories/external";
 import { scoreFinancial } from "@/lib/scoring/categories/financial";
 import { scoreFruit } from "@/lib/scoring/categories/fruit";
 import { scoreGovernance } from "@/lib/scoring/categories/governance";
@@ -134,6 +137,7 @@ export async function runScoringEngine(
   const [
     { data: inquiry, error: inquiryError },
     { data: vetting, error: vettingError },
+    { data: externalChecks },
   ] = await Promise.all([
     supabase
       .from("inquiry_responses")
@@ -145,6 +149,12 @@ export async function runScoringEngine(
       .select("*")
       .eq("application_id", application_id)
       .maybeSingle(),
+    // Scoring reads SAVE's own checks so external credit follows the evidence
+    // rather than being assumed while verification is outstanding.
+    supabase
+      .from("external_checks")
+      .select("source, status")
+      .eq("application_id", application_id),
   ]);
 
   if (inquiryError) {
@@ -171,7 +181,10 @@ export async function runScoringEngine(
   const governance = scoreGovernance(normalizedVetting);
   const financial = scoreFinancial(normalizedVetting, normalizedInquiry);
   const fruit = scoreFruit(normalizedVetting);
-  const external = scoreExternal(normalizedVetting);
+  const external = scoreExternal(
+    normalizedVetting,
+    (externalChecks ?? []) as ExternalCheckEvidence[],
+  );
 
   const components = [
     ...leadership.components,

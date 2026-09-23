@@ -18,11 +18,12 @@ throughput and quality at the same time.
 
 ## Launch
 
-*Everything needed for a donor to find a ministry, trust the assessment, and
+_Everything needed for a donor to find a ministry, trust the assessment, and
 begin a relationship — and for SAVE to produce assessments at a defensible
-standard.*
+standard._
 
 **Foundation**
+
 - Design tokens and the component system — this is not optional groundwork, it
   is the reason the rest is affordable
 - Retire the dark internal theme; delete the `theme: "dark" | "light"` fork in
@@ -30,11 +31,13 @@ standard.*
 - Replace the placeholder root metadata
 
 **Public**
+
 - Ministry library with search and filters
 - Ministry profile: impact, assessment, leadership, testimonies, provenance
 - The standard explained
 
 **Donor Portal**
+
 - Home: relationship feed, position, advisor
 - Following and saved
 - Ministry detail
@@ -42,6 +45,7 @@ standard.*
 - Updates
 
 **Ministry Portal**
+
 - Overview with journey and next best action
 - Assessment, section at a time, saving continuously
 - Evidence with per-item status and reviewer notes
@@ -50,6 +54,7 @@ standard.*
 - Profile editing and testimonies
 
 **Staff Portal**
+
 - Application queue with stage, assignment, SLA
 - Reviewer workspace: evidence, scoring with audited overrides, findings,
   decision
@@ -64,7 +69,7 @@ none is required for the first trustworthy transaction.
 
 ## V2
 
-*Deepen the relationship once it exists.*
+_Deepen the relationship once it exists._
 
 - **Prayer** — requests, "I'm praying", answered-prayer threads. Held back only
   because it needs Launch's following graph to be meaningful.
@@ -82,7 +87,7 @@ none is required for the first trustworthy transaction.
 
 ## Future
 
-*Only worth building once volume justifies it.*
+_Only worth building once volume justifies it._
 
 - Multi-user ministry accounts with per-section delegation
 - Donor visits and introductions as a scheduled workflow
@@ -96,9 +101,9 @@ none is required for the first trustworthy transaction.
 
 ## Suggested build order
 
-1. Tokens + component system + shell *(unblocks everything)*
-2. Staff portal *(raises assessment throughput and quality)*
-3. Public library + ministry profile *(the front door)*
+1. Tokens + component system + shell _(unblocks everything)_
+2. Staff portal _(raises assessment throughput and quality)_
+3. Public library + ministry profile _(the front door)_
 4. Ministry portal: assessment, evidence, findings
 5. Donor portal: home, following, ministry detail
 6. Donor giving and statements
@@ -117,14 +122,14 @@ mirror the real domain — six assessment categories matching
 `lib/scoring/categories/`, four SAVE tiers matching `lib/save-tier.ts` — so
 adoption is a data-source swap per screen rather than a rewrite:
 
-| Screen | Real source |
-|---|---|
-| Library, ministry profile | `lib/donors.ts`, `lib/brief.ts` |
-| Donor detail | `lib/brief.ts`, `lib/voice-alignment.ts` |
-| Ministry assessment | `lib/inquiry.ts`, `lib/vetting.ts` |
-| Ministry evidence | `app/api/applications/[id]/documents/…` |
-| Staff queue and review | `lib/review.ts`, `lib/scoring/*` |
-| Publishing | `lib/brief.ts` |
+| Screen                    | Real source                              |
+| ------------------------- | ---------------------------------------- |
+| Library, ministry profile | `lib/donors.ts`, `lib/brief.ts`          |
+| Donor detail              | `lib/brief.ts`, `lib/voice-alignment.ts` |
+| Ministry assessment       | `lib/inquiry.ts`, `lib/vetting.ts`       |
+| Ministry evidence         | `app/api/applications/[id]/documents/…`  |
+| Staff queue and review    | `lib/review.ts`, `lib/scoring/*`         |
+| Publishing                | `lib/brief.ts`                           |
 
 Four things have no backing model yet and need one: **following**, **giving and
 statements**, **testimonies**, and **prayer**. Those are new tables, and they

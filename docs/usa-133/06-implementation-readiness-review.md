@@ -3,14 +3,14 @@
 This file records the Codex readiness pass requested after founder review of
 the design source branch.
 
-| | |
-|---|---|
-| Repository | `rfox0629/save-website` |
-| Local dispatcher worktree | `/Users/ryanfox/USAM-Worktrees/usa-133-codex-20260801130935` |
-| Clean integration branch | `ryan/usa-133-redesign-save-ministry-donor-and-staff-administration` |
-| Integration base | `origin/main` at `76f796b` |
-| Design source reviewed | `usa-133/save-standard-redesign` at `8b0c135` |
-| Source ancestry | `rescue/save-website-local-work-20260727` plus four USA-133 commits |
+|                           |                                                                      |
+| ------------------------- | -------------------------------------------------------------------- |
+| Repository                | `rfox0629/save-website`                                              |
+| Local dispatcher worktree | `/Users/ryanfox/USAM-Worktrees/usa-133-codex-20260801130935`         |
+| Clean integration branch  | `ryan/usa-133-redesign-save-ministry-donor-and-staff-administration` |
+| Integration base          | `origin/main` at `76f796b`                                           |
+| Design source reviewed    | `usa-133/save-standard-redesign` at `8b0c135`                        |
+| Source ancestry           | `rescue/save-website-local-work-20260727` plus four USA-133 commits  |
 
 ## Recommendation
 
@@ -37,28 +37,28 @@ Applied integration hardening:
 
 The approved source branch contains four USA-133 commits:
 
-| Commit | Scope |
-|---|---|
-| `3df1e8b` | SAVE design tokens, shared component system, public/donor/ministry preview surfaces |
+| Commit    | Scope                                                                                        |
+| --------- | -------------------------------------------------------------------------------------------- |
+| `3df1e8b` | SAVE design tokens, shared component system, public/donor/ministry preview surfaces          |
 | `6accdc2` | Staff preview surfaces, design-language reference, accessibility fixes, first screenshot set |
-| `d9abe2b` | Founder review documentation package |
-| `8b0c135` | Screenshot index and responsive screenshot recaptures |
+| `d9abe2b` | Founder review documentation package                                                         |
+| `8b0c135` | Screenshot index and responsive screenshot recaptures                                        |
 
 Files inherited from `rescue/save-website-local-work-20260727` and excluded
 from this clean integration:
 
-| File | Rescue change | Readiness decision |
-|---|---|---|
-| `.github/CODEOWNERS` | Deleted relative to current `main` | Exclude; preserve current CODEOWNERS |
-| `.github/workflows/ci.yml` | Deleted relative to current `main` | Exclude; preserve CI |
-| `docs/ci-baseline.md` | Deleted relative to current `main` | Exclude; preserve CI documentation |
-| `package.json` | Removed `typecheck` script | Exclude; preserve current script |
-| `ChatGPT Image Apr 24, 2026, 02_20_19 PM.png` | Added root image asset | Exclude; unrelated to USA-133 prototype |
-| `ChatGPT Image Apr 24, 2026, 11_06_23 AM.png` | Added root image asset | Exclude; unrelated to USA-133 prototype |
-| `app/favicon.ico` | Added favicon | Exclude; unrelated to USA-133 readiness |
-| `public/wheat.svg` | Added wheat artwork | Exclude; unrelated to USA-133 readiness |
-| `docs/save-website-summary.md` | Added broad repo summary | Exclude; unrelated to USA-133 readiness |
-| `error.log` | Added local runtime/session log in USA-133 source commit | Exclude; generated output, not design work |
+| File                                          | Rescue change                                            | Readiness decision                         |
+| --------------------------------------------- | -------------------------------------------------------- | ------------------------------------------ |
+| `.github/CODEOWNERS`                          | Deleted relative to current `main`                       | Exclude; preserve current CODEOWNERS       |
+| `.github/workflows/ci.yml`                    | Deleted relative to current `main`                       | Exclude; preserve CI                       |
+| `docs/ci-baseline.md`                         | Deleted relative to current `main`                       | Exclude; preserve CI documentation         |
+| `package.json`                                | Removed `typecheck` script                               | Exclude; preserve current script           |
+| `ChatGPT Image Apr 24, 2026, 02_20_19 PM.png` | Added root image asset                                   | Exclude; unrelated to USA-133 prototype    |
+| `ChatGPT Image Apr 24, 2026, 11_06_23 AM.png` | Added root image asset                                   | Exclude; unrelated to USA-133 prototype    |
+| `app/favicon.ico`                             | Added favicon                                            | Exclude; unrelated to USA-133 readiness    |
+| `public/wheat.svg`                            | Added wheat artwork                                      | Exclude; unrelated to USA-133 readiness    |
+| `docs/save-website-summary.md`                | Added broad repo summary                                 | Exclude; unrelated to USA-133 readiness    |
+| `error.log`                                   | Added local runtime/session log in USA-133 source commit | Exclude; generated output, not design work |
 
 ## Verified deliverables
 
@@ -79,11 +79,11 @@ ministry, staff, and system views needed for a coherent walkthrough.
 
 ## Shared-change review
 
-| File | Change | Regression assessment |
-|---|---|---|
-| `app/globals.css` | Adds `@import "./save-design.css";` | Low risk. The design CSS defines global custom properties but applies typography/background behavior through `.save-root`, which is used by the preview layout. |
-| `tailwind.config.ts` | Adds SAVE color/type/spacing/radius/elevation scales | Moderate risk because it changes shared Tailwind theme values. This integration retains shadcn `sidebar` and `chart` aliases to avoid narrowing current compatibility. Build/lint must stay green before merge. |
-| `lib/utils.ts` | Replaces stock `twMerge` with `extendTailwindMerge` for SAVE custom classes | Low to moderate risk. This fixes a real contrast defect where custom `text-*` size/color classes were merged incorrectly. Existing `cn()` call sites still use the same public API. |
+| File                 | Change                                                                      | Regression assessment                                                                                                                                                                                           |
+| -------------------- | --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/globals.css`    | Adds `@import "./save-design.css";`                                         | Low risk. The design CSS defines global custom properties but applies typography/background behavior through `.save-root`, which is used by the preview layout.                                                 |
+| `tailwind.config.ts` | Adds SAVE color/type/spacing/radius/elevation scales                        | Moderate risk because it changes shared Tailwind theme values. This integration retains shadcn `sidebar` and `chart` aliases to avoid narrowing current compatibility. Build/lint must stay green before merge. |
+| `lib/utils.ts`       | Replaces stock `twMerge` with `extendTailwindMerge` for SAVE custom classes | Low to moderate risk. This fixes a real contrast defect where custom `text-*` size/color classes were merged incorrectly. Existing `cn()` call sites still use the same public API.                             |
 
 ## Environment hygiene
 
@@ -99,23 +99,23 @@ the preview package renders without credentials or production secrets.
 
 ## Capability map
 
-| Designed capability | Existing frontend/backend capability | Frontend-only work needed | Missing schema/backend capability | Founder/security decision |
-|---|---|---|---|---|
-| Public approved-ministry library | Published donor briefs via `donor_briefs`, `lib/donors.ts`, `/donors`, `/brief/[slug]` | Reframe as ministry library and apply SAVE design system | Rich profile fields, explicit library visibility may need columns | Confirm public vs donor-gated assessment details |
-| Public ministry profile | Published brief rendering, scores, risk flags, voice alignment | New relationship-first profile layout and website handoff | Profile media/story fields if not stored in briefs | Confirm what sensitive findings stay private |
-| Donor dashboard | Auth role routing and current donor comparison/dashboard | Replace comparison-first dashboard with followed-ministry home | Following graph, unread/update feed | Confirm donor access model remains invitation/approval based |
-| Donor ministry detail | Public brief data can seed assessment/trust sections | Build private donor detail around followed ministry | Reports/testimonies/giving history by ministry | Confirm donor-visible provenance labels |
-| Donor giving and annual statements | No direct giving/statement route or table | Prototype can be implemented as static/empty state first | Gifts, commitments, statements, provenance/reconciliation tables | Launch records gifts only; no SAVE payment processing initially |
-| Donor follows/selects ministries | No follow table or saved list | UI can show call-to-action and empty states | Donor-ministry following table and permissions | Confirm whether staff can view individual follow relationships |
-| Ministry overview/status | Applications, organizations, status, profile role org id | New light dashboard/shell | More granular journey/stage fields if current statuses are insufficient | Confirm stage names and approval language |
-| Ministry assessment/evidence | Inquiry/vetting forms, documents endpoint/status API | Redesign existing forms into sectioned workspace | Evidence request/reviewer-note state may need normalization | Confirm ministry multi-user roles |
-| Ministry findings and roadmap | Scores, score components, risk flags, reviewer notes | Read-only findings view can be built from existing review data | Roadmap items, owners, verification state | Confirm whether ministries keep findings after pause/decline |
-| Ministry reports/testimonies | No first-class tables/routes found | Frontend shells and submission forms | Reports, testimonies, consent, staff moderation | Confirm testimony consent/review policy |
-| Staff queue/review | `/dashboard`, `/applications/[id]`, `lib/review.ts`, scores, reviewer notes | Redesign and consolidate current dark staff surfaces | SLA/reviewer workload fields if required | Confirm assessor portfolio visibility |
-| Staff publishing controls | Donor brief `published` flag and brief editor | Make publishing gates explicit | Separate donor-library visibility/profile-readiness state may be needed | Confirm publish/unpublish reversibility and donor notice |
-| Staff donor visibility | Donor requests table/actions exist | Redesign donor request/visibility management | Donor follow/giving aggregates require new models | Confirm staff privacy boundary for donor activity |
-| Audit/activity history | Some timestamps and notes exist | Basic UI can show current events | Dedicated audit log for decisions/visibility/moderation | Confirm required audit retention and roles |
-| Restricted leader-health treatment | Leadership scoring/voice alignment data exists | Stronger visual privacy treatment in staff UI | Dedicated leader-health records and access policy | Founder/security must define authorized viewers before real data |
+| Designed capability                | Existing frontend/backend capability                                                   | Frontend-only work needed                                      | Missing schema/backend capability                                       | Founder/security decision                                        |
+| ---------------------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Public approved-ministry library   | Published donor briefs via `donor_briefs`, `lib/donors.ts`, `/donors`, `/brief/[slug]` | Reframe as ministry library and apply SAVE design system       | Rich profile fields, explicit library visibility may need columns       | Confirm public vs donor-gated assessment details                 |
+| Public ministry profile            | Published brief rendering, scores, risk flags, voice alignment                         | New relationship-first profile layout and website handoff      | Profile media/story fields if not stored in briefs                      | Confirm what sensitive findings stay private                     |
+| Donor dashboard                    | Auth role routing and current donor comparison/dashboard                               | Replace comparison-first dashboard with followed-ministry home | Following graph, unread/update feed                                     | Confirm donor access model remains invitation/approval based     |
+| Donor ministry detail              | Public brief data can seed assessment/trust sections                                   | Build private donor detail around followed ministry            | Reports/testimonies/giving history by ministry                          | Confirm donor-visible provenance labels                          |
+| Donor giving and annual statements | No direct giving/statement route or table                                              | Prototype can be implemented as static/empty state first       | Gifts, commitments, statements, provenance/reconciliation tables        | Launch records gifts only; no SAVE payment processing initially  |
+| Donor follows/selects ministries   | No follow table or saved list                                                          | UI can show call-to-action and empty states                    | Donor-ministry following table and permissions                          | Confirm whether staff can view individual follow relationships   |
+| Ministry overview/status           | Applications, organizations, status, profile role org id                               | New light dashboard/shell                                      | More granular journey/stage fields if current statuses are insufficient | Confirm stage names and approval language                        |
+| Ministry assessment/evidence       | Inquiry/vetting forms, documents endpoint/status API                                   | Redesign existing forms into sectioned workspace               | Evidence request/reviewer-note state may need normalization             | Confirm ministry multi-user roles                                |
+| Ministry findings and roadmap      | Scores, score components, risk flags, reviewer notes                                   | Read-only findings view can be built from existing review data | Roadmap items, owners, verification state                               | Confirm whether ministries keep findings after pause/decline     |
+| Ministry reports/testimonies       | No first-class tables/routes found                                                     | Frontend shells and submission forms                           | Reports, testimonies, consent, staff moderation                         | Confirm testimony consent/review policy                          |
+| Staff queue/review                 | `/dashboard`, `/applications/[id]`, `lib/review.ts`, scores, reviewer notes            | Redesign and consolidate current dark staff surfaces           | SLA/reviewer workload fields if required                                | Confirm assessor portfolio visibility                            |
+| Staff publishing controls          | Donor brief `published` flag and brief editor                                          | Make publishing gates explicit                                 | Separate donor-library visibility/profile-readiness state may be needed | Confirm publish/unpublish reversibility and donor notice         |
+| Staff donor visibility             | Donor requests table/actions exist                                                     | Redesign donor request/visibility management                   | Donor follow/giving aggregates require new models                       | Confirm staff privacy boundary for donor activity                |
+| Audit/activity history             | Some timestamps and notes exist                                                        | Basic UI can show current events                               | Dedicated audit log for decisions/visibility/moderation                 | Confirm required audit retention and roles                       |
+| Restricted leader-health treatment | Leadership scoring/voice alignment data exists                                         | Stronger visual privacy treatment in staff UI                  | Dedicated leader-health records and access policy                       | Founder/security must define authorized viewers before real data |
 
 ## Launch sequence
 
@@ -136,15 +136,15 @@ the preview package renders without credentials or production secrets.
 
 Validation run on 2026-08-01 in the isolated dispatcher worktree:
 
-| Check | Result |
-|---|---|
+| Check                                           | Result                                                                                                                                                                                                |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `npm ci --cache /private/tmp/usa-133-npm-cache` | Passed. The first `npm ci` attempt failed because the dispatcher npm cache at `/Users/ryanfox/.usam-dispatcher/tmp/npm-cache` contains root-owned files; rerunning with a writable temp cache passed. |
-| `npm run typecheck` | Passed. |
-| `npm run lint` | Passed with no warnings or errors. |
-| `npm run build` | Passed; Next.js generated 61 static pages. |
-| `git diff --check` | Passed. |
-| Screenshot inventory | Passed; 25 non-empty PNGs in `docs/usa-133/screenshots/`, all readable as PNG images. |
-| Preview route check | Passed with preview-safe local env placeholders; 36 concrete preview URLs returned HTTP 200. |
+| `npm run typecheck`                             | Passed.                                                                                                                                                                                               |
+| `npm run lint`                                  | Passed with no warnings or errors.                                                                                                                                                                    |
+| `npm run build`                                 | Passed; Next.js generated 61 static pages.                                                                                                                                                            |
+| `git diff --check`                              | Passed.                                                                                                                                                                                               |
+| Screenshot inventory                            | Passed; 25 non-empty PNGs in `docs/usa-133/screenshots/`, all readable as PNG images.                                                                                                                 |
+| Preview route check                             | Passed with preview-safe local env placeholders; 36 concrete preview URLs returned HTTP 200.                                                                                                          |
 
 Route-check command used:
 
