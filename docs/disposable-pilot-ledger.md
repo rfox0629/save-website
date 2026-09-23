@@ -75,3 +75,31 @@ item for the reference stage.
 `package.json` defines `test: vitest run`, but `.github/workflows/ci.yml` runs
 only Lint, Typecheck and Build. No test step exists, so the regression coverage
 added in #19–#25 runs nowhere on merge. Raised rather than folded into #25.
+
+---
+
+## Scoring baseline — submitted pilot (2026-09-23)
+
+The submitted disposable pilot is the fixed reference point for any future
+scoring change. Recorded here so a later recalibration can be measured against
+a known result rather than a remembered one.
+
+| Category | Score |
+| --- | --- |
+| **Total** | **83 / 100** |
+| Leadership | 20 |
+| Doctrine | 15 |
+| Fruit | 16 |
+| Governance | 13 |
+| Financial | 12 |
+| External trust | 7 |
+
+- Hard stop: **none**
+- Medium risk flags: `family_on_board`, `recent_deficit`
+- `references`: **3 / 3** (S1, [#25](https://github.com/rfox0629/save-website/pull/25))
+- `staff_doctrinal_affirmation`: **3 / 3** (P1, [#24](https://github.com/rfox0629/save-website/pull/24))
+
+**Do not recalibrate against this yet.** Scoring weights, the fruit
+length/keyword rules, and Findings A, A2 and B remain untouched by founder
+direction. This record exists so that when they are revisited, the change in
+output is visible rather than inferred.
