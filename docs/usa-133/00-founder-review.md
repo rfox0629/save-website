@@ -2,16 +2,16 @@
 
 **Founder review package**
 
-| | |
-|---|---|
-| **Clean integration branch** | `ryan/usa-133-redesign-save-ministry-donor-and-staff-administration` |
-| **Design source branch** | `usa-133/save-standard-redesign` at `8b0c135` |
-| **Integration base** | `origin/main` at `76f796b` |
-| **Repository** | `rfox0629/save-website` |
-| **Source commits reviewed** | `3df1e8b`, `6accdc2`, `d9abe2b`, `8b0c135` |
-| **Preview** | `npm run dev` → **http://localhost:3000/preview** |
-| **Screenshots** | `docs/usa-133/screenshots/` (25 images) |
-| **Status** | Typecheck clean · ESLint clean · production build passes · 36 preview URLs return 200 with preview-safe Supabase env placeholders |
+|                              |                                                                                                                                   |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| **Clean integration branch** | `ryan/usa-133-redesign-save-ministry-donor-and-staff-administration`                                                              |
+| **Design source branch**     | `usa-133/save-standard-redesign` at `8b0c135`                                                                                     |
+| **Integration base**         | `origin/main` at `76f796b`                                                                                                        |
+| **Repository**               | `rfox0629/save-website`                                                                                                           |
+| **Source commits reviewed**  | `3df1e8b`, `6accdc2`, `d9abe2b`, `8b0c135`                                                                                        |
+| **Preview**                  | `npm run dev` → **http://localhost:3000/preview**                                                                                 |
+| **Screenshots**              | `docs/usa-133/screenshots/` (25 images)                                                                                           |
+| **Status**                   | Typecheck clean · ESLint clean · production build passes · 36 preview URLs return 200 with preview-safe Supabase env placeholders |
 
 No production deploy has been created and nothing has been merged.
 
@@ -25,12 +25,12 @@ Integration-readiness details are captured in
 **17 high-fidelity screens**, all working code in the repository, all rendering
 from one design language and one component system.
 
-| Surface | Screens |
-|---|---|
-| Public | Ministry library · Ministry profile |
-| Donor Portal | Home · Following · Giving & annual statements · Ministry detail · Updates · Prayer |
-| Ministry Portal | Overview · Assessment workflow · Evidence · Findings · Roadmap · Profile editing · Testimonies · Donor updates · Reports |
-| Staff Portal | Application queue · Reviewer workspace · Publishing · Ministry portfolio · Leader health · Donor visibility · Audit history |
+| Surface         | Screens                                                                                                                     |
+| --------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Public          | Ministry library · Ministry profile                                                                                         |
+| Donor Portal    | Home · Following · Giving & annual statements · Ministry detail · Updates · Prayer                                          |
+| Ministry Portal | Overview · Assessment workflow · Evidence · Findings · Roadmap · Profile editing · Testimonies · Donor updates · Reports    |
+| Staff Portal    | Application queue · Reviewer workspace · Publishing · Ministry portfolio · Leader health · Donor visibility · Audit history |
 
 Plus `/preview` (index) and `/preview/system` (the design language, rendered
 from live tokens).
@@ -67,7 +67,7 @@ Two findings are worth pulling out because they are product gaps, not styling:
 ## Design rationale
 
 **Mission first.** SAVE exists so affluent donors find ministries they can
-trust. The interface therefore has one job: *make trust legible.* Every
+trust. The interface therefore has one job: _make trust legible._ Every
 decision below serves that.
 
 **Warm paper, not cold gray.** The signature decision. Every neutral carries
@@ -88,8 +88,8 @@ undermine it.
 donor, `AssessmentProvenance` appears near it: who assessed, when, when
 reassessment is due, and "no ministry pays SAVE for a recommendation."
 
-**Relationship, not marketplace.** The donor portal leads with *what has
-happened* — a feed of updates from ministries they follow — not with a grid of
+**Relationship, not marketplace.** The donor portal leads with _what has
+happened_ — a feed of updates from ministries they follow — not with a grid of
 options. The advisor is a person with a name and a tenure, not a support
 ticket. Prayer has its own destination. Comparison tooling was deliberately
 removed from navigation and demoted to an action.
@@ -167,13 +167,13 @@ Two things to be aware of:
 
 **1. The tier names.** `High Confidence Opportunity`, `Strong Opportunity`,
 `Proceed with Discernment`, `Not Recommended` are investment-committee
-language, as is the copy in `donor-home.tsx`: *"Suitable for meaningful capital
-investment"*, *"Not suited for capital deployment now."* You asked for this not
+language, as is the copy in `donor-home.tsx`: _"Suitable for meaningful capital
+investment"_, _"Not suited for capital deployment now."_ You asked for this not
 to feel transactional. I kept your tier names because they are your product
 vocabulary and renaming them unilaterally would be the wrong call — but I
 think they work against the mission. A relationship-first alternative:
-*Ready for partnership · Strong and worth knowing · Worth a conversation ·
-Not ready.* **Your call.**
+_Ready for partnership · Strong and worth knowing · Worth a conversation ·
+Not ready._ **Your call.**
 
 **2. What donor access actually gates.** I designed it as personally granted,
 never purchased, with an approval queue in the staff portal — because that

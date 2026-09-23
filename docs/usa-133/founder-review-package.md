@@ -51,7 +51,7 @@ One token set, `app/save-design.css`, shared by every surface:
   application chrome.
 - **Paper** (warm neutral, `--save-paper-*`) — the signature light surface. No pure white, no cold
   gray; every neutral carries warmth to match the public site's editorial feel.
-- **Brass** (`--save-brass-*`) — reserved *exclusively* for verification/trust signals (the
+- **Brass** (`--save-brass-*`) — reserved _exclusively_ for verification/trust signals (the
   `TrustSeal` component, assessment completion). Because it is never used decoratively, it stays
   meaningful.
 - **Sage / Clay / Rose** — status colors (healthy/on-track, needs attention, risk/declined) used
@@ -91,23 +91,23 @@ so they read as an extension of the marketing site rather than a portal.
 
 ## 4. Role and visibility matrix
 
-| Area | Ministry user | Donor | Assessor | SAVE staff/admin |
-|---|---|---|---|---|
-| Own application & assessment status | Read/write (own org) | — | Read (assigned) | Read/write (all) |
-| Evidence upload | Write (own org) | — | Read, comment | Read/write |
-| Findings & recommendations | Read (own org) | — | Write (assigned) | Read/write, reassign |
-| Roadmap / implementation progress | Read/write (own org) | — | Read | Read/write |
-| Public profile content (draft) | Write (own org) | — | — | Approve before publish |
-| Donor-library visibility toggle | — | — | — | Write only |
-| Ministry library / public profiles | — (sees own as donor would after publish) | Read (published only) | — | Read/write (incl. unpublished) |
-| Follow/select ministries | — | Write (own list) | — | Read (aggregate) |
-| Reports & testimonies (submit) | Write (own org) | — | — | Review/approve before donor visibility |
-| Reports & testimonies (view) | Own org | Read (followed ministries, post-approval only) | — | Read/write, moderate |
-| Giving history — SAVE-processed | — | Read (own) | — | Read (aggregate, no PII beyond need) |
-| Giving history — ministry-confirmed / donor-reported | Ministry sees own-org totals | Write (own entries) | — | Read (aggregate) |
-| Annual consolidated statement | — | Read (own) | — | Read (for support) |
-| Leader-health records | Restricted (self, if applicable) | **No access** | **No access** | Restricted: senior staff only, distinct visual treatment |
-| Audit/activity history | Own-org actions only | — | Own actions | Full (role-scoped by seniority) |
+| Area                                                 | Ministry user                             | Donor                                          | Assessor         | SAVE staff/admin                                         |
+| ---------------------------------------------------- | ----------------------------------------- | ---------------------------------------------- | ---------------- | -------------------------------------------------------- |
+| Own application & assessment status                  | Read/write (own org)                      | —                                              | Read (assigned)  | Read/write (all)                                         |
+| Evidence upload                                      | Write (own org)                           | —                                              | Read, comment    | Read/write                                               |
+| Findings & recommendations                           | Read (own org)                            | —                                              | Write (assigned) | Read/write, reassign                                     |
+| Roadmap / implementation progress                    | Read/write (own org)                      | —                                              | Read             | Read/write                                               |
+| Public profile content (draft)                       | Write (own org)                           | —                                              | —                | Approve before publish                                   |
+| Donor-library visibility toggle                      | —                                         | —                                              | —                | Write only                                               |
+| Ministry library / public profiles                   | — (sees own as donor would after publish) | Read (published only)                          | —                | Read/write (incl. unpublished)                           |
+| Follow/select ministries                             | —                                         | Write (own list)                               | —                | Read (aggregate)                                         |
+| Reports & testimonies (submit)                       | Write (own org)                           | —                                              | —                | Review/approve before donor visibility                   |
+| Reports & testimonies (view)                         | Own org                                   | Read (followed ministries, post-approval only) | —                | Read/write, moderate                                     |
+| Giving history — SAVE-processed                      | —                                         | Read (own)                                     | —                | Read (aggregate, no PII beyond need)                     |
+| Giving history — ministry-confirmed / donor-reported | Ministry sees own-org totals              | Write (own entries)                            | —                | Read (aggregate)                                         |
+| Annual consolidated statement                        | —                                         | Read (own)                                     | —                | Read (for support)                                       |
+| Leader-health records                                | Restricted (self, if applicable)          | **No access**                                  | **No access**    | Restricted: senior staff only, distinct visual treatment |
+| Audit/activity history                               | Own-org actions only                      | —                                              | Own actions      | Full (role-scoped by seniority)                          |
 
 Open question folded into §9: exact assessor visibility into cross-ministry findings (single-ministry
 scoped vs. portfolio-wide) — flagged there rather than assumed.
@@ -115,6 +115,7 @@ scoped vs. portfolio-wide) — flagged there rather than assumed.
 ## 5. End-to-end key workflows
 
 **A. Ministry applies → assessment → approval → donor visibility**
+
 1. Ministry submits application (ministry portal, pre-assessment state of Overview).
 2. SAVE staff triage into queue (`/preview/staff`), assign an assessor.
 3. Ministry completes evidence collection against the six assessment categories
@@ -129,6 +130,7 @@ scoped vs. portfolio-wide) — flagged there rather than assumed.
 7. Ministry becomes visible in `/preview/library` with a public profile.
 
 **B. Donor discovers → follows → receives reports/tracks support**
+
 1. Donor browses `/preview/library` (search/filter, non-transactional card design) or opens a
    profile directly (`/preview/ministry-profile/[slug]`).
 2. Donor follows/selects a ministry; it appears in `/preview/donor/following` and on
@@ -141,6 +143,7 @@ scoped vs. portfolio-wide) — flagged there rather than assumed.
    patterns in `components/save/patterns.tsx`) and rolls up into an annual statement.
 
 **C. Staff reviews ministry → requests changes → approves → publishes**
+
 1. Application lands in `/preview/staff` queue; staff assigns a reviewer.
 2. Reviewer works evidence/findings in `/preview/staff/review`; can return items to the ministry for
    more evidence (loop back into workflow A step 3) rather than only binary approve/decline.
@@ -191,6 +194,7 @@ their own competing token set.
 ## 8. MVP recommendation
 
 **Launch first (v1):**
+
 - Public ministry library + profile (donor trust entry point; no login required)
 - Staff: queue, review, publishing/visibility control (this is the gate everything else depends on)
 - Ministry: overview/status, assessment, evidence, findings, roadmap (the assessment journey is
@@ -200,6 +204,7 @@ their own competing token set.
   required)
 
 **Defer to v2:**
+
 - SAVE-processed gift integration (payments) and consolidated annual statements — genuinely new
   integration surface, not just UI
 - Leader-health restricted module — needs a real privacy/access-control design pass, not just a
@@ -237,5 +242,5 @@ the prototype:
 
 ---
 
-*No Supabase, auth, tenancy, RLS, payments, or production-data changes were made in producing this
-package. Everything above is either documentation or static-fixture UI under `app/(preview)/`.*
+_No Supabase, auth, tenancy, RLS, payments, or production-data changes were made in producing this
+package. Everything above is either documentation or static-fixture UI under `app/(preview)/`._

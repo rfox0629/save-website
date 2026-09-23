@@ -1,19 +1,70 @@
 import type { NormalizedVetting } from "@/lib/scoring/types";
 import { createComponent, type CategoryScoreResult } from "@/lib/scoring/types";
 
+/** What the assessment pipeline recorded for an external source. */
+export type ExternalCheckEvidence = {
+  source: string;
+  status: string | null;
+};
+
+/**
+ * IRS standing, read from SAVE's own check rather than assumed.
+ *
+ * This used to be a flat two points described as "default credit pending
+ * analyst review". It awarded full marks to every ministry, including one whose
+ * IRS check had flagged its EIN as not found — SAVE's score contradicting SAVE's
+ * evidence. Credit now requires a check that actually passed.
+ */
+export function scoreIrsVerification(checks: ExternalCheckEvidence[]): {
+  points: number;
+  rationale: string;
+} {
+  const check = checks.find((entry) => entry.source === "irs_teos");
+
+  if (!check || check.status === "pending" || check.status === null) {
+    return {
+      points: 0,
+      rationale: "IRS verification has not been established yet.",
+    };
+  }
+
+  if (check.status === "pass") {
+    return {
+      points: 2,
+      rationale: "IRS verification returned a clean result.",
+    };
+  }
+
+  if (check.status === "flag" || check.status === "fail") {
+    return {
+      points: 0,
+      rationale:
+        "IRS verification returned adverse evidence, so no credit is given.",
+    };
+  }
+
+  return {
+    points: 0,
+    rationale: `IRS verification was recorded as ${check.status}, which does not establish clean standing.`,
+  };
+}
+
 function countValidReferences(references: NormalizedVetting["references"]) {
   return references.filter((reference) =>
     Boolean(reference.name?.trim() && reference.email?.trim()),
   ).length;
 }
 
-export function scoreExternal(vetting: NormalizedVetting): CategoryScoreResult {
+export function scoreExternal(
+  vetting: NormalizedVetting,
+  externalChecks: ExternalCheckEvidence[] = [],
+): CategoryScoreResult {
   const ecfaScore = vetting.ecfa_member ? (vetting.ecfa_lapsed ? 1 : 4) : 0;
   const validReferences = countValidReferences(vetting.references);
   const referenceScore =
     validReferences >= 3 ? 3 : validReferences >= 2 ? 2 : validReferences;
   const pressScore = vetting.negative_press ? 0 : 1;
-  const irsCleanScore = 2;
+  const irs = scoreIrsVerification(externalChecks);
 
   const components = [
     createComponent(
@@ -43,13 +94,7 @@ export function scoreExternal(vetting: NormalizedVetting): CategoryScoreResult {
         ? "Negative press was disclosed."
         : "No negative press was disclosed.",
     ),
-    createComponent(
-      "external",
-      "irs_clean",
-      irsCleanScore,
-      2,
-      "Default IRS/external-check credit applied pending analyst review.",
-    ),
+    createComponent("external", "irs_clean", irs.points, 2, irs.rationale),
   ];
 
   return {

@@ -146,17 +146,17 @@ strip costs a little horizontal space and preserves the whole IA.
 Nothing is deleted. The redesign is additive under `/preview` so the running
 product is untouched. When the redesign is adopted, the mapping is:
 
-| Today | Becomes |
-|---|---|
-| `/donors` | `/donor` (dashboard) |
-| `/donors/[slug]` | `/ministry/[slug]` public, `/donor/ministry/[slug]` signed in |
-| `/donors/compare` | An action inside `/donor/following` |
-| `/brief/[slug]` | Redirect to `/ministry/[slug]` |
-| `/portal` | `/ministry` |
-| `/portal/inquiry` + `/portal/application` | `/ministry/assessment` |
-| `/portal/documents` | `/ministry/evidence` |
-| `/dashboard` | `/staff` |
-| `/applications/[id]` | `/staff/review` |
-| `/applications/[id]/brief` | `/staff/publishing` |
-| `/applications/compare` | An action inside `/staff` |
-| `/map` | Retired — the navigation replaces it |
+| Today                                     | Becomes                                                       |
+| ----------------------------------------- | ------------------------------------------------------------- |
+| `/donors`                                 | `/donor` (dashboard)                                          |
+| `/donors/[slug]`                          | `/ministry/[slug]` public, `/donor/ministry/[slug]` signed in |
+| `/donors/compare`                         | An action inside `/donor/following`                           |
+| `/brief/[slug]`                           | Redirect to `/ministry/[slug]`                                |
+| `/portal`                                 | `/ministry`                                                   |
+| `/portal/inquiry` + `/portal/application` | `/ministry/assessment`                                        |
+| `/portal/documents`                       | `/ministry/evidence`                                          |
+| `/dashboard`                              | `/staff`                                                      |
+| `/applications/[id]`                      | `/staff/review`                                               |
+| `/applications/[id]/brief`                | `/staff/publishing`                                           |
+| `/applications/compare`                   | An action inside `/staff`                                     |
+| `/map`                                    | Retired — the navigation replaces it                          |
