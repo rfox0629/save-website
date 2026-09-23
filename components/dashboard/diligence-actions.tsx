@@ -101,14 +101,48 @@ export function RecordEngagementForm({
   const [orgHealthConfidence, setOrgHealthConfidence] = useState("");
   const [strengths, setStrengths] = useState("");
   const [concerns, setConcerns] = useState("");
+  const [followUps, setFollowUps] = useState("");
   const [status, setStatus] = useState<string>("completed");
   const [visibility, setVisibility] = useState<string>("internal_only");
   const [donorExcerpt, setDonorExcerpt] = useState("");
   const [privateNotes, setPrivateNotes] = useState("");
 
+  // Every field is cleared when the form opens and after a successful save.
+  // Without this, one engagement's values carry into the next — and a donor
+  // excerpt does so invisibly, because the field is hidden while visibility is
+  // internal-only.
+  const resetForm = () => {
+    setKind("onsite_visit");
+    setOccurredOn("");
+    setLocation("");
+    setSaveParticipants("");
+    setMinistryParticipants("");
+    setNarrative("");
+    setLeadershipCharacter("");
+    setCharacterConfidence("");
+    setCulture("");
+    setCultureConfidence("");
+    setOrgHealth("");
+    setOrgHealthConfidence("");
+    setStrengths("");
+    setConcerns("");
+    setFollowUps("");
+    setStatus("completed");
+    setVisibility("internal_only");
+    setDonorExcerpt("");
+    setPrivateNotes("");
+  };
+
   if (!open) {
     return (
-      <Btn onClick={() => setOpen(true)} size="sm" variant="secondary">
+      <Btn
+        onClick={() => {
+          resetForm();
+          setOpen(true);
+        }}
+        size="sm"
+        variant="secondary"
+      >
         Record an engagement
       </Btn>
     );
@@ -244,6 +278,17 @@ export function RecordEngagementForm({
       </div>
 
       <Field
+        help="One per line. Concrete work arising from this engagement."
+        label="Follow-up items"
+      >
+        <Textarea
+          onChange={(event) => setFollowUps(event.target.value)}
+          rows={3}
+          value={followUps}
+        />
+      </Field>
+
+      <Field
         help="Internal by default. Marking it shareable does not publish it — it only allows a crafted excerpt to be used."
         label="Visibility"
       >
@@ -296,7 +341,11 @@ export function RecordEngagementForm({
                   concerns: toLines(concerns),
                   cultureConfidence: cultureConfidence || undefined,
                   cultureObservations: culture,
-                  donorExcerpt,
+                  donorExcerpt:
+                    visibility === "summary_shareable"
+                      ? donorExcerpt
+                      : undefined,
+                  followUps: toLines(followUps),
                   kind,
                   leadershipCharacterObservations: leadershipCharacter,
                   location,
@@ -313,13 +362,23 @@ export function RecordEngagementForm({
                 }),
               "Unable to record the engagement.",
             );
-            if (ok) setOpen(false);
+            if (ok) {
+              resetForm();
+              setOpen(false);
+            }
           }}
           size="sm"
         >
           {pending ? "Saving…" : "Save engagement"}
         </Btn>
-        <Btn onClick={() => setOpen(false)} size="sm" variant="ghost">
+        <Btn
+          onClick={() => {
+            resetForm();
+            setOpen(false);
+          }}
+          size="sm"
+          variant="ghost"
+        >
           Cancel
         </Btn>
       </div>
