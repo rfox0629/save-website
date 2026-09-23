@@ -36,8 +36,18 @@ export const INQUIRY_ACTION_TARGET: Record<InquiryAction, string> = {
   request_more_info: "more_info_requested",
 };
 
-/** The event recorded for each action, for the append-only history. */
-export const INQUIRY_ACTION_EVENT: Record<InquiryAction, string> = {
+/**
+ * The event recorded for each action, for the append-only history. The four
+ * values are the ones `inquiry_events.kind` accepts, so the type says so rather
+ * than leaving it to a database constraint to reject at runtime.
+ */
+export type InquiryEventKind =
+  | "approved"
+  | "more_info_requested"
+  | "rejected"
+  | "submitted";
+
+export const INQUIRY_ACTION_EVENT: Record<InquiryAction, InquiryEventKind> = {
   approve: "approved",
   decline: "rejected",
   request_more_info: "more_info_requested",
@@ -89,7 +99,7 @@ export type InquiryActionInput = {
 };
 
 export type InquiryActionPlan = {
-  eventKind: string;
+  eventKind: InquiryEventKind;
   ministryMessage: string | null;
   staffNote: string | null;
   status: string;

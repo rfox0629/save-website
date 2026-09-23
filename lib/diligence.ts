@@ -220,8 +220,7 @@ export async function createDiligenceEngagement(
 ) {
   const { user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
 
   const { data: application } = await admin
     .from("applications")
@@ -258,8 +257,7 @@ export async function updateDiligenceEngagement(
 ) {
   await requireReviewerMutationAccess();
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
 
   const { data: existing } = await admin
     .from("diligence_engagements")
@@ -318,8 +316,7 @@ export async function setRelationalDiligenceException(
 
   const trimmed = optionalText(reason);
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
 
   const { error } = await db
     .from("applications")

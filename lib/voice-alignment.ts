@@ -594,8 +594,7 @@ export async function generateVoiceAlignmentSummary(
   await requireReviewerMutationAccess();
 
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
   const { application, externalResponses, internalResponses } =
     await loadVoiceAlignmentGenerationData(applicationId);
 

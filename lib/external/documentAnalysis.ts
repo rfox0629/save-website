@@ -113,8 +113,7 @@ async function analyzeSingleDocument(
   >;
   const { status, summary } = getStatusFromAnalysis(parsed);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
   await db
     .from("external_checks")
     .delete()

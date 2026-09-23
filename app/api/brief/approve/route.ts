@@ -30,8 +30,7 @@ export async function POST(request: Request) {
     }
 
     const admin = createAdminClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const db = admin as any;
+    const db = admin;
 
     const { data: brief } = await admin
       .from("donor_briefs")

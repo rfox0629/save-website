@@ -27,10 +27,12 @@ export type UploadedDocument = {
 type StorageResult = { error?: { message: string } | null };
 
 export type DocumentUploadDeps = {
+  // Supabase query builders are thenable rather than real promises, so the
+  // dependency accepts anything awaitable.
   uploadToStorage: (
     storagePath: string,
     file: File,
-  ) => Promise<StorageResult> | StorageResult;
+  ) => PromiseLike<StorageResult> | StorageResult;
   insertDocument: (row: {
     application_id: string;
     document_type: string;
@@ -39,7 +41,7 @@ export type DocumentUploadDeps = {
     reviewed: boolean;
     storage_path: string;
     uploaded_by: string | null;
-  }) => Promise<StorageResult> | StorageResult;
+  }) => PromiseLike<StorageResult> | StorageResult;
 };
 
 export function sanitizeFilename(fileName: string) {
