@@ -183,3 +183,31 @@ The brief was `published = true` with neither author nor approver. Set to
 the donor-facing gate filters on `approved_by is not null`, so it was never
 donor-visible. No author, approver or snapshot was added, and no other New City
 record was touched.
+
+---
+
+## Finding T — no explicit SAVE assessment-decision action exists — `FOUNDER DECISION REQUIRED`
+
+`approved` and `declined` are reached through the generic later-stage status
+selector, the same control used for ordinary workflow progression. Automated
+processes write other statuses independently: the scoring pipeline sets
+`under_review` or `hard_stop`, and the external-check orchestrator sets
+`under_review`. The inquiry stage has its own three actions and is not involved.
+
+So there is no authoritative decision event for `applications.decision_made_by`
+to attach to. The column exists, carries a foreign key, and has never been
+written by any code path in the product's history. `decision`, `decision_date`
+and `decision_notes` are likewise unwritten.
+
+Attribution was deliberately **not** added for it in
+[#30](https://github.com/rfox0629/save-website/pull/30): snapshotting a write
+that never happens would repeat the defect that work existed to fix.
+
+**Founder direction (2026-09-23):** do not populate `decision_made_by`, do not
+treat a generic status mutation as a formal SAVE decision, and do not redesign
+this yet. The decision action will be defined after the real reviewer workflow
+has been exercised.
+
+Related: Finding O (the generic eight-status selector reappears after approval),
+and the observation that `vetting_submitted` is transient — an application passes
+through it in seconds on its way to `under_review`.
