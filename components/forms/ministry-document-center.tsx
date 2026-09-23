@@ -47,8 +47,7 @@ export function MinistryDocumentCenter({
 }) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
+  const db = supabase;
   const [selectedType, setSelectedType] =
     useState<(typeof DOCUMENT_TYPE_OPTIONS)[number]>("990");
   const [file, setFile] = useState<File | null>(null);

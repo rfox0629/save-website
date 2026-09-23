@@ -523,8 +523,7 @@ export async function saveVettingDraft(
     return { error: "No application is available for the SAVE Standard." };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = context.supabase as any;
+  const db = context.supabase;
   const payload = mapVettingToPersistence(values);
 
   const { error } = await db.from("vetting_responses").upsert(
@@ -573,8 +572,7 @@ export async function submitVetting(
     return { error: "No application is available for submission." };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
+  const db = supabase;
 
   const { error: vettingError } = await db
     .from("vetting_responses")

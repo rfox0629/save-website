@@ -99,8 +99,7 @@ export async function checkCharityNavigator(
 ): Promise<CharityNavigatorCheckResult> {
   const normalizedEin = normalizeEin(ein);
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
   const apiKey = process.env.CHARITY_NAVIGATOR_API_KEY;
 
   await db

@@ -284,8 +284,7 @@ export function parseReviewerSummary(
 
 export async function generateReviewerSummary(applicationId: string) {
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
 
   const { data: application } = await admin
     .from("applications")

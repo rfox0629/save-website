@@ -141,8 +141,7 @@ export async function checkIRS(
 ): Promise<IRSCheckResult> {
   const normalizedEin = normalizeEin(ein);
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
 
   await db
     .from("external_checks")

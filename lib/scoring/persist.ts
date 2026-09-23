@@ -6,8 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export async function scoreApplication(applicationId: string) {
   const score = await runScoringEngine(applicationId);
   const supabase = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
+  const db = supabase;
   const { data: irsCheck } = await db
     .from("external_checks")
     .select("status, summary")

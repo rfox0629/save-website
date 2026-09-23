@@ -277,8 +277,7 @@ export function VettingForm({
   uploadedDocuments: initialDocuments,
 }: VettingFormProps) {
   const supabase = useMemo(() => createClient(), []);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
+  const db = supabase;
   const [currentStep, setCurrentStep] = useState(initialStep);
   const [globalError, setGlobalError] = useState<string | null>(null);
   const [confirmationVisible, setConfirmationVisible] = useState(false);

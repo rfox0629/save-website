@@ -33,8 +33,7 @@ export async function revokeBriefApprovalForMaterialChange(
   reason: string,
 ): Promise<ApprovalRevocation> {
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
 
   const { data } = await admin
     .from("donor_briefs")

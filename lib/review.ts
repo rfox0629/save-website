@@ -706,7 +706,9 @@ export async function getApplicationDetail(
 
   const reviewerOptions = await getReviewerOptions();
   const actorEmailMap = await getUserEmailMap([
-    ...resolvedNotes.map((note) => note.reviewer_id),
+    ...resolvedNotes
+      .map((note) => note.reviewer_id)
+      .filter((value): value is string => Boolean(value)),
     ...resolvedDocuments
       .map((document) => document.uploaded_by)
       .filter((value): value is string => Boolean(value)),
@@ -760,6 +762,9 @@ export async function getApplicationDetail(
           !resolvedExternalChecks.some((check) => check.source === source),
       ).map((source) => ({
         application_id: applicationId,
+        checked_actor_email: null,
+        checked_actor_id: null,
+        checked_actor_name: null,
         checked_at: "",
         checked_by: null,
         id: "",
@@ -776,7 +781,13 @@ export async function getApplicationDetail(
     latestScore,
     notes: resolvedNotes.map((note) => ({
       ...note,
-      reviewerEmail: actorEmailMap.get(note.reviewer_id) ?? null,
+      // The live identity resolves the reviewer while they are still here. Once
+      // it is gone the immutable snapshot still says who wrote the note, so the
+      // attribution reaches the reviewer rather than stopping at the database.
+      reviewerEmail:
+        (note.reviewer_id ? actorEmailMap.get(note.reviewer_id) : null) ??
+        note.reviewer_actor_email ??
+        null,
     })),
     organization: resolvedOrganization,
     reviewerOptions,
@@ -836,8 +847,7 @@ export async function updateApplicationStatus(params: {
 }) {
   await requireReviewerMutationAccess();
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
 
   // Advancing an inquiry into assessment is the one transition that assigns the
   // SAVE assessment cycle year. Reading the current value first means an
@@ -895,8 +905,7 @@ export async function recordInquiryDecision(params: {
 }) {
   const { user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
 
   const { data: application } = await admin
     .from("applications")
@@ -952,8 +961,7 @@ export async function assignReviewer(params: {
 }) {
   await requireReviewerMutationAccess();
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
   const { data: application } = await admin
     .from("applications")
     .select("organization_id")
@@ -994,8 +1002,7 @@ export async function overrideCategoryScore(params: {
 }) {
   const { user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
   const latestScore = await getLatestScoreOrThrow(params.applicationId);
 
   const fieldMap = {
@@ -1056,8 +1063,7 @@ export async function resolveRiskFlag(params: {
 }) {
   const { user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
 
   const { error } = await db
     .from("risk_flags")
@@ -1085,8 +1091,7 @@ export async function markDocumentReviewed(params: {
 }) {
   const { user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
 
   const { error } = await db
     .from("documents")
@@ -1125,8 +1130,7 @@ export async function saveExternalCheck(params: {
 }) {
   const { user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
   const { data: existing } = await admin
     .from("external_checks")
     .select("*")
@@ -1190,8 +1194,7 @@ export async function createReviewerNote(params: {
 }) {
   const { user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
 
   const { error } = await db.from("reviewer_notes").insert({
     application_id: params.applicationId,

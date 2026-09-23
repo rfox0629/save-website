@@ -67,8 +67,7 @@ export async function submitDonorAccessRequest(values: {
   const admin = createAdminClient();
   // The generated schema is ahead of the local client types for this new table.
   // Cast narrowly here so we can use the table before the next type refresh.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
   const { error } = await db.from("donor_requests").insert({
     email: parsed.data.email,
     full_name: parsed.data.fullName,
@@ -88,8 +87,7 @@ export async function getDonorRequests() {
   await requireAdminPageAccess();
 
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
   const { data } = await db
     .from("donor_requests")
     .select("*")
@@ -102,8 +100,7 @@ export async function approveDonorRequest(id: string): Promise<ActionResult> {
   await requireAdminPageAccess();
 
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
   const { data: request } = await db
     .from("donor_requests")
     .select("*")
@@ -158,8 +155,7 @@ export async function declineDonorRequest(id: string): Promise<ActionResult> {
   await requireAdminPageAccess();
 
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
   const { error } = await db
     .from("donor_requests")
     .update({ status: "declined" })

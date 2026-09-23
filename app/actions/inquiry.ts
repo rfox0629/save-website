@@ -437,8 +437,7 @@ export async function saveInquiryDraft(
   applicationId?: string | null,
 ): Promise<InquiryDraftResult> {
   const { organizationId, supabase } = await getMinistryContext();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
+  const db = supabase;
   const payload = mapDraftToPersistence(values);
 
   let resolvedApplicationId = applicationId ?? null;
@@ -515,8 +514,7 @@ export async function submitInquiry(
   }
 
   const { organizationId, supabase } = await getMinistryContext();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
+  const db = supabase;
 
   const { error: inquiryError } = await db
     .from("inquiry_responses")

@@ -40,8 +40,7 @@ export async function POST(
     }
 
     const admin = createAdminClient();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const db = admin as any;
+    const db = admin;
 
     const { error } = await db
       .from("organizations")

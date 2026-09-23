@@ -20,8 +20,7 @@ type LoadedApplication = Applications & {
 
 export async function runFullVetting(applicationId: string) {
   const supabase = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = supabase as any;
+  const db = supabase;
   const { data: application } = await db
     .from("applications")
     .select("*, organizations(*), vetting_responses(*)")

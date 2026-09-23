@@ -1,3 +1,4 @@
+import type { Database } from "@/lib/supabase/types";
 import { buildActorSnapshot, toActorIdentity } from "@/lib/attribution";
 import "server-only";
 
@@ -93,8 +94,7 @@ export async function createRoadmapItem(
   }
 
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
 
   const { data: application } = await admin
     .from("applications")
@@ -143,12 +143,11 @@ export async function updateRoadmapItem(
 ) {
   await requireReviewerMutationAccess();
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
 
   // Only the fields actually supplied are changed, so a status control does
   // not blank out the rest of the item.
-  const patch: Record<string, unknown> = {
+  const patch: Database["public"]["Tables"]["roadmap_items"]["Update"] = {
     updated_at: new Date().toISOString(),
   };
 
@@ -200,8 +199,7 @@ export async function setFindingsShared(
 ) {
   await requireReviewerMutationAccess();
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
 
   const { error } = await db
     .from("applications")

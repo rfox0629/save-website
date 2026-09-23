@@ -63,8 +63,7 @@ export async function checkWebsite(
   applicationId: string,
 ): Promise<WebsiteCheckResult> {
   const admin = createAdminClient();
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const db = admin as any;
+  const db = admin;
   const normalizedUrl = normalizeUrl(websiteUrl);
 
   await db
