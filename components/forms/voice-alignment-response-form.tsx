@@ -110,7 +110,10 @@ export function VoiceAlignmentResponseForm({
     yearsContextKnown: "",
   });
 
-  function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
+  function update<K extends keyof typeof form>(
+    key: K,
+    value: (typeof form)[K],
+  ) {
     setForm((current) => ({
       ...current,
       [key]: value,
@@ -193,7 +196,9 @@ export function VoiceAlignmentResponseForm({
             <Field label="Your name">
               <input
                 className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480]"
-                onChange={(event) => update("respondentName", event.target.value)}
+                onChange={(event) =>
+                  update("respondentName", event.target.value)
+                }
                 type="text"
                 value={form.respondentName}
               />
@@ -223,7 +228,9 @@ export function VoiceAlignmentResponseForm({
             >
               <input
                 className="w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480]"
-                onChange={(event) => update("yearsContextKnown", event.target.value)}
+                onChange={(event) =>
+                  update("yearsContextKnown", event.target.value)
+                }
                 type="text"
                 value={form.yearsContextKnown}
               />
@@ -239,28 +246,36 @@ export function VoiceAlignmentResponseForm({
               <Field label="How would you describe the leader’s character?">
                 <textarea
                   className="min-h-[120px] w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480]"
-                  onChange={(event) => update("leaderCharacter", event.target.value)}
+                  onChange={(event) =>
+                    update("leaderCharacter", event.target.value)
+                  }
                   value={form.leaderCharacter}
                 />
               </Field>
               <Field label="What does this organization do especially well?">
                 <textarea
                   className="min-h-[120px] w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480]"
-                  onChange={(event) => update("orgStrengths", event.target.value)}
+                  onChange={(event) =>
+                    update("orgStrengths", event.target.value)
+                  }
                   value={form.orgStrengths}
                 />
               </Field>
               <Field label="Where do you see opportunities for growth?">
                 <textarea
                   className="min-h-[120px] w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480]"
-                  onChange={(event) => update("growthAreas", event.target.value)}
+                  onChange={(event) =>
+                    update("growthAreas", event.target.value)
+                  }
                   value={form.growthAreas}
                 />
               </Field>
               <Field label="How would you describe the internal culture?">
                 <textarea
                   className="min-h-[120px] w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480]"
-                  onChange={(event) => update("internalCulture", event.target.value)}
+                  onChange={(event) =>
+                    update("internalCulture", event.target.value)
+                  }
                   value={form.internalCulture}
                 />
               </Field>
@@ -285,14 +300,18 @@ export function VoiceAlignmentResponseForm({
               <Field label="How would you describe this organization or its leadership?">
                 <textarea
                   className="min-h-[120px] w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480]"
-                  onChange={(event) => update("orgLeaderDescription", event.target.value)}
+                  onChange={(event) =>
+                    update("orgLeaderDescription", event.target.value)
+                  }
                   value={form.orgLeaderDescription}
                 />
               </Field>
               <Field label="What stands out most positively?">
                 <textarea
                   className="min-h-[120px] w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480]"
-                  onChange={(event) => update("positiveObservations", event.target.value)}
+                  onChange={(event) =>
+                    update("positiveObservations", event.target.value)
+                  }
                   value={form.positiveObservations}
                 />
               </Field>
@@ -316,7 +335,9 @@ export function VoiceAlignmentResponseForm({
               <Field label="Anything else you’d like to share?">
                 <textarea
                   className="min-h-[120px] w-full rounded-2xl border border-[#D8D1C3] bg-[#FFFDF8] px-4 py-3 text-[#1A4480]"
-                  onChange={(event) => update("additionalComments", event.target.value)}
+                  onChange={(event) =>
+                    update("additionalComments", event.target.value)
+                  }
                   value={form.additionalComments}
                 />
               </Field>

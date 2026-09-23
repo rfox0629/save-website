@@ -121,7 +121,9 @@ export function BriefEditor({
             : "Draft saved.",
       );
     } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Unable to save brief.");
+      setError(
+        caught instanceof Error ? caught.message : "Unable to save brief.",
+      );
     } finally {
       setPending(false);
     }
@@ -157,8 +159,8 @@ export function BriefEditor({
       <div className="min-w-0 space-y-6">
         {initialIsStale ? (
           <Callout title="This brief is behind the review" tone="clay">
-            The assessment has changed since this brief was generated. Update and
-            republish so donors are reading the current picture.
+            The assessment has changed since this brief was generated. Update
+            and republish so donors are reading the current picture.
           </Callout>
         ) : null}
 
@@ -272,7 +274,10 @@ export function BriefEditor({
                 {formatDate(approvedAt)}. Publishing is available.
               </Callout>
             ) : (
-              <Callout title="A second reviewer must approve this first" tone="clay">
+              <Callout
+                title="A second reviewer must approve this first"
+                tone="clay"
+              >
                 {isAuthor
                   ? "You wrote this brief, so you cannot be its second reviewer. Another reviewer approves it from the reviewer workspace."
                   : "Approval is recorded from the reviewer workspace. Until then this brief cannot be published to donors."}
@@ -320,7 +325,9 @@ export function BriefEditor({
             {message ? (
               <p className="text-caption text-sage-700">{message}</p>
             ) : null}
-            {error ? <p className="text-caption text-risk-700">{error}</p> : null}
+            {error ? (
+              <p className="text-caption text-risk-700">{error}</p>
+            ) : null}
             {copyMessage ? (
               <p className="text-caption text-ink-500">{copyMessage}</p>
             ) : null}

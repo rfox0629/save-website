@@ -313,7 +313,11 @@ export function MinistryDocumentCenter({
             onClick={() => void handleUpload()}
             type="button"
           >
-            {pending ? "Uploading..." : readOnly ? "Preview only" : "Upload document"}
+            {pending
+              ? "Uploading..."
+              : readOnly
+                ? "Preview only"
+                : "Upload document"}
           </Button>
         </div>
       </section>

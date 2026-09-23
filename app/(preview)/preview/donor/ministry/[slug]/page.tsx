@@ -99,7 +99,11 @@ export default function DonorMinistryDetailPage({
             { href: "#assessment", label: "Assessment" },
             { href: "#impact", label: "Impact" },
             { count: gifts.length, href: "#giving", label: "Your giving" },
-            { count: ministry.updates.length, href: "#updates", label: "Updates" },
+            {
+              count: ministry.updates.length,
+              href: "#updates",
+              label: "Updates",
+            },
           ]}
         />
       </div>
@@ -118,11 +122,13 @@ export default function DonorMinistryDetailPage({
             value={formatMoney(givenThisYear * 3 + 40_000)}
           />
           <Stat
-            caption={pledge ? `Through ${formatDate(pledge.through)}` : "No open pledge"}
-            label="Outstanding commitment"
-            value={
-              pledge ? formatMoney(pledge.amount - pledge.committed) : "—"
+            caption={
+              pledge
+                ? `Through ${formatDate(pledge.through)}`
+                : "No open pledge"
             }
+            label="Outstanding commitment"
+            value={pledge ? formatMoney(pledge.amount - pledge.committed) : "—"}
           />
           <Stat
             caption={`Reassessment ${formatDate(ministry.reassessmentDue)}`}
@@ -294,7 +300,10 @@ export default function DonorMinistryDetailPage({
             <CardBody>
               <DataList>
                 <DataRow label="Founded" value={ministry.founded} />
-                <DataRow label="Annual budget" value={formatMoney(ministry.budget)} />
+                <DataRow
+                  label="Annual budget"
+                  value={formatMoney(ministry.budget)}
+                />
                 <DataRow label="Staff" value={ministry.staff} />
                 <DataRow label="Region" value={ministry.region} />
                 <DataRow label="EIN" value={ministry.ein} />

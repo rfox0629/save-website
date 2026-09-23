@@ -71,8 +71,8 @@ export default async function AccessPendingPage() {
         <p className="mt-4 text-[15px] leading-7 text-[#4F6357]">
           You&rsquo;re signed in as{" "}
           <span className="font-semibold text-[#1A4480]">{user.email}</span>.
-          Your account is verified, but it doesn&rsquo;t have a SAVE role yet. If
-          you were invited to SAVE, you&rsquo;ll be able to continue once an
+          Your account is verified, but it doesn&rsquo;t have a SAVE role yet.
+          If you were invited to SAVE, you&rsquo;ll be able to continue once an
           administrator assigns your role.
         </p>
 

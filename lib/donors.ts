@@ -1,12 +1,18 @@
 import { redirect } from "next/navigation";
 
-import { parseReviewerSummary, type ReviewerSummary } from "@/lib/ai/reviewerSummary";
+import {
+  parseReviewerSummary,
+  type ReviewerSummary,
+} from "@/lib/ai/reviewerSummary";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getPathForRole } from "@/lib/auth";
 import { getRelationalDiligenceStatus } from "@/lib/diligence";
 import { getSaveTier, type SaveTier } from "@/lib/save-tier";
 import { getViewerContext } from "@/lib/view-mode";
-import { parseVoiceAlignmentInsight, type VoiceAlignmentInsight } from "@/lib/voice-alignment";
+import {
+  parseVoiceAlignmentInsight,
+  type VoiceAlignmentInsight,
+} from "@/lib/voice-alignment";
 import type {
   Applications,
   DiligenceEngagement,
@@ -73,9 +79,12 @@ function getHighestSeverity(flags: RiskFlag[]) {
     return null;
   }
 
-  return [...flags].sort(
-    (left, right) => severityRank(right.severity) - severityRank(left.severity),
-  )[0]?.severity ?? null;
+  return (
+    [...flags].sort(
+      (left, right) =>
+        severityRank(right.severity) - severityRank(left.severity),
+    )[0]?.severity ?? null
+  );
 }
 
 function buildCategorySummary(summary: ReviewerSummary | null) {
@@ -87,9 +96,7 @@ function buildCategorySummary(summary: ReviewerSummary | null) {
     [
       "Leadership",
       summary.leadership_integrity.confidence,
-      summary.leadership_integrity.confidence === "high"
-        ? "strong"
-        : "solid",
+      summary.leadership_integrity.confidence === "high" ? "strong" : "solid",
     ],
     [
       "Doctrine",
@@ -199,7 +206,9 @@ export async function requireDonorBriefs() {
   const orgIds = Array.from(
     new Set(
       resolvedBriefs
-        .map((brief) => applicationMap.get(brief.application_id)?.organization_id)
+        .map(
+          (brief) => applicationMap.get(brief.application_id)?.organization_id,
+        )
         .filter((value): value is string => Boolean(value)),
     ),
   );
@@ -227,10 +236,7 @@ export async function requireDonorBriefs() {
       .select("*")
       .in("application_id", organizationIds)
       .order("calculated_at", { ascending: false }),
-    admin
-      .from("risk_flags")
-      .select("*")
-      .in("application_id", organizationIds),
+    admin.from("risk_flags").select("*").in("application_id", organizationIds),
     admin
       .from("voice_alignment_summaries")
       .select("*")
@@ -288,7 +294,8 @@ export async function requireDonorBriefs() {
         const score = latestScoreMap.get(application.id) ?? null;
         const flags = flagsByApplication.get(application.id) ?? [];
         const highestRiskSeverity = getHighestSeverity(flags);
-        const voiceAlignmentRecord = voiceAlignmentMap.get(application.id) ?? null;
+        const voiceAlignmentRecord =
+          voiceAlignmentMap.get(application.id) ?? null;
         const voiceAlignmentSummary = parseVoiceAlignmentInsight(
           voiceAlignmentRecord?.summary ?? null,
         );

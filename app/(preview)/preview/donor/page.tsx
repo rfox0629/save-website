@@ -50,7 +50,9 @@ export default function DonorHomePage() {
     .flatMap((ministry) =>
       ministry.prayer.map((request) => ({ ministry, request })),
     )
-    .sort((a, b) => Number(b.request.urgent ?? 0) - Number(a.request.urgent ?? 0))
+    .sort(
+      (a, b) => Number(b.request.urgent ?? 0) - Number(a.request.urgent ?? 0),
+    )
     .slice(0, 2);
 
   return (

@@ -61,10 +61,26 @@ export default function StaffMinistriesPage() {
 
       <div className="mt-8">
         <StatRow>
-          <Stat caption="Published assessments" label="Ministries" value={MINISTRIES.length} />
-          <Stat caption="Across the portfolio" label="Combined budget" value={formatMoney(totalBudget)} />
-          <Stat caption="Weighted equally" label="Average score" value={avgScore} />
-          <Stat caption="Within 12 months" label="Reassessment due" value={dueSoon.length} />
+          <Stat
+            caption="Published assessments"
+            label="Ministries"
+            value={MINISTRIES.length}
+          />
+          <Stat
+            caption="Across the portfolio"
+            label="Combined budget"
+            value={formatMoney(totalBudget)}
+          />
+          <Stat
+            caption="Weighted equally"
+            label="Average score"
+            value={avgScore}
+          />
+          <Stat
+            caption="Within 12 months"
+            label="Reassessment due"
+            value={dueSoon.length}
+          />
         </StatRow>
       </div>
 
@@ -101,7 +117,9 @@ export default function StaffMinistriesPage() {
           </thead>
           <tbody>
             {[...MINISTRIES]
-              .sort((a, b) => a.reassessmentDue.localeCompare(b.reassessmentDue))
+              .sort((a, b) =>
+                a.reassessmentDue.localeCompare(b.reassessmentDue),
+              )
               .map((ministry) => (
                 <tr className="transition hover:bg-paper-100" key={ministry.id}>
                   <Td>

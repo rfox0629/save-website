@@ -314,36 +314,35 @@ export async function getBriefExportData(
     { data: externalChecks },
     { data: scores },
     { data: voiceAlignmentSummary },
-  ] =
-    await Promise.all([
-      admin
-        .from("organizations")
-        .select("*")
-        .eq("id", resolvedApplication.organization_id)
-        .maybeSingle(),
-      admin
-        .from("donor_briefs")
-        .select("*")
-        .eq("application_id", applicationId)
-        .order("generated_at", { ascending: false })
-        .limit(1)
-        .maybeSingle(),
-      admin
-        .from("external_checks")
-        .select("*")
-        .eq("application_id", applicationId)
-        .order("checked_at", { ascending: false }),
-      admin
-        .from("scores")
-        .select("*")
-        .eq("application_id", applicationId)
-        .order("calculated_at", { ascending: false }),
-      admin
-        .from("voice_alignment_summaries")
-        .select("*")
-        .eq("application_id", applicationId)
-        .maybeSingle(),
-    ]);
+  ] = await Promise.all([
+    admin
+      .from("organizations")
+      .select("*")
+      .eq("id", resolvedApplication.organization_id)
+      .maybeSingle(),
+    admin
+      .from("donor_briefs")
+      .select("*")
+      .eq("application_id", applicationId)
+      .order("generated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    admin
+      .from("external_checks")
+      .select("*")
+      .eq("application_id", applicationId)
+      .order("checked_at", { ascending: false }),
+    admin
+      .from("scores")
+      .select("*")
+      .eq("application_id", applicationId)
+      .order("calculated_at", { ascending: false }),
+    admin
+      .from("voice_alignment_summaries")
+      .select("*")
+      .eq("application_id", applicationId)
+      .maybeSingle(),
+  ]);
 
   const resolvedOrganization = organization as Organizations | null;
   const resolvedBrief = brief as DonorBrief | null;

@@ -60,10 +60,22 @@ export default function RoadmapPage() {
 
       <div className="mt-8">
         <StatRow>
-          <Stat caption="Confirmed by SAVE" label="Verified" value={verified.length} />
-          <Stat caption="Awaiting reviewer" label="Submitted" value={submitted.length} />
+          <Stat
+            caption="Confirmed by SAVE"
+            label="Verified"
+            value={verified.length}
+          />
+          <Stat
+            caption="Awaiting reviewer"
+            label="Submitted"
+            value={submitted.length}
+          />
           <Stat caption="With your team" label="Open" value={open.length} />
-          <Stat caption="Of all roadmap items" label="Complete" value={`${pct}%`} />
+          <Stat
+            caption="Of all roadmap items"
+            label="Complete"
+            value={`${pct}%`}
+          />
         </StatRow>
       </div>
 
@@ -93,7 +105,11 @@ export default function RoadmapPage() {
             </div>
             <CardFooter>
               <span className="text-caption text-ink-400">
-                Next due {formatDate(open.sort((a, b) => a.due.localeCompare(b.due))[0]?.due ?? "2026-08-15")}
+                Next due{" "}
+                {formatDate(
+                  open.sort((a, b) => a.due.localeCompare(b.due))[0]?.due ??
+                    "2026-08-15",
+                )}
               </span>
               <Btn size="sm" variant="secondary">
                 Assign owners
@@ -150,7 +166,8 @@ export default function RoadmapPage() {
               {Array.from(new Set(ROADMAP.map((item) => item.owner))).map(
                 (owner) => {
                   const count = ROADMAP.filter(
-                    (item) => item.owner === owner && item.status !== "verified",
+                    (item) =>
+                      item.owner === owner && item.status !== "verified",
                   ).length;
 
                   return (
@@ -170,9 +187,7 @@ export default function RoadmapPage() {
           </Card>
 
           <Card className="p-6" tone="sunken">
-            <p className="text-sm font-semibold text-ink-900">
-              Reassessment
-            </p>
+            <p className="text-sm font-semibold text-ink-900">Reassessment</p>
             <p className="save-numeric mt-2 text-caption leading-relaxed text-ink-500">
               Scheduled for {formatDate("2028-06-03")}. You can request an early
               reassessment once every roadmap item is verified.

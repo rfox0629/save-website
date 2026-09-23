@@ -61,7 +61,11 @@ export default function DonorPrayerPage() {
           <Stat label="Open requests" value={requests.length} />
           <Stat label="Marked urgent" value={urgent.length} />
           <Stat label="Ministries" value={following.length} />
-          <Stat caption="Across all followers" label="People praying" value="404" />
+          <Stat
+            caption="Across all followers"
+            label="People praying"
+            value="404"
+          />
         </StatRow>
       </div>
 
@@ -108,7 +112,7 @@ export default function DonorPrayerPage() {
           <p className="save-display text-title font-semibold text-brass-700">
             Answered
           </p>
-          <p className="mt-2.5 max-w-prose text-sm leading-relaxed text-brass-700/80">
+          <p className="text-brass-700/80 mt-2.5 max-w-prose text-sm leading-relaxed">
             When a request is answered, the ministry tells you. Four of the
             requests you prayed for this year have been marked answered — the
             Springfield building, two family relocations, and the Karen

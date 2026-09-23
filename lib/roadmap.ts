@@ -1,3 +1,4 @@
+import { buildActorSnapshot, toActorIdentity } from "@/lib/attribution";
 import "server-only";
 
 import { revalidatePath } from "next/cache";
@@ -68,7 +69,8 @@ export function getRoadmapProgress(items: RoadmapItem[]): RoadmapProgress {
     open,
     total: items.length,
     verified,
-    verifiedPct: items.length === 0 ? 0 : Math.round((verified / items.length) * 100),
+    verifiedPct:
+      items.length === 0 ? 0 : Math.round((verified / items.length) * 100),
   };
 }
 
@@ -111,6 +113,7 @@ export async function createRoadmapItem(
     application_id: applicationId,
     category: optionalText(input.category),
     created_by: user.id,
+    ...buildActorSnapshot("created", toActorIdentity(user)),
     detail: optionalText(input.detail),
     due_date: optionalText(input.dueDate),
     organization_id: organizationId,

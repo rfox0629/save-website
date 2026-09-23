@@ -25,12 +25,54 @@ import { REVIEWERS } from "@/lib/preview/data";
 export const metadata: Metadata = { title: "Donors" };
 
 const DONORS = [
-  { advisor: "Hannah Bradley", following: 4, givenYtd: 285_000, joined: "2017-04-12", name: "Margaret Ellison", status: "active" },
-  { advisor: "Tom Reyes", following: 7, givenYtd: 640_000, joined: "2015-09-30", name: "The Callahan Foundation", status: "active" },
-  { advisor: "Hannah Bradley", following: 2, givenYtd: 95_000, joined: "2022-01-18", name: "David & Ruth Kimani", status: "active" },
-  { advisor: "Dana Kim", following: 11, givenYtd: 1_240_000, joined: "2013-06-05", name: "Northbridge Family Office", status: "active" },
-  { advisor: null, following: 0, givenYtd: 0, joined: "2026-07-28", name: "Peter Vance", status: "pending" },
-  { advisor: null, following: 0, givenYtd: 0, joined: "2026-07-30", name: "Grace Lindqvist", status: "pending" },
+  {
+    advisor: "Hannah Bradley",
+    following: 4,
+    givenYtd: 285_000,
+    joined: "2017-04-12",
+    name: "Margaret Ellison",
+    status: "active",
+  },
+  {
+    advisor: "Tom Reyes",
+    following: 7,
+    givenYtd: 640_000,
+    joined: "2015-09-30",
+    name: "The Callahan Foundation",
+    status: "active",
+  },
+  {
+    advisor: "Hannah Bradley",
+    following: 2,
+    givenYtd: 95_000,
+    joined: "2022-01-18",
+    name: "David & Ruth Kimani",
+    status: "active",
+  },
+  {
+    advisor: "Dana Kim",
+    following: 11,
+    givenYtd: 1_240_000,
+    joined: "2013-06-05",
+    name: "Northbridge Family Office",
+    status: "active",
+  },
+  {
+    advisor: null,
+    following: 0,
+    givenYtd: 0,
+    joined: "2026-07-28",
+    name: "Peter Vance",
+    status: "pending",
+  },
+  {
+    advisor: null,
+    following: 0,
+    givenYtd: 0,
+    joined: "2026-07-30",
+    name: "Grace Lindqvist",
+    status: "pending",
+  },
 ];
 
 /**
@@ -71,10 +113,26 @@ export default function StaffDonorsPage() {
 
       <div className="mt-8">
         <StatRow>
-          <Stat caption="With full access" label="Active donors" value={active.length} />
-          <Stat caption="Awaiting a decision" label="Access requests" value={pending.length} />
-          <Stat caption="Through SAVE, this year" label="Given" value={formatMoney(totalYtd)} />
-          <Stat caption="Per active donor" label="Ministries followed" value="6" />
+          <Stat
+            caption="With full access"
+            label="Active donors"
+            value={active.length}
+          />
+          <Stat
+            caption="Awaiting a decision"
+            label="Access requests"
+            value={pending.length}
+          />
+          <Stat
+            caption="Through SAVE, this year"
+            label="Given"
+            value={formatMoney(totalYtd)}
+          />
+          <Stat
+            caption="Per active donor"
+            label="Ministries followed"
+            value="6"
+          />
         </StatRow>
       </div>
 
@@ -173,8 +231,8 @@ export default function StaffDonorsPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <Callout title="What SAVE does not do" tone="ink">
           We do not sell donor lists, we do not let ministries browse donors,
-          and we do not rank donors by capacity. A ministry learns a donor&apos;s
-          name when that donor chooses to introduce themselves.
+          and we do not rank donors by capacity. A ministry learns a
+          donor&apos;s name when that donor chooses to introduce themselves.
         </Callout>
 
         <Card>

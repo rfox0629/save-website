@@ -1,6 +1,10 @@
 import { parseReviewerSummary } from "@/lib/ai/reviewerSummary";
 import type { PublicVoiceAlignmentData } from "@/lib/brief";
-import type { Applications, ExternalCheck, Organizations } from "@/lib/supabase/types";
+import type {
+  Applications,
+  ExternalCheck,
+  Organizations,
+} from "@/lib/supabase/types";
 
 function getRecommendationBadgeClass(recommendation: string) {
   if (recommendation === "advance") {
@@ -91,7 +95,9 @@ function SignalCard({
   );
 }
 
-function getVoiceAlignmentBadgeClass(status: PublicVoiceAlignmentData["status"]) {
+function getVoiceAlignmentBadgeClass(
+  status: PublicVoiceAlignmentData["status"],
+) {
   if (status === "aligned") {
     return "border-blue-200 bg-blue-50 text-blue-900";
   }
@@ -199,7 +205,9 @@ export function PublicAiSummary({
 
             <section className="grid gap-6 md:grid-cols-2 print:break-inside-avoid-page">
               <div className="rounded-[28px] border border-[#D8E5F6] bg-[#F7FBF8] p-6 print:break-inside-avoid-page">
-                <h3 className="text-lg font-semibold text-[#1A4480]">Strengths</h3>
+                <h3 className="text-lg font-semibold text-[#1A4480]">
+                  Strengths
+                </h3>
                 <ul className="mt-4 space-y-3 text-[15px] leading-8 text-[#475A4F]">
                   {summary.top_strengths.map((item) => (
                     <li className="ml-5 list-disc pl-1" key={item}>
@@ -226,21 +234,23 @@ export function PublicAiSummary({
                 Category Assessments
               </h3>
               <div className="mt-5 grid gap-4 md:grid-cols-2">
-                {([
-                  ["Leadership Integrity", summary.leadership_integrity],
-                  ["Doctrine", summary.doctrine],
-                  ["Governance", summary.governance],
-                  ["Financial Stewardship", summary.financial_stewardship],
-                  ["Fruit", summary.fruit],
-                ] as Array<
+                {(
                   [
-                    string,
-                    {
-                      assessment: string;
-                      confidence: "high" | "low" | "medium";
-                    },
-                  ]
-                >).map(([label, value]) => (
+                    ["Leadership Integrity", summary.leadership_integrity],
+                    ["Doctrine", summary.doctrine],
+                    ["Governance", summary.governance],
+                    ["Financial Stewardship", summary.financial_stewardship],
+                    ["Fruit", summary.fruit],
+                  ] as Array<
+                    [
+                      string,
+                      {
+                        assessment: string;
+                        confidence: "high" | "low" | "medium";
+                      },
+                    ]
+                  >
+                ).map(([label, value]) => (
                   <div
                     className="rounded-[24px] border border-[#E3DCCF] bg-[#FCFAF5] p-5 print:break-inside-avoid-page"
                     key={label}
@@ -308,11 +318,16 @@ export function PublicAiSummary({
                       Themes
                     </p>
                     <ul className="mt-3 space-y-3 text-[15px] leading-8 text-[#475A4F]">
-                      {voiceAlignment.summary.internal_summary.themes.map((item) => (
-                        <li className="ml-5 list-disc pl-1" key={`internal-theme-${item}`}>
-                          {item}
-                        </li>
-                      ))}
+                      {voiceAlignment.summary.internal_summary.themes.map(
+                        (item) => (
+                          <li
+                            className="ml-5 list-disc pl-1"
+                            key={`internal-theme-${item}`}
+                          >
+                            {item}
+                          </li>
+                        ),
+                      )}
                     </ul>
                   </div>
                   <div>
@@ -320,11 +335,16 @@ export function PublicAiSummary({
                       Strengths
                     </p>
                     <ul className="mt-3 space-y-3 text-[15px] leading-8 text-[#475A4F]">
-                      {voiceAlignment.summary.internal_summary.strengths.map((item) => (
-                        <li className="ml-5 list-disc pl-1" key={`internal-strength-${item}`}>
-                          {item}
-                        </li>
-                      ))}
+                      {voiceAlignment.summary.internal_summary.strengths.map(
+                        (item) => (
+                          <li
+                            className="ml-5 list-disc pl-1"
+                            key={`internal-strength-${item}`}
+                          >
+                            {item}
+                          </li>
+                        ),
+                      )}
                     </ul>
                   </div>
                   <div>
@@ -332,11 +352,16 @@ export function PublicAiSummary({
                       Concerns
                     </p>
                     <ul className="mt-3 space-y-3 text-[15px] leading-8 text-[#475A4F]">
-                      {voiceAlignment.summary.internal_summary.concerns.map((item) => (
-                        <li className="ml-5 list-disc pl-1" key={`internal-concern-${item}`}>
-                          {item}
-                        </li>
-                      ))}
+                      {voiceAlignment.summary.internal_summary.concerns.map(
+                        (item) => (
+                          <li
+                            className="ml-5 list-disc pl-1"
+                            key={`internal-concern-${item}`}
+                          >
+                            {item}
+                          </li>
+                        ),
+                      )}
                     </ul>
                   </div>
                 </div>
@@ -352,11 +377,16 @@ export function PublicAiSummary({
                       Themes
                     </p>
                     <ul className="mt-3 space-y-3 text-[15px] leading-8 text-[#475A4F]">
-                      {voiceAlignment.summary.external_summary.themes.map((item) => (
-                        <li className="ml-5 list-disc pl-1" key={`external-theme-${item}`}>
-                          {item}
-                        </li>
-                      ))}
+                      {voiceAlignment.summary.external_summary.themes.map(
+                        (item) => (
+                          <li
+                            className="ml-5 list-disc pl-1"
+                            key={`external-theme-${item}`}
+                          >
+                            {item}
+                          </li>
+                        ),
+                      )}
                     </ul>
                   </div>
                   <div>
@@ -364,11 +394,16 @@ export function PublicAiSummary({
                       Strengths
                     </p>
                     <ul className="mt-3 space-y-3 text-[15px] leading-8 text-[#475A4F]">
-                      {voiceAlignment.summary.external_summary.strengths.map((item) => (
-                        <li className="ml-5 list-disc pl-1" key={`external-strength-${item}`}>
-                          {item}
-                        </li>
-                      ))}
+                      {voiceAlignment.summary.external_summary.strengths.map(
+                        (item) => (
+                          <li
+                            className="ml-5 list-disc pl-1"
+                            key={`external-strength-${item}`}
+                          >
+                            {item}
+                          </li>
+                        ),
+                      )}
                     </ul>
                   </div>
                   <div>
@@ -376,11 +411,16 @@ export function PublicAiSummary({
                       Concerns
                     </p>
                     <ul className="mt-3 space-y-3 text-[15px] leading-8 text-[#475A4F]">
-                      {voiceAlignment.summary.external_summary.concerns.map((item) => (
-                        <li className="ml-5 list-disc pl-1" key={`external-concern-${item}`}>
-                          {item}
-                        </li>
-                      ))}
+                      {voiceAlignment.summary.external_summary.concerns.map(
+                        (item) => (
+                          <li
+                            className="ml-5 list-disc pl-1"
+                            key={`external-concern-${item}`}
+                          >
+                            {item}
+                          </li>
+                        ),
+                      )}
                     </ul>
                   </div>
                 </div>
@@ -404,7 +444,10 @@ export function PublicAiSummary({
                   </h4>
                   <ul className="mt-3 space-y-3 text-[15px] leading-8 text-[#475A4F]">
                     {voiceAlignment.summary.follow_up_questions.map((item) => (
-                      <li className="ml-5 list-disc pl-1" key={`follow-up-${item}`}>
+                      <li
+                        className="ml-5 list-disc pl-1"
+                        key={`follow-up-${item}`}
+                      >
                         {item}
                       </li>
                     ))}

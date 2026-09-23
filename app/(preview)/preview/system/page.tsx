@@ -37,25 +37,96 @@ export const metadata: Metadata = { title: "Design language" };
  * the CSS variable prefix; `name` is the Tailwind scale it is exposed as.
  */
 const RAMPS = [
-  { label: "Ink — text, primary action, authority", name: "ink", steps: [900, 800, 700, 600, 500, 400, 300, 200, 100, 50], token: "ink" },
-  { label: "Paper — surfaces and rules. The warm signature.", name: "paper", steps: [500, 400, 300, 200, 100, 50], token: "paper" },
-  { label: "Brass — verification only. Never a generic accent.", name: "brass", steps: [700, 600, 500, 400, 200, 100, 50], token: "brass" },
-  { label: "Sage — healthy, approved, on track", name: "sage", steps: [700, 600, 500, 100, 50], token: "sage" },
-  { label: "Clay — attention, in progress, needs work", name: "clay", steps: [700, 600, 500, 100, 50], token: "clay" },
-  { label: "Risk — declined, hard stop. Warm, never neon.", name: "risk", steps: [700, 600, 100, 50], token: "rose" },
+  {
+    label: "Ink — text, primary action, authority",
+    name: "ink",
+    steps: [900, 800, 700, 600, 500, 400, 300, 200, 100, 50],
+    token: "ink",
+  },
+  {
+    label: "Paper — surfaces and rules. The warm signature.",
+    name: "paper",
+    steps: [500, 400, 300, 200, 100, 50],
+    token: "paper",
+  },
+  {
+    label: "Brass — verification only. Never a generic accent.",
+    name: "brass",
+    steps: [700, 600, 500, 400, 200, 100, 50],
+    token: "brass",
+  },
+  {
+    label: "Sage — healthy, approved, on track",
+    name: "sage",
+    steps: [700, 600, 500, 100, 50],
+    token: "sage",
+  },
+  {
+    label: "Clay — attention, in progress, needs work",
+    name: "clay",
+    steps: [700, 600, 500, 100, 50],
+    token: "clay",
+  },
+  {
+    label: "Risk — declined, hard stop. Warm, never neon.",
+    name: "risk",
+    steps: [700, 600, 100, 50],
+    token: "rose",
+  },
 ];
 
 const TYPE = [
-  { class: "text-display-xl save-display", label: "Display XL · 56/60", sample: "Give with conviction" },
-  { class: "text-display-lg save-display", label: "Display LG · 44/48", sample: "Ministries worth a lifetime" },
-  { class: "text-display-md save-display", label: "Display MD · 34/40", sample: "New City Fellowship Network" },
-  { class: "text-display-sm save-display", label: "Display SM · 26/32", sample: "The assessment" },
-  { class: "text-title", label: "Title · 20/28", sample: "Six categories, one standard" },
-  { class: "text-lg", label: "Large · 17/26", sample: "Planting churches that outlive their planters." },
-  { class: "text-base", label: "Base · 15/24", sample: "Every ministry answers the same questions and supplies the same evidence." },
-  { class: "text-sm", label: "Small · 13.5/20", sample: "Assessed 14 March 2026 by the SAVE assessment team." },
-  { class: "text-caption", label: "Caption · 13/18", sample: "Reassessment due 14 March 2028" },
-  { class: "save-eyebrow", label: "Eyebrow · 11/1 · 0.12em", sample: "The SAVE Standard" },
+  {
+    class: "text-display-xl save-display",
+    label: "Display XL · 56/60",
+    sample: "Give with conviction",
+  },
+  {
+    class: "text-display-lg save-display",
+    label: "Display LG · 44/48",
+    sample: "Ministries worth a lifetime",
+  },
+  {
+    class: "text-display-md save-display",
+    label: "Display MD · 34/40",
+    sample: "New City Fellowship Network",
+  },
+  {
+    class: "text-display-sm save-display",
+    label: "Display SM · 26/32",
+    sample: "The assessment",
+  },
+  {
+    class: "text-title",
+    label: "Title · 20/28",
+    sample: "Six categories, one standard",
+  },
+  {
+    class: "text-lg",
+    label: "Large · 17/26",
+    sample: "Planting churches that outlive their planters.",
+  },
+  {
+    class: "text-base",
+    label: "Base · 15/24",
+    sample:
+      "Every ministry answers the same questions and supplies the same evidence.",
+  },
+  {
+    class: "text-sm",
+    label: "Small · 13.5/20",
+    sample: "Assessed 14 March 2026 by the SAVE assessment team.",
+  },
+  {
+    class: "text-caption",
+    label: "Caption · 13/18",
+    sample: "Reassessment due 14 March 2028",
+  },
+  {
+    class: "save-eyebrow",
+    label: "Eyebrow · 11/1 · 0.12em",
+    sample: "The SAVE Standard",
+  },
 ];
 
 export default function DesignSystemPage() {
@@ -85,11 +156,26 @@ export default function DesignSystemPage() {
           </SectionTitle>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {[
-              { body: "Every neutral carries warmth. Cold grays read as software; warm paper reads as a document worth trusting.", title: "Warm paper, not cold gray" },
-              { body: "Navy is authority. It carries text and primary action and is never used decoratively.", title: "Ink is navy" },
-              { body: "Brass marks verification and nothing else. If it appears, SAVE has assessed something.", title: "Brass is earned" },
-              { body: "Whitespace is the premium signal. When a screen feels cramped, remove content rather than shrink it.", title: "Whitespace over density" },
-              { body: "Money, scores, dates and counts are always tabular. A donor should be able to compare down a column.", title: "Numbers are typeset" },
+              {
+                body: "Every neutral carries warmth. Cold grays read as software; warm paper reads as a document worth trusting.",
+                title: "Warm paper, not cold gray",
+              },
+              {
+                body: "Navy is authority. It carries text and primary action and is never used decoratively.",
+                title: "Ink is navy",
+              },
+              {
+                body: "Brass marks verification and nothing else. If it appears, SAVE has assessed something.",
+                title: "Brass is earned",
+              },
+              {
+                body: "Whitespace is the premium signal. When a screen feels cramped, remove content rather than shrink it.",
+                title: "Whitespace over density",
+              },
+              {
+                body: "Money, scores, dates and counts are always tabular. A donor should be able to compare down a column.",
+                title: "Numbers are typeset",
+              },
             ].map((principle) => (
               <Card className="p-6" key={principle.title}>
                 <p className="text-sm font-semibold text-ink-900">
@@ -214,7 +300,11 @@ export default function DesignSystemPage() {
 
               <p className="save-eyebrow mb-4 mt-8 text-ink-400">Trust seal</p>
               <div className="flex flex-wrap items-center gap-3">
-                <TrustSeal size="sm" tier="Strong and worth knowing" year={2026} />
+                <TrustSeal
+                  size="sm"
+                  tier="Strong and worth knowing"
+                  year={2026}
+                />
                 <TrustSeal size="md" tier="Ready for partnership" year={2026} />
               </div>
 
@@ -254,10 +344,26 @@ export default function DesignSystemPage() {
           </SectionTitle>
           <div className="space-y-6">
             <StatRow>
-              <Stat caption="Across 4 ministries" label="Given this year" value="$285,000" />
-              <Stat delta={{ direction: "up", label: "12% vs 2025" }} label="Lifetime giving" value="$1,642,500" />
-              <Stat delta={{ direction: "down", label: "4 days vs Q1" }} label="Median days to decision" value="34" />
-              <Stat delta={{ direction: "flat", label: "unchanged" }} label="Approval rate" value="62%" />
+              <Stat
+                caption="Across 4 ministries"
+                label="Given this year"
+                value="$285,000"
+              />
+              <Stat
+                delta={{ direction: "up", label: "12% vs 2025" }}
+                label="Lifetime giving"
+                value="$1,642,500"
+              />
+              <Stat
+                delta={{ direction: "down", label: "4 days vs Q1" }}
+                label="Median days to decision"
+                value="34"
+              />
+              <Stat
+                delta={{ direction: "flat", label: "unchanged" }}
+                label="Approval rate"
+                value="62%"
+              />
             </StatRow>
 
             <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
@@ -271,7 +377,12 @@ export default function DesignSystemPage() {
                   <Meter label="Doctrine" tone="sage" value={96} />
                   <Meter label="Financial Integrity" tone="brass" value={81} />
                   <Meter label="Leadership" tone="clay" value={71} />
-                  <Meter label="Assessment complete" tone="ink" value={52} valueLabel="52/100" />
+                  <Meter
+                    label="Assessment complete"
+                    tone="ink"
+                    value={52}
+                    valueLabel="52/100"
+                  />
                 </div>
 
                 <p className="save-eyebrow mb-4 mt-8 text-ink-400">Data list</p>
@@ -284,7 +395,10 @@ export default function DesignSystemPage() {
             </div>
 
             <Card>
-              <CardHeader title="Table" description="One table style. Tabular figures, hairline rules, generous rows." />
+              <CardHeader
+                title="Table"
+                description="One table style. Tabular figures, hairline rules, generous rows."
+              />
               <Table>
                 <thead>
                   <tr>
@@ -296,16 +410,38 @@ export default function DesignSystemPage() {
                 </thead>
                 <tbody>
                   {[
-                    { budget: "$2,480,000", ministry: "New City Fellowship Network", score: 92, stage: "Published" },
-                    { budget: "$1,150,000", ministry: "Living Water East Africa", score: 84, stage: "Published" },
-                    { budget: "$1,720,000", ministry: "Rio Hope Church Network", score: 87, stage: "Evidence review" },
+                    {
+                      budget: "$2,480,000",
+                      ministry: "New City Fellowship Network",
+                      score: 92,
+                      stage: "Published",
+                    },
+                    {
+                      budget: "$1,150,000",
+                      ministry: "Living Water East Africa",
+                      score: 84,
+                      stage: "Published",
+                    },
+                    {
+                      budget: "$1,720,000",
+                      ministry: "Rio Hope Church Network",
+                      score: 87,
+                      stage: "Evidence review",
+                    },
                   ].map((row) => (
-                    <tr className="transition hover:bg-paper-100" key={row.ministry}>
+                    <tr
+                      className="transition hover:bg-paper-100"
+                      key={row.ministry}
+                    >
                       <Td>
-                        <span className="font-medium text-ink-900">{row.ministry}</span>
+                        <span className="font-medium text-ink-900">
+                          {row.ministry}
+                        </span>
                       </Td>
                       <Td>
-                        <Badge tone={row.stage === "Published" ? "sage" : "ink"}>
+                        <Badge
+                          tone={row.stage === "Published" ? "sage" : "ink"}
+                        >
                           {row.stage}
                         </Badge>
                       </Td>
@@ -330,7 +466,12 @@ export default function DesignSystemPage() {
           </SectionTitle>
           <Card>
             <CardBody className="grid gap-6 md:grid-cols-2">
-              <Field help="Shown beneath the field." hint="Optional hint" label="Text input" required>
+              <Field
+                help="Shown beneath the field."
+                hint="Optional hint"
+                label="Text input"
+                required
+              >
                 <Input defaultValue="New City Fellowship Network" />
               </Field>
               <Field label="Select">
@@ -341,7 +482,10 @@ export default function DesignSystemPage() {
               </Field>
               <div className="md:col-span-2">
                 <Field help="Three or four sentences." label="Long form">
-                  <Textarea rows={4} defaultValue="When a designated fund is oversubscribed we contact each donor individually." />
+                  <Textarea
+                    rows={4}
+                    defaultValue="When a designated fund is oversubscribed we contact each donor individually."
+                  />
                 </Field>
               </div>
             </CardBody>
@@ -357,7 +501,12 @@ export default function DesignSystemPage() {
             <Card className="p-7">
               <Tabs
                 items={[
-                  { active: true, count: 9, href: "#a", label: "All requirements" },
+                  {
+                    active: true,
+                    count: 9,
+                    href: "#a",
+                    label: "All requirements",
+                  },
                   { count: 3, href: "#b", label: "Needs you" },
                   { count: 1, href: "#c", label: "In review" },
                   { count: 5, href: "#d", label: "Accepted" },
@@ -369,8 +518,16 @@ export default function DesignSystemPage() {
               <Steps
                 steps={[
                   { label: "Inquiry", meta: "Approved 14 Jun", state: "done" },
-                  { label: "Assessment", meta: "52% complete", state: "current" },
-                  { label: "Evidence review", meta: "3 items open", state: "todo" },
+                  {
+                    label: "Assessment",
+                    meta: "52% complete",
+                    state: "current",
+                  },
+                  {
+                    label: "Evidence review",
+                    meta: "3 items open",
+                    state: "todo",
+                  },
                   { label: "Decision", meta: "Expected Oct", state: "todo" },
                 ]}
               />

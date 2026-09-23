@@ -107,9 +107,10 @@ async function analyzeSingleDocument(
     1500,
   );
 
-  const parsed = JSON.parse(
-    extractJsonObject(responseText),
-  ) as Record<string, unknown>;
+  const parsed = JSON.parse(extractJsonObject(responseText)) as Record<
+    string,
+    unknown
+  >;
   const { status, summary } = getStatusFromAnalysis(parsed);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

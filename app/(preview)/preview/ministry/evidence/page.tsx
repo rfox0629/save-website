@@ -78,9 +78,21 @@ export default function EvidencePage() {
             label="Accepted"
             value={accepted.length}
           />
-          <Stat caption="With your reviewer" label="In review" value={inReview.length} />
-          <Stat caption="Returned with notes" label="Needs attention" value={needsAttention.length} />
-          <Stat caption="Not yet uploaded" label="Missing" value={missing.length} />
+          <Stat
+            caption="With your reviewer"
+            label="In review"
+            value={inReview.length}
+          />
+          <Stat
+            caption="Returned with notes"
+            label="Needs attention"
+            value={needsAttention.length}
+          />
+          <Stat
+            caption="Not yet uploaded"
+            label="Missing"
+            value={missing.length}
+          />
         </StatRow>
       </div>
 
@@ -88,7 +100,12 @@ export default function EvidencePage() {
       <Card className="mt-6 border-dashed" tone="flat">
         <CardBody className="flex flex-col items-center px-6 py-12 text-center">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-ink-50 text-ink-400">
-            <svg aria-hidden="true" className="h-5 w-5" fill="none" viewBox="0 0 20 20">
+            <svg
+              aria-hidden="true"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 20 20"
+            >
               <path
                 d="M10 13.5V4m0 0L6.5 7.5M10 4l3.5 3.5M3.5 13v2A1.5 1.5 0 0 0 5 16.5h10a1.5 1.5 0 0 0 1.5-1.5v-2"
                 stroke="currentColor"
@@ -117,8 +134,17 @@ export default function EvidencePage() {
       <div className="mt-8">
         <Tabs
           items={[
-            { active: true, count: EVIDENCE.length, href: "#all", label: "All requirements" },
-            { count: needsAttention.length + missing.length, href: "#action", label: "Needs you" },
+            {
+              active: true,
+              count: EVIDENCE.length,
+              href: "#all",
+              label: "All requirements",
+            },
+            {
+              count: needsAttention.length + missing.length,
+              href: "#action",
+              label: "Needs you",
+            },
             { count: inReview.length, href: "#review", label: "In review" },
             { count: accepted.length, href: "#accepted", label: "Accepted" },
           ]}
@@ -136,7 +162,12 @@ export default function EvidencePage() {
             {[...needsAttention, ...missing].map((item) => (
               <EvidenceRow
                 action={
-                  <Btn size="sm" variant={item.status === "missing" ? "primary" : "secondary"}>
+                  <Btn
+                    size="sm"
+                    variant={
+                      item.status === "missing" ? "primary" : "secondary"
+                    }
+                  >
                     {item.status === "missing" ? "Upload" : "Replace"}
                   </Btn>
                 }
@@ -151,7 +182,9 @@ export default function EvidencePage() {
       {/* --------------------------------------------------- Full checklist */}
       <div className="mt-6 space-y-6" id="all">
         {Object.entries(grouped).map(([category, items]) => {
-          const done = items.filter((item) => item.status === "accepted").length;
+          const done = items.filter(
+            (item) => item.status === "accepted",
+          ).length;
 
           return (
             <Card key={category}>
@@ -165,7 +198,9 @@ export default function EvidencePage() {
                     />
                   </div>
                 }
-                title={CATEGORY_LABELS[category as keyof typeof CATEGORY_LABELS]}
+                title={
+                  CATEGORY_LABELS[category as keyof typeof CATEGORY_LABELS]
+                }
               />
               <div className="divide-y divide-hairline">
                 {items.map((item) => (

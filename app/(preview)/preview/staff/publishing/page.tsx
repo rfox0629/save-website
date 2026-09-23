@@ -29,8 +29,20 @@ import { getMinistry } from "@/lib/preview/data";
 export const metadata: Metadata = { title: "Publishing" };
 
 const PUBLISH_QUEUE = [
-  { decided: "2026-07-24", id: "APP-2026-0142", ministry: "Bright Path Foster Care", stage: "Ready to publish", tier: "Ready for partnership" },
-  { decided: "2026-07-26", id: "APP-2026-0144", ministry: "Sierra Leone Medical Mission", stage: "Awaiting ministry sign-off", tier: "Strong and worth knowing" },
+  {
+    decided: "2026-07-24",
+    id: "APP-2026-0142",
+    ministry: "Bright Path Foster Care",
+    stage: "Ready to publish",
+    tier: "Ready for partnership",
+  },
+  {
+    decided: "2026-07-26",
+    id: "APP-2026-0144",
+    ministry: "Sierra Leone Medical Mission",
+    stage: "Awaiting ministry sign-off",
+    tier: "Strong and worth knowing",
+  },
 ];
 
 /**
@@ -73,10 +85,18 @@ export default function PublishingPage() {
 
       <div className="mt-8">
         <StatRow>
-          <Stat caption="Awaiting publication" label="In queue" value={PUBLISH_QUEUE.length} />
+          <Stat
+            caption="Awaiting publication"
+            label="In queue"
+            value={PUBLISH_QUEUE.length}
+          />
           <Stat caption="This quarter" label="Published" value="11" />
           <Stat caption="From decision to live" label="Median days" value="4" />
-          <Stat caption="Due for reassessment" label="Expiring in 90 days" value="3" />
+          <Stat
+            caption="Due for reassessment"
+            label="Expiring in 90 days"
+            value="3"
+          />
         </StatRow>
       </div>
 
@@ -92,9 +112,21 @@ export default function PublishingPage() {
             <CardBody>
               <Steps
                 steps={[
-                  { label: "Decision recorded", meta: "Hannah Bradley", state: "done" },
-                  { label: "Second reviewer", meta: "Tom Reyes", state: "done" },
-                  { label: "Ministry sign-off", meta: "Received 28 Jul", state: "done" },
+                  {
+                    label: "Decision recorded",
+                    meta: "Hannah Bradley",
+                    state: "done",
+                  },
+                  {
+                    label: "Second reviewer",
+                    meta: "Tom Reyes",
+                    state: "done",
+                  },
+                  {
+                    label: "Ministry sign-off",
+                    meta: "Received 28 Jul",
+                    state: "done",
+                  },
                   { label: "Donor brief", meta: "Ready", state: "current" },
                   { label: "Live to donors", state: "todo" },
                 ]}
@@ -108,9 +140,18 @@ export default function PublishingPage() {
               <div className="space-y-3">
                 {[
                   { done: true, label: "All required evidence accepted" },
-                  { done: true, label: "External checks re-run within 30 days" },
-                  { done: true, label: "Score overrides carry written reasons" },
-                  { done: true, label: "Ministry has approved its public profile" },
+                  {
+                    done: true,
+                    label: "External checks re-run within 30 days",
+                  },
+                  {
+                    done: true,
+                    label: "Score overrides carry written reasons",
+                  },
+                  {
+                    done: true,
+                    label: "Ministry has approved its public profile",
+                  },
                   { done: true, label: "Impact figures traced to evidence" },
                   { done: false, label: "Donor brief summary proofread" },
                 ].map((check) => (
@@ -277,7 +318,9 @@ export default function PublishingPage() {
                   <p className="save-numeric mt-1 text-caption text-ink-400">
                     {item.id} · decided {formatDate(item.decided)}
                   </p>
-                  <p className="mt-1.5 text-caption text-ink-500">{item.tier}</p>
+                  <p className="mt-1.5 text-caption text-ink-500">
+                    {item.tier}
+                  </p>
                 </div>
               ))}
             </div>

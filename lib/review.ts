@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { buildActorSnapshot, toActorIdentity } from "@/lib/attribution";
 import { revokeBriefApprovalForMaterialChange } from "@/lib/brief-approval";
 import {
   getVoiceAlignmentSummary,
@@ -343,7 +344,7 @@ async function getCurrentProfile() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, role, organization_id")
+    .select("id, role, organization_id, deactivated_at")
     .eq("id", user.id)
     .maybeSingle();
 
@@ -351,6 +352,12 @@ async function getCurrentProfile() {
     profile: (profile as Profile | null) ?? null,
     user,
   };
+}
+
+function isDeactivated(profile: unknown) {
+  return Boolean(
+    (profile as { deactivated_at?: string | null } | null)?.deactivated_at,
+  );
 }
 
 export async function requireReviewerPageAccess() {
@@ -361,6 +368,10 @@ export async function requireReviewerPageAccess() {
   }
 
   if (!context.profile) {
+    redirect("/access-pending");
+  }
+
+  if (isDeactivated(context.profile)) {
     redirect("/access-pending");
   }
 
@@ -386,6 +397,10 @@ export async function requireAdminPageAccess() {
     redirect("/access-pending");
   }
 
+  if (isDeactivated(context.profile)) {
+    redirect("/access-pending");
+  }
+
   if (context.profile.role === "ministry") {
     redirect("/portal");
   }
@@ -406,6 +421,12 @@ export async function requireReviewerMutationAccess() {
 
   if (!context?.user) {
     throw new Error("Unauthorized");
+  }
+
+  // Deactivation withdraws staff capability while keeping the identity, so a
+  // session that outlives offboarding cannot still act as staff.
+  if (isDeactivated(context.profile)) {
+    throw new Error("Forbidden");
   }
 
   if (
@@ -908,6 +929,9 @@ export async function recordInquiryDecision(params: {
 
   const { error: eventError } = await db.from("inquiry_events").insert({
     actor_id: user.id,
+    actor_snapshot_email: toActorIdentity(user).email,
+    actor_snapshot_id: user.id,
+    actor_snapshot_name: toActorIdentity(user).name,
     application_id: params.applicationId,
     kind: plan.eventKind,
     ministry_message: plan.ministryMessage,
@@ -998,6 +1022,7 @@ export async function overrideCategoryScore(params: {
     .update({
       [scoreField]: params.score,
       override_by: user.id,
+      ...buildActorSnapshot("override", toActorIdentity(user)),
       override_notes: `[${params.category}] ${params.note}`,
       total_score:
         currentTotals.leadership +
@@ -1041,6 +1066,7 @@ export async function resolveRiskFlag(params: {
       resolved: true,
       resolved_at: new Date().toISOString(),
       resolved_by: user.id,
+      ...buildActorSnapshot("resolved", toActorIdentity(user)),
     })
     .eq("id", params.flagId)
     .eq("application_id", params.applicationId);
@@ -1067,6 +1093,15 @@ export async function markDocumentReviewed(params: {
     .update({
       reviewed: params.reviewed,
       reviewer_id: params.reviewed ? user.id : null,
+      // Un-reviewing clears the attribution too: it records who reviewed the
+      // document, and after this nobody has.
+      ...(params.reviewed
+        ? buildActorSnapshot("reviewer", toActorIdentity(user))
+        : {
+            reviewer_actor_email: null,
+            reviewer_actor_id: null,
+            reviewer_actor_name: null,
+          }),
     })
     .eq("id", params.documentId)
     .eq("application_id", params.applicationId);
@@ -1111,6 +1146,7 @@ export async function saveExternalCheck(params: {
     application_id: params.applicationId,
     checked_at: new Date().toISOString(),
     checked_by: user.id,
+    ...buildActorSnapshot("checked", toActorIdentity(user)),
     raw_result: {
       ...existingRawResult,
       ...(params.rawResult &&
@@ -1163,6 +1199,9 @@ export async function createReviewerNote(params: {
     note: params.note,
     reviewer_id: user.id,
     section: params.section,
+    // The note outlives the reviewer: the live id resolves them today, the
+    // snapshot says who wrote it once they have gone.
+    ...buildActorSnapshot("reviewer", toActorIdentity(user)),
   });
 
   if (error) {

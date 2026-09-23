@@ -209,9 +209,7 @@ export default function RegisterPage() {
                   }
                   aria-pressed={showConfirmPassword}
                   className="absolute inset-y-0 right-0 inline-flex items-center justify-center rounded-r-2xl px-4 text-[#7088A5] transition hover:text-[#1A4480] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A4480]/20"
-                  onClick={() =>
-                    setShowConfirmPassword((current) => !current)
-                  }
+                  onClick={() => setShowConfirmPassword((current) => !current)}
                 >
                   {showConfirmPassword ? (
                     <EyeOff className="h-5 w-5" aria-hidden="true" />

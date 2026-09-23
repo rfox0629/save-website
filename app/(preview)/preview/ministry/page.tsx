@@ -73,7 +73,11 @@ export default function MinistryOverviewPage() {
             { label: "Inquiry", meta: "Approved 14 Jun", state: "done" },
             { label: "Assessment", meta: `${pct}% complete`, state: "current" },
             { label: "Evidence review", meta: "3 items open", state: "todo" },
-            { label: "Findings & roadmap", meta: "Draft shared", state: "todo" },
+            {
+              label: "Findings & roadmap",
+              meta: "Draft shared",
+              state: "todo",
+            },
             { label: "Decision", meta: "Expected Oct", state: "todo" },
             { label: "Published", state: "todo" },
           ]}
@@ -126,7 +130,11 @@ export default function MinistryOverviewPage() {
           <Card>
             <CardHeader
               action={
-                <Btn href="/preview/ministry/assessment" size="sm" variant="ghost">
+                <Btn
+                  href="/preview/ministry/assessment"
+                  size="sm"
+                  variant="ghost"
+                >
                   Open
                 </Btn>
               }
@@ -176,7 +184,11 @@ export default function MinistryOverviewPage() {
           <Card>
             <CardHeader
               action={
-                <Btn href="/preview/ministry/findings" size="sm" variant="ghost">
+                <Btn
+                  href="/preview/ministry/findings"
+                  size="sm"
+                  variant="ghost"
+                >
                   All findings
                 </Btn>
               }
@@ -197,7 +209,11 @@ export default function MinistryOverviewPage() {
             <CardBody>
               <p className="save-eyebrow text-brass-700">Your reviewer</p>
               <div className="mt-4 flex items-center gap-3.5">
-                <Monogram name={MINISTRY_ACCOUNT.reviewer} size="lg" tone="brass" />
+                <Monogram
+                  name={MINISTRY_ACCOUNT.reviewer}
+                  size="lg"
+                  tone="brass"
+                />
                 <div className="min-w-0">
                   <p className="text-sm font-semibold text-ink-900">
                     {MINISTRY_ACCOUNT.reviewer}
@@ -221,7 +237,11 @@ export default function MinistryOverviewPage() {
           <Card>
             <CardHeader
               action={
-                <Btn href="/preview/ministry/evidence" size="sm" variant="ghost">
+                <Btn
+                  href="/preview/ministry/evidence"
+                  size="sm"
+                  variant="ghost"
+                >
                   All
                 </Btn>
               }
@@ -238,10 +258,16 @@ export default function MinistryOverviewPage() {
             <CardHeader title="Application" />
             <CardBody>
               <DataList>
-                <DataRow label="Reference" value={MINISTRY_ACCOUNT.applicationId} />
+                <DataRow
+                  label="Reference"
+                  value={MINISTRY_ACCOUNT.applicationId}
+                />
                 <DataRow label="Stage" value={MINISTRY_ACCOUNT.stage} />
                 <DataRow label="Opened" value={formatDate("2026-06-14")} />
-                <DataRow label="Target decision" value={formatDate("2026-10-15")} />
+                <DataRow
+                  label="Target decision"
+                  value={formatDate("2026-10-15")}
+                />
               </DataList>
             </CardBody>
           </Card>

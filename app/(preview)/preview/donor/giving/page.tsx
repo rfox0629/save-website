@@ -36,7 +36,8 @@ export const metadata: Metadata = { title: "Giving" };
 export default function DonorGivingPage() {
   const byMinistry = Object.entries(
     GIFTS.reduce<Record<string, number>>((totals, gift) => {
-      totals[gift.ministrySlug] = (totals[gift.ministrySlug] ?? 0) + gift.amount;
+      totals[gift.ministrySlug] =
+        (totals[gift.ministrySlug] ?? 0) + gift.amount;
       return totals;
     }, {}),
   ).sort((a, b) => b[1] - a[1]);
@@ -58,7 +59,10 @@ export default function DonorGivingPage() {
               <Btn size="sm">Give</Btn>
             </>
           }
-          breadcrumb={[{ href: "/preview/donor", label: "Home" }, { label: "Giving" }]}
+          breadcrumb={[
+            { href: "/preview/donor", label: "Home" },
+            { label: "Giving" },
+          ]}
         />
       }
     >
@@ -162,7 +166,10 @@ export default function DonorGivingPage() {
               </thead>
               <tbody>
                 {STATEMENTS.map((statement) => (
-                  <tr className="transition hover:bg-paper-100" key={statement.id}>
+                  <tr
+                    className="transition hover:bg-paper-100"
+                    key={statement.id}
+                  >
                     <Td numeric>
                       <span className="font-semibold text-ink-900">
                         {statement.year}
@@ -217,7 +224,9 @@ export default function DonorGivingPage() {
             <CardBody className="space-y-5">
               {PLEDGES.map((pledge) => {
                 const ministry = getMinistry(pledge.ministrySlug);
-                const pct = Math.round((pledge.committed / pledge.amount) * 100);
+                const pct = Math.round(
+                  (pledge.committed / pledge.amount) * 100,
+                );
 
                 return (
                   <div key={pledge.ministrySlug}>
@@ -228,8 +237,8 @@ export default function DonorGivingPage() {
                       <Badge tone="brass">{pct}%</Badge>
                     </div>
                     <p className="save-numeric mt-1 text-caption text-ink-400">
-                      {formatMoney(pledge.amount - pledge.committed)} remaining ·
-                      through {formatDate(pledge.through)}
+                      {formatMoney(pledge.amount - pledge.committed)} remaining
+                      · through {formatDate(pledge.through)}
                     </p>
                     <div className="mt-2.5">
                       <Meter tone="brass" value={pct} />
@@ -252,7 +261,10 @@ export default function DonorGivingPage() {
             <CardHeader title="Giving methods" />
             <CardBody>
               <DataList>
-                <DataRow label="Donor-advised fund" value="Fidelity Charitable" />
+                <DataRow
+                  label="Donor-advised fund"
+                  value="Fidelity Charitable"
+                />
                 <DataRow label="Wire" value="On file" />
                 <DataRow label="Appreciated stock" value="On file" />
                 <DataRow label="Default designation" value="Unrestricted" />

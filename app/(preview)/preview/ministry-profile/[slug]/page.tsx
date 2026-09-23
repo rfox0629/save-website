@@ -121,9 +121,15 @@ export default function MinistryProfilePage({
               <Divider className="my-5" />
 
               <DataList>
-                <DataRow label="Annual budget" value={formatMoney(ministry.budget)} />
+                <DataRow
+                  label="Annual budget"
+                  value={formatMoney(ministry.budget)}
+                />
                 <DataRow label="Staff" value={ministry.staff} />
-                <DataRow label="Assessed" value={formatDate(ministry.assessedOn)} />
+                <DataRow
+                  label="Assessed"
+                  value={formatDate(ministry.assessedOn)}
+                />
                 <DataRow label="EIN" value={ministry.ein} />
               </DataList>
 
@@ -170,7 +176,11 @@ export default function MinistryProfilePage({
               <Card>
                 <CardBody>
                   <div className="flex flex-wrap items-start gap-5">
-                    <Monogram name={ministry.leader.name} size="lg" tone="sage" />
+                    <Monogram
+                      name={ministry.leader.name}
+                      size="lg"
+                      tone="sage"
+                    />
                     <div className="min-w-0 flex-1">
                       <p className="text-lg font-semibold text-ink-900">
                         {ministry.leader.name}
@@ -253,9 +263,25 @@ export default function MinistryProfilePage({
               <CardHeader title="Financial snapshot" />
               <CardBody>
                 <DataList>
-                  <DataRow label="Annual budget" value={formatMoney(ministry.budget)} />
-                  <DataRow label="Financial integrity score" value={ministry.categoryScores.find((c) => c.key === "financial")?.score ?? "—"} />
-                  <DataRow label="Governance score" value={ministry.categoryScores.find((c) => c.key === "governance")?.score ?? "—"} />
+                  <DataRow
+                    label="Annual budget"
+                    value={formatMoney(ministry.budget)}
+                  />
+                  <DataRow
+                    label="Financial integrity score"
+                    value={
+                      ministry.categoryScores.find((c) => c.key === "financial")
+                        ?.score ?? "—"
+                    }
+                  />
+                  <DataRow
+                    label="Governance score"
+                    value={
+                      ministry.categoryScores.find(
+                        (c) => c.key === "governance",
+                      )?.score ?? "—"
+                    }
+                  />
                   <DataRow label="Region" value={ministry.region} />
                 </DataList>
                 <p className="mt-4 text-caption leading-relaxed text-ink-400">
@@ -273,7 +299,11 @@ export default function MinistryProfilePage({
                 A SAVE advisor will walk you through the full assessment,
                 introduce you to leadership, and stay with the relationship.
               </p>
-              <Btn className="mt-4 w-full" href="/preview/donor" variant="secondary">
+              <Btn
+                className="mt-4 w-full"
+                href="/preview/donor"
+                variant="secondary"
+              >
                 Talk to an advisor
               </Btn>
             </Card>

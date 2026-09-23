@@ -30,8 +30,24 @@ function QueueIcon() {
   return (
     <svg aria-hidden="true" fill="none" viewBox="0 0 16 16">
       <rect x="2" y="3" width="12" height="2.4" rx="1" fill="currentColor" />
-      <rect x="2" y="6.8" width="12" height="2.4" rx="1" fill="currentColor" opacity="0.7" />
-      <rect x="2" y="10.6" width="8" height="2.4" rx="1" fill="currentColor" opacity="0.45" />
+      <rect
+        x="2"
+        y="6.8"
+        width="12"
+        height="2.4"
+        rx="1"
+        fill="currentColor"
+        opacity="0.7"
+      />
+      <rect
+        x="2"
+        y="10.6"
+        width="8"
+        height="2.4"
+        rx="1"
+        fill="currentColor"
+        opacity="0.45"
+      />
     </svg>
   );
 }

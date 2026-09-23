@@ -45,7 +45,8 @@ const sections: RouteSection[] = [
       {
         path: "/for-ministries",
         label: "For Ministries",
-        description: "Public ministry-facing overview for organizations applying to SAVE.",
+        description:
+          "Public ministry-facing overview for organizations applying to SAVE.",
         openHref: "/for-ministries",
       },
     ],
@@ -57,19 +58,22 @@ const sections: RouteSection[] = [
       {
         path: "/login",
         label: "Sign In",
-        description: "Primary authentication page for password and magic-link access.",
+        description:
+          "Primary authentication page for password and magic-link access.",
         openHref: "/login",
       },
       {
         path: "/register",
         label: "Register",
-        description: "Ministry registration flow that provisions the organization and application.",
+        description:
+          "Ministry registration flow that provisions the organization and application.",
         openHref: "/register",
       },
       {
         path: "/auth/confirm",
         label: "Magic Link Confirm",
-        description: "Auth callback route that exchanges the email code for a session.",
+        description:
+          "Auth callback route that exchanges the email code for a session.",
         notes: "Utility callback route. Not normally opened directly.",
       },
     ],
@@ -81,7 +85,8 @@ const sections: RouteSection[] = [
       {
         path: "/dashboard",
         label: "Application Dashboard",
-        description: "Reviewer and admin overview for applications, scores, flags, and triage.",
+        description:
+          "Reviewer and admin overview for applications, scores, flags, and triage.",
         openHref: "/dashboard",
       },
       {
@@ -95,20 +100,25 @@ const sections: RouteSection[] = [
         path: "/applications/[id]/brief",
         example: "/applications/22222222-2222-4222-8222-222222222222/brief",
         label: "Donor Brief Editor",
-        description: "Internal donor brief editor, publishing controls, and share settings.",
+        description:
+          "Internal donor brief editor, publishing controls, and share settings.",
         openHref: "/applications/22222222-2222-4222-8222-222222222222/brief",
       },
       {
         path: "/applications/[id]/brief/export",
-        example: "/applications/22222222-2222-4222-8222-222222222222/brief/export",
+        example:
+          "/applications/22222222-2222-4222-8222-222222222222/brief/export",
         label: "Brief PDF Export View",
-        description: "Print-optimized internal export view for saving a donor brief as PDF.",
-        openHref: "/applications/22222222-2222-4222-8222-222222222222/brief/export",
+        description:
+          "Print-optimized internal export view for saving a donor brief as PDF.",
+        openHref:
+          "/applications/22222222-2222-4222-8222-222222222222/brief/export",
       },
       {
         path: "/applications/compare",
         label: "Application Compare",
-        description: "Internal side-by-side nonprofit comparison view for reviewers.",
+        description:
+          "Internal side-by-side nonprofit comparison view for reviewers.",
         openHref:
           "/applications/compare?left=22222222-2222-4222-8222-222222222222&right=22222222-2222-4222-8222-222222222222",
       },
@@ -121,7 +131,8 @@ const sections: RouteSection[] = [
       {
         path: "/map",
         label: "Route Map",
-        description: "Hidden internal route map and control-panel style sitemap for the product.",
+        description:
+          "Hidden internal route map and control-panel style sitemap for the product.",
         openHref: "/map",
       },
     ],
@@ -133,13 +144,15 @@ const sections: RouteSection[] = [
       {
         path: "/portal",
         label: "Portal Home",
-        description: "Ministry landing page after authentication and onboarding.",
+        description:
+          "Ministry landing page after authentication and onboarding.",
         openHref: "/portal",
       },
       {
         path: "/portal/inquiry",
         label: "Inquiry Form",
-        description: "Structured inquiry workflow for ministries entering SAVE.",
+        description:
+          "Structured inquiry workflow for ministries entering SAVE.",
         openHref: "/portal/inquiry",
       },
       {
@@ -152,7 +165,8 @@ const sections: RouteSection[] = [
       {
         path: "/portal/documents",
         label: "Document Center",
-        description: "Document upload and management surface for ministry submissions.",
+        description:
+          "Document upload and management surface for ministry submissions.",
         openHref: "/portal/documents",
       },
     ],
@@ -164,26 +178,30 @@ const sections: RouteSection[] = [
       {
         path: "/donors",
         label: "Donor Dashboard",
-        description: "Authenticated donor-facing landing page for published briefs.",
+        description:
+          "Authenticated donor-facing landing page for published briefs.",
         openHref: "/donors",
       },
       {
         path: "/donors/[slug]",
         example: "/donors/new-city-fellowship-brief",
         label: "Public Donor Brief",
-        description: "Published donor brief experience with SAVE brief, AI summary, and relational discernment.",
+        description:
+          "Published donor brief experience with SAVE brief, AI summary, and relational discernment.",
         openHref: "/donors/new-city-fellowship-brief",
       },
       {
         path: "/donors/request-access",
         label: "Donor Access Request",
-        description: "Public request form for prospective donors seeking platform access.",
+        description:
+          "Public request form for prospective donors seeking platform access.",
         openHref: "/donors/request-access",
       },
       {
         path: "/donors/compare",
         label: "Donor Compare",
-        description: "Authenticated donor-side nonprofit comparison view for published briefs.",
+        description:
+          "Authenticated donor-side nonprofit comparison view for published briefs.",
         openHref:
           "/donors/compare?left=new-city-fellowship-brief&right=new-city-fellowship-brief",
       },
@@ -197,14 +215,17 @@ const sections: RouteSection[] = [
         path: "/brief/[slug]",
         example: "/brief/new-city-fellowship-brief",
         label: "Legacy Brief Route",
-        description: "Alternate brief route useful for internal checks or older share paths.",
+        description:
+          "Alternate brief route useful for internal checks or older share paths.",
         openHref: "/brief/new-city-fellowship-brief",
       },
       {
         path: "/voice-alignment/[token]",
         label: "Voice Alignment Invite Form",
-        description: "Invite-only public feedback form used for internal and external response collection.",
-        notes: "Dynamic token required. No stable public example should be exposed here.",
+        description:
+          "Invite-only public feedback form used for internal and external response collection.",
+        notes:
+          "Dynamic token required. No stable public example should be exposed here.",
       },
     ],
   },
@@ -216,7 +237,9 @@ function RouteCard({ route }: { route: RouteEntry }) {
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="space-y-3">
           <div>
-            <h3 className="text-lg font-semibold text-[#1A4480]">{route.label}</h3>
+            <h3 className="text-lg font-semibold text-[#1A4480]">
+              {route.label}
+            </h3>
             <p className="mt-2 max-w-3xl text-sm leading-7 text-[#7088A5]">
               {route.description}
             </p>

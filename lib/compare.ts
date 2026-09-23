@@ -5,7 +5,10 @@ import { requireDonorBriefs } from "@/lib/donors";
 import { getPublishedBriefBySlug } from "@/lib/brief";
 import { getRelationalDiligenceStatus } from "@/lib/diligence";
 import { getSaveTier, type SaveTier } from "@/lib/save-tier";
-import { getRecommendationLevel, requireReviewerPageAccess } from "@/lib/review";
+import {
+  getRecommendationLevel,
+  requireReviewerPageAccess,
+} from "@/lib/review";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   Applications,
@@ -50,7 +53,11 @@ export type ComparisonPageData = {
   rightValue: string | null;
 };
 
-function getCheckSignal(checks: ExternalCheck[], source: string, label: string) {
+function getCheckSignal(
+  checks: ExternalCheck[],
+  source: string,
+  label: string,
+) {
   const check = checks.find((item) => item.source === source);
 
   if (!check) {
@@ -190,13 +197,18 @@ export async function getReviewerComparisonPageData(
     { data: organizations },
     { data: scores },
     { data: voiceAlignmentSummaries },
-  ] =
-    await Promise.all([
-      admin.from("applications").select("*").order("created_at", { ascending: false }),
-      admin.from("organizations").select("*"),
-      admin.from("scores").select("*").order("calculated_at", { ascending: false }),
-      admin.from("voice_alignment_summaries").select("*"),
-    ]);
+  ] = await Promise.all([
+    admin
+      .from("applications")
+      .select("*")
+      .order("created_at", { ascending: false }),
+    admin.from("organizations").select("*"),
+    admin
+      .from("scores")
+      .select("*")
+      .order("calculated_at", { ascending: false }),
+    admin.from("voice_alignment_summaries").select("*"),
+  ]);
 
   const applicationRows = (applications ?? []) as Applications[];
   const organizationRows = (organizations ?? []) as Organizations[];
@@ -213,7 +225,8 @@ export async function getReviewerComparisonPageData(
     }
   }
 
-  for (const summary of (voiceAlignmentSummaries ?? []) as VoiceAlignmentSummaryRecord[]) {
+  for (const summary of (voiceAlignmentSummaries ??
+    []) as VoiceAlignmentSummaryRecord[]) {
     if (!voiceAlignmentMap.has(summary.application_id)) {
       voiceAlignmentMap.set(summary.application_id, summary);
     }
@@ -237,7 +250,9 @@ export async function getReviewerComparisonPageData(
   }));
   const resolvedLeftValue = leftValue ?? options[0]?.value ?? null;
   const resolvedRightValue =
-    rightValue ?? options.find((item) => item.value !== resolvedLeftValue)?.value ?? resolvedLeftValue;
+    rightValue ??
+    options.find((item) => item.value !== resolvedLeftValue)?.value ??
+    resolvedLeftValue;
 
   const selectedIds = [resolvedLeftValue, resolvedRightValue].filter(
     (value): value is string => Boolean(value),
@@ -251,9 +266,9 @@ export async function getReviewerComparisonPageData(
         .order("checked_at", { ascending: false })
     : { data: [] as ExternalCheck[] };
 
-  const checksByApplication = ((externalChecks ?? []) as ExternalCheck[]).reduce<
-    Map<string, ExternalCheck[]>
-  >((map, check) => {
+  const checksByApplication = (
+    (externalChecks ?? []) as ExternalCheck[]
+  ).reduce<Map<string, ExternalCheck[]>>((map, check) => {
     const current = map.get(check.application_id) ?? [];
     current.push(check);
     map.set(check.application_id, current);
@@ -329,7 +344,9 @@ export async function getDonorComparisonPageData(
   }));
   const resolvedLeftValue = leftValue ?? options[0]?.value ?? null;
   const resolvedRightValue =
-    rightValue ?? options.find((item) => item.value !== resolvedLeftValue)?.value ?? resolvedLeftValue;
+    rightValue ??
+    options.find((item) => item.value !== resolvedLeftValue)?.value ??
+    resolvedLeftValue;
 
   async function loadRecord(slug: string | null) {
     if (!slug) {
@@ -352,7 +369,8 @@ export async function getDonorComparisonPageData(
       application: data.application,
       checks: data.externalChecks,
       engagements: (engagementRows ?? []) as DiligenceEngagement[],
-      fallbackRecommendation: data.brief.recommendation_level ?? data.scoreRecommendation,
+      fallbackRecommendation:
+        data.brief.recommendation_level ?? data.scoreRecommendation,
       org: data.org,
       voiceAlignmentStatus: data.voiceAlignment?.status ?? null,
     });
