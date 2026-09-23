@@ -211,3 +211,80 @@ has been exercised.
 Related: Finding O (the generic eight-status selector reappears after approval),
 and the observation that `vetting_submitted` is transient — an application passes
 through it in seconds on its way to `under_review`.
+
+---
+
+## Staff review stage (2026-09-23)
+
+Reviewer assigned and the submitted evidence examined through the real staff
+workspace as `pilot-admin@savestandard.org`. No score was overridden and no
+answer changed.
+
+### `PRODUCTION VERIFIED`
+
+- **Reviewer assignment.** Assigned through the real UI; persisted to
+  `organizations.assigned_reviewer_id`. Only the pilot organisation row changed —
+  the application row, status and score were untouched.
+- **Complete Application evidence (Finding R).** All eight sections render the
+  ministry's answers verbatim, labelled "Read-only ministry evidence — scoring,
+  risk flags and SAVE-assisted analysis appear separately below."
+- **References (Finding S).** All three render with name, role, email and
+  relationship, and score 3/3.
+- **Documents.** All six listed; a signed link returns HTTP 200,
+  `application/pdf`, `%PDF-1.4`. Short-lived signed URLs work.
+- **Document analysis.** 990, Bylaws and Doctrinal analyses ran against the real
+  uploaded files and correctly identified them as fictional placeholders without
+  real content — the analysis read the documents rather than the form.
+- **AI summary (P2).** Generated from the submitted evidence; the payload keeps
+  `ministry_submitted` and `save_derived_context` separate, and the UI labels the
+  output "SAVE's synthesis, not the ministry's testimony". The summary surfaced
+  the IRS and website flags as top risks.
+
+### `FOUNDER DECISION REQUIRED` — five points are awarded without evidence
+
+Two scoring components award credit for judgements nobody has made:
+
+| Component | Awarded | Rationale as displayed |
+| --- | --- | --- |
+| `self_score_honesty` | 3 / 3 | "Default reviewer honesty credit applied **pending manual review**" |
+| `irs_clean` | 2 / 2 | "Default IRS/external-check credit applied **pending analyst review**" |
+
+No reviewer had reviewed anything when these were awarded. Worse, `irs_clean`
+contradicts SAVE's own evidence: the **IRS TEOS check flagged "EIN not found in
+IRS database"**, and the Website check flagged "Website returned error or is
+unreachable", while the engine granted full external-check credit.
+
+Without these two defaults the composite would be **78/100** rather than 83/100.
+The engine's own AI summary lists the IRS flag as a top risk, so SAVE's analysis
+and SAVE's score currently disagree with each other.
+
+Recorded, not corrected — scoring policy is frozen by founder direction.
+
+### `FOUNDER DECISION REQUIRED` — presence-based scoring
+
+`theory_of_change` (5/5), `spiritual_measurement_method` (4/4) and
+`leadership_conflict_notes` (3/3) are awarded because text "was provided". The
+rationale strings say so explicitly. A ministry writing "None." in the conflict
+field appears to earn the same three points as one describing a mediated
+conflict. This is the known fruit length/keyword calibration issue reaching
+components outside the fruit category.
+
+### `MISSING IMPLEMENTATION` — no reviewer-role account exists
+
+Only two staff identities exist, both `admin`: `pilot-admin@savestandard.org`
+and `ryan@usamissionaries.org`. There is no account with the `reviewer` role, so
+reviewer-versus-admin scoping cannot be exercised, and the second-reviewer gate
+on a donor brief cannot be tested without involving a real founder account. A
+disposable `reviewer`-role identity is needed before the publishing gate can be
+verified end to end.
+
+### Reviewer observations, not defects
+
+- `references` scored 3/3 from what the ministry submitted, while the
+  `References` external check is still "Pending — No result recorded". SAVE has
+  credited references it has not yet contacted. Defensible as "references
+  supplied", but submitted evidence and verified evidence are not the same thing.
+- `leader_marital_status` awards 4/4 for "Married and stable". That is a rubric
+  policy question rather than a defect.
+- Four external checks are adverse (IRS TEOS, Website, Bylaws Analysis,
+  Doctrinal Analysis) and three remain Pending (Form 990, Candid, References).
