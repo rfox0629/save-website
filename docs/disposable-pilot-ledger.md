@@ -103,3 +103,83 @@ a known result rather than a remembered one.
 length/keyword rules, and Findings A, A2 and B remain untouched by founder
 direction. This record exists so that when they are revisited, the change in
 output is visible rather than inferred.
+
+---
+
+## Attribution integrity — Findings G and L (2026-09-23)
+
+### G — a staff departure destroyed evidence — `BUG FOUND + FIXED`
+
+`reviewer_notes.reviewer_id` cascaded from `auth.users`: deleting a staff
+identity deleted their reviewer notes outright — the evidence itself, not the
+byline. Every other person column was `set null`, which kept the row and erased
+who acted, including `applications.decision_made_by`.
+
+Repaired in [#30](https://github.com/rfox0629/save-website/pull/30) with
+immutable attribution snapshots plus soft deactivation (`profiles.deactivated_at`).
+The live foreign key resolves the current identity; the snapshot
+(`<role>_actor_id/name/email`) is written at the action and never afterwards.
+Eleven historical staff actions carry snapshots.
+`organizations.assigned_reviewer_id` deliberately does not: it is a current
+assignment, not a historical event.
+
+**Proved in production:** deleting a reviewer's identity leaves the note intact,
+the live id released to null, and the snapshot id, email and note text retained.
+A deactivated admin holding the same live session reads 0 applications, 0 vetting
+responses, 0 notes and 0 briefs, where an active one reads 3.
+
+### L — an authorless brief was approvable by anyone — `BUG FOUND + FIXED`
+
+The gate was `generated_by === approver`. A null author makes that comparison
+false, so the two-person requirement vanished exactly when authorship was
+missing. Approval now fails closed: an author must be identifiable from the live
+foreign key or the snapshot, and the author can never approve their own brief.
+
+### Assessment decisions have no distinct action — `FOUNDER DECISION REQUIRED`
+
+`applications.decision_made_by` exists, has a foreign key, and **has never been
+written by any code path**. Investigating why found the reason: there is no
+distinct assessment-decision mutation. `approved` and `declined` are reachable
+only through the generic eight-status selector, and `hard_stop` and
+`under_review` are written automatically by the pipeline.
+
+Attribution was therefore deliberately **not** added for it — snapshotting a
+write that never happens would repeat the defect. Recording who decided requires
+a real decision action first. This connects to Finding O (the generic status
+selector) and to the observation that `vetting_submitted` is transient: an
+application passes through it in seconds on its way to `under_review`.
+
+### Attribution was barely recorded at all — `PRODUCTION VERIFIED` (as a baseline)
+
+Before this work, exactly **one row** in the entire database carried a person
+attribution (`inquiry_events.actor_id`). Fourteen rows of external checks, six
+documents, three applications, two briefs, two scores and two risk flags all had
+none. Those rows are historically irrecoverable and are recorded as such — no
+actor was inferred from timestamps, assignments, membership or likely users.
+
+### Evidence provenance — `BUG FOUND + FIXED`
+
+`documents.uploaded_by` was written only by `/portal/documents`, never by the
+Complete Application, so the pilot's six documents record no supplier. The
+row-level policy scoped documents by organisation but never constrained the
+column, so a client could also name someone else. A `before insert` trigger now
+records the session's own user, fixing both paths and making a client-supplied id
+irrelevant. The six existing documents remain unattributed rather than
+backfilled on assumption.
+
+### Two defects found by verification rather than review
+
+- `reviewer_notes.reviewer_id` was `NOT NULL`, so `on delete set null` could not
+  execute and the delete errored instead — failing safe, but blocking staff
+  offboarding. The column is now nullable; without that the foreign-key change
+  was inert.
+- `getCurrentProfile` selected only `id, role, organization_id`, so the new
+  deactivation gate would have read `undefined` and silently never fired.
+
+### New City Fellowship — single approved correction
+
+The brief was `published = true` with neither author nor approver. Set to
+`published = false`. Donor visibility proved `false` before and `false` after —
+the donor-facing gate filters on `approved_by is not null`, so it was never
+donor-visible. No author, approver or snapshot was added, and no other New City
+record was touched.
