@@ -268,3 +268,98 @@ earn the same three points as a described and mediated conflict.
 
 Deliberately unchanged by founder direction: how narrative evidence should
 contribute will be decided after relational diligence is exercised.
+
+---
+
+## Relational diligence stage (2026-09-23)
+
+Voice Alignment and Time With Leadership exercised end to end against the
+disposable pilot. All diligence content is clearly labelled disposable test
+data: **no site visit, meal or conversation actually took place.**
+
+### `PRODUCTION VERIFIED`
+
+- **Voice Alignment end to end.** Six invitations created by deliberate staff
+  action (3 external from the ministry's own submitted references, 3 internal),
+  six recipient responses submitted through the public token links, all
+  persisted, collection status reached "Ready for Summary", synthesis generated.
+- **The approved model held.** Nothing auto-sent. Each invitation required a
+  staff member to choose to create it, exactly as directed.
+- **Respondent privacy holds.** The page promises feedback "is never attributed
+  back to the person who gave it". Verified: no DOM element contains both a
+  respondent's name and their own response text — names appear only in the
+  invitation roster, responses render unattributed, and the synthesis names
+  nobody. (With three respondents per type, inference remains possible; the
+  promise is non-attribution, not anonymity.)
+- **Synthesis is genuinely triangulated.** It independently surfaced succession
+  planning and administrative capacity as converging internal/external concerns,
+  which is what the respondents actually raised.
+- **Attribution snapshots on live staff actions.** Every invitation and
+  engagement recorded `invited_actor_email` / `created_actor_email`. Finding G's
+  work proving itself on real actions rather than in tests.
+- **Diligence captures relational substance.** Onsite visit, shared meal and
+  reference conversation each recorded with narrative, leadership character,
+  culture and organisational health readings, per-reading confidence markers,
+  strengths, concerns, visibility and private notes.
+
+### `BUG FOUND` — donor excerpt leaks between engagements
+
+The engagement form never resets after a save (`setOpen(false)` only), and the
+donor excerpt is submitted regardless of visibility even though it is only
+rendered when visibility is "summary shareable".
+
+Combined, a donor-facing excerpt written for one engagement silently attaches to
+the next. In this pilot the **reference conversation, explicitly marked internal
+only, carries the shared meal's donor excerpt verbatim** — text never entered for
+it, invisible to the reviewer because the field was not rendered, and describing
+an event that did not happen in that engagement.
+
+Consequences: stale donor-facing text on the wrong record; donor-publishable text
+on a record marked internal only; and a reviewer cannot see or clear it.
+
+Not fixed — reported for direction.
+
+### `MISSING IMPLEMENTATION`
+
+- **Follow-up items cannot be captured.** `diligence_engagements.follow_ups`
+  exists and the API accepts `followUps`, but the form has no field for them. All
+  three engagements recorded zero follow-ups despite follow-up being part of the
+  intended diligence record.
+- **No reference → Voice Alignment prefill.** As already known, staff retyped all
+  three submitted references by hand. Recorded rather than worked around.
+- **No email is sent anywhere in the product.** There is no mail provider, SMTP,
+  or send call in the codebase. `createVoiceAlignmentRequest` inserts a row and
+  returns an invite URL; a human must deliver every link. The UI language of
+  "invitations sent" describes manual delivery. Extends Finding F.
+- **No reference → diligence link.** A reference conversation cannot be
+  associated with the submitted reference it followed up; the connection was
+  noted in free text.
+
+### What the relational evidence says about the mechanical score
+
+Six voice responses and three diligence engagements, against the corrected
+mechanical **78/100**:
+
+- **Supported.** Leadership character is corroborated by six independent sources
+  with no dissenting account — the strongest-evidenced part of the score.
+  Financial disclosure (the 2024 deficit) was described consistently by three
+  unconnected people and was volunteered before being asked.
+- **Supported, but not by the mechanism that scored it.** Fruit narrative
+  components scored on text length and keywords; the relational evidence happens
+  to corroborate the substance (a volunteer discipled in a group now leads one;
+  field staff report no pressure to inflate numbers). The score was right by
+  accident, not by measurement.
+- **Confirmed as a real weakness.** The family-on-board flag is genuine: the
+  board chair and the spouse both raised the arrangement unprompted as something
+  to resolve.
+- **Unchanged.** External trust remains weak on evidence, not on judgment: the
+  IRS EIN is still not found and the website is still unreachable.
+- **Incomplete — the significant gap.** Succession and key-person risk were named
+  independently by at least four sources and by SAVE's own site visit. **No
+  scoring component measures organisational durability or key-person risk at
+  all.** The mechanical score cannot express the single most consistent concern
+  the relational evidence produced.
+
+So: materially **supported** on character and disclosure, **incomplete** on
+durability, and **not improved** on external verification. Recorded as evidence,
+not converted into a score.
