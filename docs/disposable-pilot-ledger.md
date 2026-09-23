@@ -75,3 +75,53 @@ item for the reference stage.
 `package.json` defines `test: vitest run`, but `.github/workflows/ci.yml` runs
 only Lint, Typecheck and Build. No test step exists, so the regression coverage
 added in #19–#25 runs nowhere on merge. Raised rather than folded into #25.
+
+---
+
+## Complete Application run (2026-09-23)
+
+The eight-step Complete Application was completed end to end as **SAVE Pilot
+Test Ministry** with fictional data and submitted. Final engine score **83/100**,
+no hard stop, two medium risk flags (`family_on_board`, `recent_deficit`) — both
+correctly raised by answers deliberately chosen to trigger them.
+
+### `PRODUCTION VERIFIED`
+
+- **S1 reference scoring.** `references` scored **3 of 3** — *"3 valid external
+  references were provided."* Before the fix this was 0 of 3 for every ministry.
+  The three references persisted under `ref_1_*`…`ref_3_*`, the keys scoring now
+  reads.
+- **P1 doctrinal affirmation.** `staff_doctrinal_affirmation` scored **3 of 3**.
+  Previously unearnable. Together with S1 these are the 6 points no ministry
+  could reach.
+- **Attestation persistence (#24).** `attests_information_is_true`,
+  `attestation_name`, `attestation_title` and `attestation_signed_at` all
+  populated from the signed form. The two columns the form never asks about
+  remain unwritten, as designed.
+- **Conditional fields.** Five exercised, each appearing only on the triggering
+  answer: `marriage_sexuality_url`, `family_on_board_relationship`,
+  `deficit_explanation`, `ecfa_body`, `ecfa_lapsed`.
+- **Save/resume.** A full reload restored every answer from steps 1–7,
+  including the `"Yes formal"` ↔ `"Yes, formal structure"` enum round-trip.
+- **Submission handoff.** `vetting_submitted`, `submitted_at` set, 6 documents
+  stored, external checks 4 → 8, scoring engine ran automatically.
+
+### `MISSING IMPLEMENTATION`
+
+- **Step 8 has no draft save.** Steps 1–7 save on each Next click. Step 8's only
+  button is Submit, so uploaded documents, both attestation checkboxes and the
+  signatory fields are lost if the ministry leaves the page. A ministry that
+  uploads six files and steps away loses all six with no warning.
+- **Resume always returns to Step 1.** A part-finished application reopens at the
+  beginning; the ministry must click Next seven times to reach where it left off.
+- **Yes/No toggles expose no pressed state.** They are `<button>` elements with
+  no `aria-pressed` (selection is conveyed by background colour alone), so
+  assistive technology cannot tell which option is selected.
+
+### Tooling limitation (not a product defect)
+
+Synthesized keystrokes and mouse clicks are dropped while the Chrome window is
+not rendered (`document.visibilityState === "hidden"`, zero-size viewport). Form
+entry was completed by setting values through React's native setter and
+dispatching real `input`/`change` events, and every value was then verified
+against the database rather than trusted from the tool's own success message.
