@@ -501,3 +501,150 @@ other column changes, no other row touched, and no migration — the code fix
 prevents recurrence, so this is a one-row cleanup of a value that should never
 have been written rather than a schema concern. Awaiting direction; the rest of
 the pilot evidence stays exactly as entered, imperfect internal answers included.
+
+---
+
+## Findings, roadmap and Brief (2026-09-24)
+
+### `PRODUCTION VERIFIED` — the donor-excerpt repair, in production
+
+Verified against the deployed build, not the test suite:
+
+- a new engagement opens with every field at its default;
+- saving resets the form — kind, narrative, follow-ups, visibility and excerpt all cleared;
+- cancelling resets it identically;
+- an internal-only engagement cannot persist a donor excerpt. Proven below the
+  UI: a crafted API request carrying `visibility: "internal_only"` together with
+  an explicit `donorExcerpt` returned 200 and stored `donor_excerpt` as **null**;
+- switching `summary_shareable → internal_only` clears the excerpt server-side,
+  by the same invariant;
+- follow-up items complete create → save → reload → edit, persisting as a string
+  array and rendering on the engagement.
+
+The approval-revocation path is intact and is now *stronger* than before. It
+compares the new excerpt with the previous one; previously, switching to
+internal-only preserved the stale excerpt so the values matched and **no
+revocation fired**. Clearing it now produces `null !== previous`, so a
+donor-facing change is correctly treated as material. Behavioural proof of an
+actual revocation needs an approved brief, which is outside this stop line.
+
+### Correction of software-generated contamination
+
+One row corrected, by explicit founder approval:
+`diligence_engagements.id = 56770ed7-a9bd-4031-914e-7a99e986e122`,
+`donor_excerpt` set to NULL. No other column, no other row.
+
+**This is not an edit of reviewer testimony.** The value was written by the
+defect, not by a reviewer: before the write its md5 was
+`67a05bda2789da00f2163dee0c763945`, byte-identical to the `shared_meal`
+engagement's excerpt, and it had never been entered against this engagement.
+
+Proven afterwards: that row's excerpt is null; the source `shared_meal`
+engagement retains its own legitimate excerpt unchanged; and every narrative,
+private note, strength and concern across all pilot engagements hashes exactly as
+it did before the write. The imperfect internal Voice Alignment answers remain
+exactly as entered.
+
+### Findings and roadmap
+
+Eight reviewer findings recorded through the production workflow, each attributed
+to `pilot-admin@savestandard.org` and each `is_internal = true`: leadership
+integrity, fruit, governance/family-on-board, succession, external verification,
+financial position, the scope of the mechanical score, and a provenance note
+recording that all relational evidence here is simulated.
+
+Six roadmap items, each a concrete action with an owner, a category and a date,
+rather than a restatement of a concern: a written succession and delegation plan;
+replacing the family board-secretary seat; supplying EIN documentation and
+restoring a reachable website; a dated stipend schedule; a minimum bookkeeping
+and minute-taking standard; and an independent financial review.
+
+### `MISSING IMPLEMENTATION` — the ministry never receives findings or roadmap
+
+Sharing findings writes `applications.findings_shared_at` and the interface then
+states: "The ministry can see its findings and this roadmap."
+
+**It cannot.** There is no authenticated ministry surface for either. The real
+portal offers inquiry, vetting, documents and application only; the findings and
+roadmap pages that exist are `/preview/*` design mockups backed by hardcoded
+data. `roadmap_items` carries no ministry RLS policy at all, so even a direct
+read is refused.
+
+The gate therefore fails closed, which is the safe direction — but the reviewer
+is told delivery happened when nothing was delivered. A reviewer could believe a
+ministry has been given its findings when it has not.
+
+### `MISSING IMPLEMENTATION` — the findings layer cannot see relational evidence
+
+`generateReviewerSummary` loads inquiry responses, the Complete Application,
+external checks and reviewer notes. It never reads `diligence_engagements`,
+`voice_alignment_responses` or `voice_alignment_summaries`.
+
+So the summary that feeds both the reviewer view and the donor projection is
+structurally blind to Voice Alignment and Time With Leadership. Relational
+evidence reaches it only if a reviewer retypes it into a note by hand, which is
+what was done here. Anything a reviewer omits is invisible to every downstream
+surface.
+
+### `MISSING IMPLEMENTATION` — the Brief caps cautions at two
+
+`toBriefFormData` pads commendations to three with `.slice(0, 3)` and cautions to
+two, and the editor offers no way to add more. This file has three material
+cautions — succession, external verification and the family board seat — so the
+form would have forced a reviewer to drop one of them. The Brief was therefore
+saved through the same authenticated API route the editor posts to, carrying all
+three.
+
+The commendations `.slice(0, 3)` is also a latent data-loss path: a brief stored
+with more than three commendations is silently truncated when opened in the
+editor, and the truncation is persisted on the next save.
+
+### Information boundaries — results
+
+Proven at the database, not merely in the interface. `diligence_engagements`,
+`roadmap_items`, `voice_alignment_responses` and `voice_alignment_summaries` all
+have RLS enabled with admin/reviewer policies **only** — no ministry policy and
+no donor policy. `reviewer_notes` permits a ministry to read only rows where
+`is_internal = false`; `createReviewerNote` hardcodes `is_internal: true`, so no
+reviewer note can reach a ministry.
+
+The donor surface is double-gated: `getPublishedBriefBySlug` requires
+`published = true` **and** `approved_by IS NOT NULL`. Fetched without a session,
+the public brief URL returns the application shell with no headline, no cautions
+and no ministry name.
+
+The generated Brief was inspected for leakage and contains none: no respondent
+name, no verbatim Voice Alignment response, no private note, and no reviewer-note
+fragment. Including Voice Alignment in a Brief exposes only the parsed synthesis,
+which names nobody — `resolvePublicVoiceAlignment` returns the summary alone and
+never the individual responses.
+
+One structural observation worth recording: donor-facing strengths and risks are
+read from `ai_summary`, the same reviewer summary generated from internal
+reviewer notes. There is no separately authored donor summary. Nothing reaches a
+donor without publication and second-reviewer approval, so this is a matter of
+provenance rather than exposure — but donor-facing copy does derive from internal
+material rather than being independently curated.
+
+### The Brief
+
+Generated through the authenticated staff workflow. `generated_by` moved from
+null to the acting reviewer, with the immutable snapshot alongside it
+(`generated_actor_id`, `generated_actor_email = pilot-admin@savestandard.org`) —
+the Finding G and L repairs exercised on a real action. `generated_actor_name` is
+null because that profile carries no display name.
+
+It is unpublished, unapproved, and waiting for an independent reviewer. Because
+`resolveBriefAuthorId` returns the author, the same identity cannot approve it.
+
+Recommendation level was authored from the evidence as **Recommended with
+Conditions** rather than left at the seeded "Recommended". The mechanical 78/100
+is presented as one input and explicitly not as SAVE's assessment; succession
+survives into the Brief despite having no scoring component; the family-board
+concern carries its context; and the Brief opens by stating plainly that SAVE did
+not visit this ministry, share a meal with anyone connected to it, or hold any
+real-world conversation with a reference.
+
+One engagement — a `video_call` dated 2026-09-24 and labelled VERIFICATION
+RECORD — exists only to verify the repair. It is not diligence evidence and is
+excluded from the findings, the roadmap and the Brief.
