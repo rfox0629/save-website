@@ -351,7 +351,7 @@ async function getCurrentProfile() {
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("id, role, organization_id, deactivated_at")
+    .select("id, role, organization_id, deactivated_at, display_name")
     .eq("id", user.id)
     .maybeSingle();
 
