@@ -648,3 +648,133 @@ real-world conversation with a reference.
 One engagement — a `video_call` dated 2026-09-24 and labelled VERIFICATION
 RECORD — exists only to verify the repair. It is not diligence evidence and is
 excluded from the findings, the roadmap and the Brief.
+
+---
+
+## Independent review and the decision lifecycle (2026-09-24)
+
+### Test-generated duplication, corrected
+
+One roadmap row was deleted: `6df7b98f-814d-4fc4-af63-ddfb6b3033b5`.
+
+Proof before deletion. Both rows carried the same title, the same `detail` hash
+`a4ab0dd46a379c768bfeb93af67bfdbf`, the same owner, due date and status, so they
+were duplicates rather than two distinct asks. The discriminator was `category`:
+every form submission during that session stored `category` as null because of a
+React state problem in the automation, while the deliberate API submission sent
+`category: "financial"` explicitly. The surviving row `4500e469` carries
+`financial`; the deleted row carried null and was written 57 seconds later, when
+a stalled browser tab finally flushed a save that had already been reported as
+failed. Exactly one title was duplicated, nothing references `roadmap_items`, and
+the delete matched on id, title, null category and exact timestamp together.
+
+Seven roadmap rows remain, all six substantive items intact.
+
+**This is test-generated duplication, not an editorial change to the
+assessment.** No reviewer judgement was altered.
+
+**Not a product defect.** The roadmap Save control is disabled for the whole
+request (`disabled={pending || !title.trim()}`), so a person cannot easily
+double-submit by clicking twice. The duplicate arose because automation issued
+the action twice — once through a stalled tab and once through the API. No
+deduplication was built, since there is no evidence of a normal product risk.
+
+### Draft donor Brief access, closed
+
+No state representing ministry Brief review or sign-off exists anywhere.
+`donor_briefs` has no such column, and `applications` has only
+`findings_shared_at`, which covers findings and roadmap.
+
+A ministry could previously read its own donor brief at any stage, including a
+working draft carrying cautions written for donors. The portal already filtered
+on `published`, so nothing in the product depended on the wider access — it was
+reachable only by querying the API directly with a ministry token.
+
+Until a deliberate sign-off state exists, a ministry now sees a brief on the same
+terms a donor does: published, and approved by a second reviewer. Verified as the
+ministry identity: draft briefs visible **0**, findings 4, roadmap 7, internal
+diligence 0, Voice Alignment 0. No sign-off state was invented.
+
+### `PRODUCTION VERIFIED` — the independence gate
+
+Attempted in production as the brief's own author: refused with "You wrote this
+brief, so you cannot be its second reviewer." The brief remains unapproved.
+
+Approval does **not** publish. It writes `approved_at`, `approved_by` and the
+approver snapshot only; publishing is a separate action gated on approval. There
+is no coupling defect to report.
+
+Deactivation protection is intact: `requireReviewerMutationAccess` rejects a
+deactivated profile before any role check, so a session outliving offboarding
+cannot approve. An authorless brief fails closed in `canApproveBrief`, covered by
+nine unit tests.
+
+### `BLOCKED` — the approval action itself
+
+`pilot-reviewer@savestandard.org` exists, has role exactly `reviewer`, is not
+deactivated, and has never signed in. Acting as that identity requires its
+password, which is not something to handle, so the approve action was not
+performed. What the identity *can reach* was exercised directly under RLS: the
+Complete Application, inquiry, 6 documents, 14 external checks, scores, risk
+flags, the Voice Alignment synthesis, 5 Time With Leadership engagements, all 12
+reviewer notes, the roadmap and the briefs.
+
+No agreement was manufactured. The recommendation remains the first reviewer's
+proposal.
+
+### `MISSING IMPLEMENTATION` — a reviewer can only agree
+
+The second reviewer has exactly two actions: "Approve as second reviewer" and
+"Withdraw approval". There is no way to request changes, record a disagreement,
+attach a condition, note what was examined, or say that a caution is overstated
+or a commendation unsupported. A reviewer who disagrees can only decline to
+click, which is indistinguishable from not having looked yet.
+
+Nothing records *that* a review happened, only that approval did.
+
+### Reviewer access to respondent-level Voice Alignment
+
+Staff reviewers can read individual Voice Alignment responses with respondent
+names attached — six of them here. This is the product's actual permission model
+rather than something loosened for the test. The promise that feedback is "never
+attributed back to the person who gave it" holds against ministries and donors,
+not against SAVE staff. Worth deciding deliberately rather than by default.
+
+### `FOUNDER DECISION REQUIRED` — the smallest decision lifecycle
+
+Grounded in what this pilot actually needed, not the eight-status selector.
+
+The pilot produced four distinct things that the product currently conflates:
+a reviewer's *proposed* recommendation ("Recommended with Conditions"), an
+independent reviewer's *judgement of that proposal*, SAVE's *formal decision*
+about the ministry, and the act of *publishing* to donors. Today only the first
+and last have real actions, and approval silently stands in for the middle two.
+
+Most of the state already exists:
+
+| Stage | State today | Gap |
+| --- | --- | --- |
+| Reviewer recommendation | `donor_briefs.recommendation_level` | no "submitted for review" moment |
+| Independent review | `approved_by`, `approved_at`, snapshots | approve only — no request-changes, no reason |
+| Formal SAVE decision | `applications.decision`, `decision_date`, `decision_notes`, `decision_made_by` | **columns exist and are read in two places, but nothing ever writes them** |
+| Publication | `published`, `published_at` | none |
+
+The decision columns are already rendered on the staff page, and
+`decision_notes` is already rendered to the **ministry** in its portal. The read
+surfaces are built and waiting.
+
+**Proposed smallest model — two additions, no new tables:**
+
+1. A review outcome on the brief: `review_outcome` (`approved` |
+   `changes_requested`) with `review_note` and the existing approver snapshot.
+   Requesting changes returns the brief to its author with a reason, and records
+   that an independent review happened even when it did not end in approval.
+2. One explicit decision action writing the four `applications.decision*`
+   columns, available only after an independent review has approved, and
+   separate from publishing.
+
+Publication then requires: a decision recorded, and a brief approved. A ministry
+sees the decision through the surface that already exists.
+
+Deliberately excluded: any new status enum, any workflow engine, and any change
+to scoring. Not implemented — proposal only.
