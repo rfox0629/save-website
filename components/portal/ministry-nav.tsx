@@ -32,7 +32,7 @@ export function MinistryNav({
   canPreview = false,
   currentViewMode = "admin",
 }: {
-  active: "documents" | "inquiry" | "overview" | "vetting";
+  active: "documents" | "findings" | "inquiry" | "overview" | "vetting";
   canPreview?: boolean;
   currentViewMode?: ViewMode;
 }) {
@@ -59,6 +59,11 @@ export function MinistryNav({
             active={active === "documents"}
             href="/portal/documents"
             label="Documents"
+          />
+          <PortalNavLink
+            active={active === "findings"}
+            href="/portal/findings"
+            label="Findings"
           />
         </div>
 
