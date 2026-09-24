@@ -253,6 +253,13 @@ function matchesFlagSeverity(severity: FlagSeverity | null, filter?: string) {
   return severity === filter;
 }
 
+/**
+ * Statuses that only SAVE's formal decision may set. `hard_stop` is excluded:
+ * it is a scoring outcome the pipeline records, not a judgement a person makes
+ * in this form.
+ */
+export const DECISION_OWNED_STATUSES = new Set(["approved", "declined"]);
+
 export function getStatusLabel(status: string) {
   return status
     .split("_")
@@ -880,6 +887,16 @@ export async function updateApplicationStatus(params: {
     );
   }
 
+  // `approved` and `declined` are outcomes of SAVE's formal decision, not
+  // stages a reviewer moves through. They are written by the decision action,
+  // which requires an independently approved brief and an administrator. A
+  // dropdown must not be able to stand in for that.
+  if (DECISION_OWNED_STATUSES.has(params.status)) {
+    throw new Error(
+      "Approving or declining an assessment is a formal SAVE decision, not a status change. Record it in the decision section, which requires an approved donor brief.",
+    );
+  }
+
   const { error } = await db
     .from("applications")
     .update(buildStatusUpdate(params.status, existingCycleYear))
@@ -903,7 +920,7 @@ export async function recordInquiryDecision(params: {
   ministryMessage?: string | null;
   staffNote?: string | null;
 }) {
-  const { user } = await requireReviewerMutationAccess();
+  const { profile, user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
   const db = admin;
 
@@ -938,9 +955,9 @@ export async function recordInquiryDecision(params: {
 
   const { error: eventError } = await db.from("inquiry_events").insert({
     actor_id: user.id,
-    actor_snapshot_email: toActorIdentity(user).email,
+    actor_snapshot_email: toActorIdentity(user, profile).email,
     actor_snapshot_id: user.id,
-    actor_snapshot_name: toActorIdentity(user).name,
+    actor_snapshot_name: toActorIdentity(user, profile).name,
     application_id: params.applicationId,
     kind: plan.eventKind,
     ministry_message: plan.ministryMessage,
@@ -1000,7 +1017,7 @@ export async function overrideCategoryScore(params: {
   note: string;
   score: number;
 }) {
-  const { user } = await requireReviewerMutationAccess();
+  const { profile, user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
   const db = admin;
   const latestScore = await getLatestScoreOrThrow(params.applicationId);
@@ -1029,7 +1046,7 @@ export async function overrideCategoryScore(params: {
     .update({
       [scoreField]: params.score,
       override_by: user.id,
-      ...buildActorSnapshot("override", toActorIdentity(user)),
+      ...buildActorSnapshot("override", toActorIdentity(user, profile)),
       override_notes: `[${params.category}] ${params.note}`,
       total_score:
         currentTotals.leadership +
@@ -1061,7 +1078,7 @@ export async function resolveRiskFlag(params: {
   flagId: string;
   resolutionNotes: string;
 }) {
-  const { user } = await requireReviewerMutationAccess();
+  const { profile, user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
   const db = admin;
 
@@ -1072,7 +1089,7 @@ export async function resolveRiskFlag(params: {
       resolved: true,
       resolved_at: new Date().toISOString(),
       resolved_by: user.id,
-      ...buildActorSnapshot("resolved", toActorIdentity(user)),
+      ...buildActorSnapshot("resolved", toActorIdentity(user, profile)),
     })
     .eq("id", params.flagId)
     .eq("application_id", params.applicationId);
@@ -1089,7 +1106,7 @@ export async function markDocumentReviewed(params: {
   documentId: string;
   reviewed: boolean;
 }) {
-  const { user } = await requireReviewerMutationAccess();
+  const { profile, user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
   const db = admin;
 
@@ -1101,7 +1118,7 @@ export async function markDocumentReviewed(params: {
       // Un-reviewing clears the attribution too: it records who reviewed the
       // document, and after this nobody has.
       ...(params.reviewed
-        ? buildActorSnapshot("reviewer", toActorIdentity(user))
+        ? buildActorSnapshot("reviewer", toActorIdentity(user, profile))
         : {
             reviewer_actor_email: null,
             reviewer_actor_id: null,
@@ -1128,7 +1145,7 @@ export async function saveExternalCheck(params: {
   status: string;
   summary: string;
 }) {
-  const { user } = await requireReviewerMutationAccess();
+  const { profile, user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
   const db = admin;
   const { data: existing } = await admin
@@ -1150,7 +1167,7 @@ export async function saveExternalCheck(params: {
     application_id: params.applicationId,
     checked_at: new Date().toISOString(),
     checked_by: user.id,
-    ...buildActorSnapshot("checked", toActorIdentity(user)),
+    ...buildActorSnapshot("checked", toActorIdentity(user, profile)),
     raw_result: {
       ...existingRawResult,
       ...(params.rawResult &&
@@ -1197,7 +1214,7 @@ export async function createReviewerNote(params: {
   note: string;
   section: string;
 }) {
-  const { user } = await requireReviewerMutationAccess();
+  const { profile, user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
   const db = admin;
 
@@ -1209,7 +1226,7 @@ export async function createReviewerNote(params: {
     section: params.section,
     // The note outlives the reviewer: the live id resolves them today, the
     // snapshot says who wrote it once they have gone.
-    ...buildActorSnapshot("reviewer", toActorIdentity(user)),
+    ...buildActorSnapshot("reviewer", toActorIdentity(user, profile)),
   });
 
   if (error) {

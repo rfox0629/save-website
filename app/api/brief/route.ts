@@ -5,6 +5,7 @@ import {
   getMaterialBriefChanges,
   revokeBriefApprovalForMaterialChange,
 } from "@/lib/brief-approval";
+import { canPublish } from "@/lib/brief-review";
 import { requireReviewerMutationAccess } from "@/lib/review";
 import { getRequestBaseUrl } from "@/lib/site-url";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -25,7 +26,7 @@ function slugify(value: string) {
 
 export async function POST(request: Request) {
   try {
-    const { user } = await requireReviewerMutationAccess();
+    const { profile, user } = await requireReviewerMutationAccess();
     const body = (await request.json().catch(() => null)) as {
       application_id?: string;
       cautions?: string[];
@@ -95,15 +96,28 @@ export async function POST(request: Request) {
     const resolvedExistingBrief = existingBrief as DonorBrief | null;
 
     // Founder decision B3: nothing becomes donor-visible on one reviewer's say-so.
+    // Publication needs both gates — an independently approved brief and a
+    // recorded SAVE decision. Neither implies the other, and neither publishes
+    // anything by happening.
     if (body.published) {
       const approvedBy = resolvedExistingBrief?.approved_by ?? null;
 
-      if (!approvedBy) {
+      const { data: applicationRow } = await admin
+        .from("applications")
+        .select("decision")
+        .eq("id", body.application_id)
+        .maybeSingle();
+
+      const publishGate = canPublish({
+        brief: resolvedExistingBrief,
+        decision:
+          (applicationRow as { decision: string | null } | null)?.decision ??
+          null,
+      });
+
+      if (!publishGate.allowed) {
         return NextResponse.json(
-          {
-            error:
-              "A second reviewer must approve this brief before it can be published to donors.",
-          },
+          { error: publishGate.reason },
           { status: 400 },
         );
       }
@@ -125,7 +139,7 @@ export async function POST(request: Request) {
       commendations: filteredCommendations,
       generated_at: now,
       generated_by: user.id,
-      ...buildActorSnapshot("generated", toActorIdentity(user)),
+      ...buildActorSnapshot("generated", toActorIdentity(user, profile)),
       headline: body.headline ?? null,
       include_voice_alignment: Boolean(body.include_voice_alignment),
       ministry_description: body.ministry_description ?? null,

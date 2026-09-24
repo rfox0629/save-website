@@ -424,7 +424,7 @@ export async function createVoiceAlignmentRequest(
   input: CreateVoiceAlignmentRequestInput,
 ) {
   const parsed = createRequestSchema.parse(input);
-  const { user } = await requireReviewerMutationAccess();
+  const { profile, user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
   const { data: application } = await admin
     .from("applications")
@@ -444,7 +444,7 @@ export async function createVoiceAlignmentRequest(
     {
       application_id: resolvedApplication.id,
       invited_by: user.id,
-      ...buildActorSnapshot("invited", toActorIdentity(user)),
+      ...buildActorSnapshot("invited", toActorIdentity(user, profile)),
       organization_id: resolvedApplication.organization_id,
       relationship: parsed.relationship?.trim() || null,
       request_type: parsed.requestType,
