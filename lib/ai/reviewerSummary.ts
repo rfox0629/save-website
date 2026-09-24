@@ -3,9 +3,16 @@ import "server-only";
 import { z } from "zod";
 
 import { completeJson, extractJsonObject } from "@/lib/ai/openai";
+import {
+  assembleReviewerSummaryPayload,
+  buildTimeWithLeadershipPayload,
+  buildVoiceAlignmentPayload,
+  compactRecord,
+} from "@/lib/ai/reviewer-summary-payload";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type {
   Applications,
+  DiligenceEngagement,
   ExternalCheck,
   InquiryResponse,
   Organizations,
@@ -51,36 +58,6 @@ type LoadedApplication = Pick<
 > & {
   organizations: Organizations | null;
 };
-
-function compactValue(value: unknown): unknown {
-  if (value === null || value === undefined) {
-    return undefined;
-  }
-
-  if (typeof value === "string") {
-    const trimmed = value.trim();
-    return trimmed.length > 0 ? trimmed : undefined;
-  }
-
-  if (Array.isArray(value)) {
-    const compacted = value
-      .map((item) => compactValue(item))
-      .filter((item): item is NonNullable<typeof item> => item !== undefined);
-
-    return compacted.length > 0 ? compacted : undefined;
-  }
-
-  return value;
-}
-
-function compactRecord(record: Record<string, unknown>) {
-  return Object.fromEntries(
-    Object.entries(record).flatMap(([key, value]) => {
-      const compacted = compactValue(value);
-      return compacted === undefined ? [] : [[key, compacted]];
-    }),
-  );
-}
 
 function buildOrganizationPayload(organization: Organizations) {
   return compactRecord({
@@ -235,6 +212,17 @@ If information is missing or unclear, say so plainly and lower confidence approp
 Keep the output concise and useful for a human donor/reviewer.
 Stay grounded in leadership integrity, doctrine, governance, financial stewardship, and fruit.
 
+The evidence is separated by where it came from, and you must respect that separation:
+- "ministry_submitted" is the ministry's own account of itself. Never present it as verified.
+- "save_documents_and_external_checks" is what SAVE confirmed, or failed to confirm, from documents and public records. An absent or failed check is a gap in evidence, not proof of wrongdoing.
+- "save_voice_alignment" is the approved, unattributed synthesis of what people around the ministry said independently. Never guess who said what, and never attribute any of it to a named individual.
+- "save_time_with_leadership" is SAVE's own record of relational diligence. Where several independent sources agree, say so — corroboration across sources is stronger evidence than any single account.
+- "reviewer_authored" is a SAVE reviewer's own opinion. Never present it as the ministry's testimony or as an independent voice.
+
+A concern carried by the relational evidence matters even when no score measures it. Do not drop a risk merely because it has no numeric component.
+
+If any evidence states that it is simulated, a test record, or that an engagement did not actually take place, you must say so explicitly in the executive summary and must not describe that engagement as though it really happened.
+
 Return ONLY a valid JSON object with this exact structure:
 {
   "executive_summary": "",
@@ -297,8 +285,14 @@ export async function generateReviewerSummary(applicationId: string) {
     throw new Error("Application organization could not be loaded.");
   }
 
-  const [inquiryResponse, vettingResponse, externalChecks, reviewerNotes] =
-    await Promise.all([
+  const [
+    inquiryResponse,
+    vettingResponse,
+    externalChecks,
+    reviewerNotes,
+    diligenceEngagements,
+    voiceAlignmentSummary,
+  ] = await Promise.all([
       admin
         .from("inquiry_responses")
         .select("*")
@@ -319,27 +313,54 @@ export async function generateReviewerSummary(applicationId: string) {
         .select("*")
         .eq("application_id", applicationId)
         .order("created_at", { ascending: false }),
+      admin
+        .from("diligence_engagements")
+        .select("*")
+        .eq("application_id", applicationId)
+        .order("occurred_on", { ascending: false, nullsFirst: false }),
+      // The synthesis, not the responses behind it: respondents are promised
+      // their feedback is never attributed back to them.
+      admin
+        .from("voice_alignment_summaries")
+        .select("*")
+        .eq("application_id", applicationId)
+        .order("generated_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
     ]);
 
   const inquiry = inquiryResponse.data as InquiryResponse | null;
   const vetting = vettingResponse.data as VettingResponse | null;
   const checks = (externalChecks.data ?? []) as ExternalCheck[];
   const notes = (reviewerNotes.data ?? []) as ReviewerNote[];
+  const engagements = (diligenceEngagements.data ?? []) as DiligenceEngagement[];
+  const alignment = voiceAlignmentSummary.data as {
+    generated_at: string | null;
+    status: string | null;
+    summary: unknown;
+  } | null;
 
-  // The payload separates what the ministry itself submitted from context SAVE
-  // gathered or wrote, so the model cannot present SAVE's own material — or a
-  // reviewer's note — as the ministry's testimony.
-  const payload = compactRecord({
-    ministry_submitted: compactRecord({
+  // Every source of evidence keeps its own bucket, so the model cannot present
+  // SAVE's own material, a reviewer's opinion, or a third party's testimony as
+  // the ministry's own claim. Relational evidence arrives here directly: a
+  // reviewer no longer has to retype it into a note for it to be seen.
+  const payload = assembleReviewerSummaryPayload({
+    externalChecks: buildChecksPayload(checks),
+    ministrySubmitted: compactRecord({
       organization: buildOrganizationPayload(resolvedApplication.organizations),
       inquiry: buildInquiryPayload(inquiry),
       complete_application: buildVettingPayload(vetting),
     }),
-    save_derived_context: compactRecord({
-      external_checks: buildChecksPayload(checks),
-      reviewer_notes:
-        notes.length > 0 ? buildReviewerNotesPayload(notes) : undefined,
-    }),
+    reviewerNotes:
+      notes.length > 0 ? buildReviewerNotesPayload(notes) : undefined,
+    timeWithLeadership: buildTimeWithLeadershipPayload(engagements),
+    voiceAlignment: alignment
+      ? buildVoiceAlignmentPayload({
+          generatedAt: alignment.generated_at,
+          status: alignment.status,
+          summary: alignment.summary,
+        })
+      : undefined,
   });
 
   const text = await completeJson(buildPrompt(payload), 1200);

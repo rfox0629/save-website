@@ -1084,12 +1084,15 @@ export default async function ApplicationWorkspacePage({
               {data.application.findings_shared_at ? (
                 <Callout title="Findings are with the ministry" tone="sage">
                   Shared {formatDate(data.application.findings_shared_at)}. The
-                  ministry can see its findings and this roadmap.
+                  ministry can now read the findings written for it, and this
+                  roadmap, in its own portal. Internal notes and relational
+                  diligence stay inside SAVE.
                 </Callout>
               ) : (
                 <Callout title="Findings are internal" tone="ink">
                   The ministry cannot see its findings or this roadmap yet.
-                  Nothing reaches them until a reviewer shares it.
+                  Nothing reaches them until a reviewer shares it — and only
+                  notes written as findings for the ministry are ever included.
                 </Callout>
               )}
               <div className="mt-3.5">

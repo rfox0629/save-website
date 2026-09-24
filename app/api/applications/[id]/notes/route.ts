@@ -11,6 +11,7 @@ export async function POST(
   try {
     await createReviewerNote({
       applicationId: params.id,
+      ministryFacing: body?.ministryFacing === true,
       note: body?.note,
       section: body?.section,
     });

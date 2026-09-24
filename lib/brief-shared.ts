@@ -84,11 +84,14 @@ export function getRecommendationBadgeClass(level: string | null) {
 
 export function toBriefFormData(brief: DonorBrief | null): BriefFormData {
   return {
+    // Every stored entry is loaded. A fixed slice here silently discarded
+    // material findings on open and persisted the loss on the next save, so a
+    // reviewer could turn three real concerns into two without being told.
     cautions:
-      brief?.cautions && brief.cautions.length > 0 ? brief.cautions : ["", ""],
+      brief?.cautions && brief.cautions.length > 0 ? [...brief.cautions] : ["", ""],
     commendations:
       brief?.commendations && brief.commendations.length > 0
-        ? [...brief.commendations, "", ""].slice(0, 3)
+        ? [...brief.commendations]
         : ["", "", ""],
     headline: brief?.headline ?? "",
     include_voice_alignment: brief?.include_voice_alignment ?? false,

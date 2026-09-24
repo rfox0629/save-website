@@ -497,6 +497,7 @@ export function NoteForm({ applicationId }: { applicationId: string }) {
   const { error, pending, run } = useAction();
   const [note, setNote] = useState("");
   const [section, setSection] = useState("");
+  const [ministryFacing, setMinistryFacing] = useState(false);
 
   return (
     <div>
@@ -511,12 +512,31 @@ export function NoteForm({ applicationId }: { applicationId: string }) {
         <Field label="Note" required>
           <Textarea
             onChange={(event) => setNote(event.target.value)}
-            placeholder="Private to the SAVE team. Never shown to the ministry or donors."
+            placeholder={
+              ministryFacing
+                ? "Written for the ministry to read. Shared only once findings are shared."
+                : "Private to the SAVE team. Never shown to the ministry or donors."
+            }
             rows={4}
             value={note}
           />
         </Field>
       </div>
+      <label className="mt-3 flex items-start gap-2.5 text-caption leading-relaxed text-ink-600">
+        <input
+          checked={ministryFacing}
+          className="mt-0.5"
+          onChange={(event) => setMinistryFacing(event.target.checked)}
+          type="checkbox"
+        />
+        <span>
+          Write this as a finding for the ministry.{" "}
+          <span className="text-ink-400">
+            Ministry-facing findings reach the ministry only after you share
+            findings. Everything else stays inside SAVE.
+          </span>
+        </span>
+      </label>
       <Btn
         className="mt-3 w-full"
         disabled={pending || !note.trim()}
@@ -524,6 +544,7 @@ export function NoteForm({ applicationId }: { applicationId: string }) {
           const ok = await run(
             () =>
               postJson(`/api/applications/${applicationId}/notes`, {
+                ministryFacing,
                 note,
                 section: section || undefined,
               }),
@@ -532,6 +553,7 @@ export function NoteForm({ applicationId }: { applicationId: string }) {
           if (ok) {
             setNote("");
             setSection("");
+            setMinistryFacing(false);
           }
         }}
         size="sm"

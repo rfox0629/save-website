@@ -1189,6 +1189,11 @@ export async function saveExternalCheck(params: {
 
 export async function createReviewerNote(params: {
   applicationId: string;
+  /**
+   * A note is internal unless a reviewer deliberately writes it for the
+   * ministry. Defaulting to internal keeps an unconsidered note private.
+   */
+  ministryFacing?: boolean;
   note: string;
   section: string;
 }) {
@@ -1198,7 +1203,7 @@ export async function createReviewerNote(params: {
 
   const { error } = await db.from("reviewer_notes").insert({
     application_id: params.applicationId,
-    is_internal: true,
+    is_internal: params.ministryFacing !== true,
     note: params.note,
     reviewer_id: user.id,
     section: params.section,

@@ -154,6 +154,32 @@ export function BriefEditor({
     });
   }
 
+  function addListEntry(key: "cautions" | "commendations") {
+    setForm((current) => ({ ...current, [key]: [...current[key], ""] }));
+  }
+
+  // Removing an entry is how a reviewer curates. It is a deliberate act with a
+  // confirmation, never something the form does quietly on their behalf.
+  function removeListEntry(key: "cautions" | "commendations", index: number) {
+    const existing = form[key][index]?.trim();
+
+    if (
+      existing &&
+      !window.confirm(
+        key === "cautions"
+          ? "Remove this caution from the brief? A donor will not see it."
+          : "Remove this commendation from the brief?",
+      )
+    ) {
+      return;
+    }
+
+    setForm((current) => ({
+      ...current,
+      [key]: current[key].filter((_, position) => position !== index),
+    }));
+  }
+
   return (
     <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,460px)]">
       <div className="min-w-0 space-y-6">
@@ -227,30 +253,71 @@ export function BriefEditor({
           />
           <CardBody className="grid gap-5 md:grid-cols-2">
             <div className="space-y-3">
-              <p className="save-eyebrow text-ink-400">Commendations</p>
+              <p className="save-eyebrow text-ink-400">
+                Commendations ({form.commendations.length})
+              </p>
               {form.commendations.map((value, index) => (
-                <Input
-                  key={`commendation-${index + 1}`}
-                  onChange={(event) =>
-                    updateList("commendations", index, event.target.value)
-                  }
-                  placeholder={`Commendation ${index + 1}`}
-                  value={value}
-                />
+                <div className="flex gap-2" key={`commendation-${index + 1}`}>
+                  <Input
+                    onChange={(event) =>
+                      updateList("commendations", index, event.target.value)
+                    }
+                    placeholder={`Commendation ${index + 1}`}
+                    value={value}
+                  />
+                  <Btn
+                    aria-label={`Remove commendation ${index + 1}`}
+                    onClick={() => removeListEntry("commendations", index)}
+                    size="sm"
+                    variant="ghost"
+                  >
+                    Remove
+                  </Btn>
+                </div>
               ))}
+              <Btn
+                onClick={() => addListEntry("commendations")}
+                size="sm"
+                variant="secondary"
+              >
+                Add a commendation
+              </Btn>
             </div>
             <div className="space-y-3">
-              <p className="save-eyebrow text-ink-400">Cautions</p>
+              <p className="save-eyebrow text-ink-400">
+                Cautions ({form.cautions.length})
+              </p>
               {form.cautions.map((value, index) => (
-                <Input
-                  key={`caution-${index + 1}`}
-                  onChange={(event) =>
-                    updateList("cautions", index, event.target.value)
-                  }
-                  placeholder={`Caution ${index + 1} (optional)`}
-                  value={value}
-                />
+                <div className="flex gap-2" key={`caution-${index + 1}`}>
+                  <Input
+                    onChange={(event) =>
+                      updateList("cautions", index, event.target.value)
+                    }
+                    placeholder={`Caution ${index + 1}`}
+                    value={value}
+                  />
+                  <Btn
+                    aria-label={`Remove caution ${index + 1}`}
+                    onClick={() => removeListEntry("cautions", index)}
+                    size="sm"
+                    variant="ghost"
+                  >
+                    Remove
+                  </Btn>
+                </div>
               ))}
+              <Btn
+                onClick={() => addListEntry("cautions")}
+                size="sm"
+                variant="secondary"
+              >
+                Add a caution
+              </Btn>
+              <p className="text-caption leading-relaxed text-ink-400">
+                Every material caution belongs here. If one should not reach
+                donors, remove it deliberately — the brief will not drop it for
+                you.
+              </p>
             </div>
           </CardBody>
         </Card>
