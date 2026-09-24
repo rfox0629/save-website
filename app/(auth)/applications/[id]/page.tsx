@@ -904,7 +904,7 @@ export default async function ApplicationWorkspacePage({
                               Strengths
                             </p>
                             <ul className="list-disc space-y-1 pl-5 text-caption leading-relaxed text-ink-600">
-                              {engagement.strengths.map((item) => (
+                              {engagement.strengths.map((item: string) => (
                                 <li key={item}>{item}</li>
                               ))}
                             </ul>
@@ -916,12 +916,26 @@ export default async function ApplicationWorkspacePage({
                               Concerns
                             </p>
                             <ul className="list-disc space-y-1 pl-5 text-caption leading-relaxed text-ink-600">
-                              {engagement.concerns.map((item) => (
+                              {engagement.concerns.map((item: string) => (
                                 <li key={item}>{item}</li>
                               ))}
                             </ul>
                           </div>
                         ) : null}
+                      </div>
+                    ) : null}
+
+                    {Array.isArray(engagement.follow_ups) &&
+                    engagement.follow_ups.length > 0 ? (
+                      <div className="mt-3">
+                        <p className="save-eyebrow mb-1.5 text-ink-400">
+                          Follow-up
+                        </p>
+                        <ul className="list-disc space-y-1 pl-5 text-caption leading-relaxed text-ink-600">
+                          {engagement.follow_ups.map((item: unknown) => (
+                            <li key={String(item)}>{String(item)}</li>
+                          ))}
+                        </ul>
                       </div>
                     ) : null}
                   </div>

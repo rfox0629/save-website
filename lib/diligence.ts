@@ -7,12 +7,11 @@ import { revokeBriefApprovalForMaterialChange } from "@/lib/brief-approval";
 import { requireReviewerMutationAccess } from "@/lib/review";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
-  CONFIDENCE_LEVELS,
-  DILIGENCE_KINDS,
-  DILIGENCE_STATUSES,
-  DILIGENCE_VISIBILITIES,
+  buildDiligencePayload,
+  type DiligenceEngagementInput,
   type DiligenceKind,
   type DiligenceStatus,
+  optionalText,
 } from "@/lib/diligence-shared";
 import type { Applications, DiligenceEngagement } from "@/lib/supabase/types";
 
@@ -56,48 +55,9 @@ export type RelationalDiligenceStatus = {
   total: number;
 };
 
-function assertOneOf<T extends string>(
-  value: unknown,
-  allowed: readonly T[],
-  field: string,
-): T {
-  if (typeof value !== "string" || !allowed.includes(value as T)) {
-    throw new Error(`${field} must be one of: ${allowed.join(", ")}.`);
-  }
-
-  return value as T;
-}
-
-function optionalOneOf<T extends string>(
-  value: unknown,
-  allowed: readonly T[],
-  field: string,
-): T | null {
-  if (value === undefined || value === null || value === "") {
-    return null;
-  }
-
-  return assertOneOf(value, allowed, field);
-}
-
-function toStringArray(value: unknown) {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  return value
-    .filter((item): item is string => typeof item === "string")
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-function optionalText(value: unknown) {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const trimmed = value.trim();
-  return trimmed.length > 0 ? trimmed : null;
+function revalidateDiligencePaths(applicationId: string) {
+  revalidatePath(`/applications/${applicationId}`);
+  revalidatePath(`/applications/${applicationId}/time-with-leadership`);
 }
 
 export async function getDiligenceEngagements(applicationId: string) {
@@ -139,81 +99,6 @@ export function getRelationalDiligenceStatus(
   };
 }
 
-export type DiligenceEngagementInput = {
-  characterConfidence?: unknown;
-  concerns?: unknown;
-  cultureConfidence?: unknown;
-  cultureObservations?: unknown;
-  donorExcerpt?: unknown;
-  followUps?: unknown;
-  kind: unknown;
-  leadershipCharacterObservations?: unknown;
-  linkedVoiceAlignmentRequestId?: unknown;
-  location?: unknown;
-  ministryParticipants?: unknown;
-  narrative?: unknown;
-  occurredOn?: unknown;
-  orgHealthConfidence?: unknown;
-  orgHealthObservations?: unknown;
-  privateNotes?: unknown;
-  saveParticipants?: unknown;
-  status?: unknown;
-  strengths?: unknown;
-  visibility?: unknown;
-};
-
-function buildPayload(input: DiligenceEngagementInput) {
-  return {
-    character_confidence: optionalOneOf(
-      input.characterConfidence,
-      CONFIDENCE_LEVELS,
-      "Character confidence",
-    ),
-    concerns: toStringArray(input.concerns),
-    culture_confidence: optionalOneOf(
-      input.cultureConfidence,
-      CONFIDENCE_LEVELS,
-      "Culture confidence",
-    ),
-    culture_observations: optionalText(input.cultureObservations),
-    donor_excerpt: optionalText(input.donorExcerpt),
-    follow_ups: Array.isArray(input.followUps) ? input.followUps : [],
-    kind: assertOneOf(input.kind, DILIGENCE_KINDS, "Engagement kind"),
-    leadership_character_observations: optionalText(
-      input.leadershipCharacterObservations,
-    ),
-    linked_voice_alignment_request_id: optionalText(
-      input.linkedVoiceAlignmentRequestId,
-    ),
-    location: optionalText(input.location),
-    ministry_participants: Array.isArray(input.ministryParticipants)
-      ? input.ministryParticipants
-      : [],
-    narrative: optionalText(input.narrative),
-    occurred_on: optionalText(input.occurredOn),
-    org_health_confidence: optionalOneOf(
-      input.orgHealthConfidence,
-      CONFIDENCE_LEVELS,
-      "Organizational health confidence",
-    ),
-    org_health_observations: optionalText(input.orgHealthObservations),
-    private_notes: optionalText(input.privateNotes),
-    save_participants: toStringArray(input.saveParticipants),
-    status: input.status
-      ? assertOneOf(input.status, DILIGENCE_STATUSES, "Status")
-      : "scheduled",
-    strengths: toStringArray(input.strengths),
-    visibility: input.visibility
-      ? assertOneOf(input.visibility, DILIGENCE_VISIBILITIES, "Visibility")
-      : "internal_only",
-  };
-}
-
-function revalidateDiligencePaths(applicationId: string) {
-  revalidatePath(`/applications/${applicationId}`);
-  revalidatePath(`/applications/${applicationId}/time-with-leadership`);
-}
-
 export async function createDiligenceEngagement(
   applicationId: string,
   input: DiligenceEngagementInput,
@@ -236,7 +121,7 @@ export async function createDiligenceEngagement(
   }
 
   const { error } = await db.from("diligence_engagements").insert({
-    ...buildPayload(input),
+    ...buildDiligencePayload(input),
     application_id: applicationId,
     created_by: user.id,
     ...buildActorSnapshot("created", toActorIdentity(user)),
@@ -269,7 +154,7 @@ export async function updateDiligenceEngagement(
     (existing as Pick<DiligenceEngagement, "donor_excerpt"> | null)
       ?.donor_excerpt ?? null;
 
-  const payload = buildPayload(input);
+  const payload = buildDiligencePayload(input);
 
   const { error } = await db
     .from("diligence_engagements")
