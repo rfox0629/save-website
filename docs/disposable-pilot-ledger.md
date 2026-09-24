@@ -648,3 +648,96 @@ real-world conversation with a reference.
 One engagement — a `video_call` dated 2026-09-24 and labelled VERIFICATION
 RECORD — exists only to verify the repair. It is not diligence evidence and is
 excluded from the findings, the roadmap and the Brief.
+
+---
+
+## Relational evidence repairs (2026-09-24)
+
+### The pre-repair Brief, preserved
+
+The Brief generated before these repairs is kept as the pilot's pre-repair
+artifact: headline "DISPOSABLE PILOT RECORD — simulated relational evidence, not
+a real SAVE assessment", recommendation "Recommended with Conditions", three
+commendations, three cautions, description md5
+`8371ba93770312b240d8676b6434c110`, generated 2026-09-24 14:56 by
+`pilot-admin@savestandard.org`. It was never approved or published.
+
+### `PRODUCTION VERIFIED` — relational evidence reaches the synthesis directly
+
+The previous synthesis, generated 2026-09-23 before any of this work, contained
+no relational evidence at all. Its strengths were "Gospel clarity", "Leader
+accountability" and "High program expense percentage (82%)"; succession appeared
+nowhere; its recommendation was `hold`.
+
+Regenerated from canonical evidence, it now reports dependency on key personnel
+and succession risk as a **top risk**, raises leadership-integrity confidence to
+**high** on the grounds that integrity was "consistently recognized across
+multiple independent sources", records "positive alignment between internal and
+external perceptions", and moves to `needs_review`.
+
+It also *lowers* fruit confidence to low, because the impact narrative "cannot be
+strongly verified due to the simulated nature of relational data". The rule
+requiring a stated simulation to survive into the output works, and the model
+correctly discounted simulated evidence rather than treating it as real.
+
+**Proof the evidence flowed directly rather than through a reviewer's retyping:**
+three distinguishing phrases appear in the new synthesis and in the canonical
+relational evidence, and in **zero** reviewer notes — "administrative capacity"
+(Voice Alignment synthesis), "indigenous" methods (a Time With Leadership
+engagement's recorded strengths), and the internal/external alignment reading
+(the synthesis's `alignment_insight`). A unit test covers the same claim by
+assembling a payload with no reviewer notes at all.
+
+Per founder direction, the internal notes written before this repair were not
+deleted — the instruction was not to *carry forward* the manual duplication, and
+no new duplicating note was written. The evidence stands as entered.
+
+### `PRODUCTION VERIFIED` — what the ministry can and cannot see
+
+Queried as the disposable ministry identity itself, with RLS enforcing:
+
+| Bucket | Visible |
+| --- | --- |
+| Findings written for the ministry | 4 |
+| Internal reviewer notes | **0** of 8 |
+| Time With Leadership engagements | **0** |
+| Voice Alignment responses | **0** |
+| Voice Alignment synthesis | **0** |
+| Roadmap items | 8, all its own |
+
+Both `reviewer_notes` and `roadmap_items` are gated on `findings_shared_at`, so
+nothing reaches a ministry before a reviewer shares it. The not-yet-shared state
+renders as an explicit explanation rather than an empty page.
+
+A ministry can also read its own `donor_briefs` row before publication, under a
+pre-existing policy consistent with the design's ministry sign-off gate. That
+includes draft cautions, which is worth a founder decision rather than a silent
+assumption.
+
+### `PRODUCTION VERIFIED` — no silent Brief truncation
+
+The editor now loads all three pilot cautions and shows explicit counts, an "Add
+a caution" control and per-entry removal with confirmation. Saving through the
+editor preserved three commendations and three cautions; before the repair the
+third caution — the family-board concern — would have been dropped on open and
+the loss persisted on save.
+
+### `MISSING IMPLEMENTATION` — no staff display name can be captured
+
+`generated_actor_name` is null because there is nowhere for a name to come from.
+The `profiles` table has no name column at all (id, organization_id, timestamps,
+role, deactivated_at), `toActorIdentity` reads `user_metadata`, and all three
+staff accounts have none. Every staff attribution snapshot will therefore carry a
+null name until a display name is captured somewhere.
+
+Recorded as a data-quality gap. Nothing was backfilled and no historical snapshot
+was invented.
+
+### Pilot data note — a duplicate of my own making
+
+`Obtain an independent financial review` exists twice in the roadmap, created
+2026-09-24 14:51:24 and 14:52:21. The first save succeeded during a browser
+disconnection that reported failure, and it was then submitted again. This is a
+tooling artifact of the session, not a product defect, and the ministry currently
+sees the duplicate. Left in place per the instruction not to clean up test data
+retroactively; removing the later row is a one-row correction awaiting direction.
