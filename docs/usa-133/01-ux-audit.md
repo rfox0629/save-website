@@ -11,11 +11,11 @@ What follows is an assessment of the SAVE platform as it stands on
 The application loads three unrelated font pairings and three unrelated
 palettes depending on which route you land on.
 
-| Layer | Fonts | Background | Text |
-|---|---|---|---|
-| `app/layout.tsx` (root) | Geist Sans / Geist Mono | shadcn `--background` (pure white) | shadcn `--foreground` |
-| `app/(public)/layout.tsx` | DM Sans / Playfair Display | `#F9F6F0` | `#0E2E5C` |
-| `app/(auth)/layout.tsx` | Plus Jakarta Sans / Lora | `#F9F6F0` | `#1A4480` |
+| Layer                     | Fonts                      | Background                         | Text                  |
+| ------------------------- | -------------------------- | ---------------------------------- | --------------------- |
+| `app/layout.tsx` (root)   | Geist Sans / Geist Mono    | shadcn `--background` (pure white) | shadcn `--foreground` |
+| `app/(public)/layout.tsx` | DM Sans / Playfair Display | `#F9F6F0`                          | `#0E2E5C`             |
+| `app/(auth)/layout.tsx`   | Plus Jakarta Sans / Lora   | `#F9F6F0`                          | `#1A4480`             |
 
 A donor who moves from the marketing site to their dashboard crosses two
 typographic systems in one click. Nothing about that reads as one company.
@@ -64,13 +64,13 @@ The heavy blur reads as 2019 "soft UI", not as a financial institution.
 `components/ui/` contains `button.tsx`, `app-toaster.tsx`, `page-skeleton.tsx`.
 Everything else is bespoke per screen. The consequences show up as size:
 
-| File | Lines |
-|---|---:|
-| `components/forms/vetting-form.tsx` | 1,493 |
-| `components/forms/inquiry-form.tsx` | 1,144 |
-| `app/(auth)/applications/[id]/page.tsx` | 874 |
-| `components/dashboard/voice-alignment-manager.tsx` | 832 |
-| `app/(public)/page.tsx` | 716 |
+| File                                               | Lines |
+| -------------------------------------------------- | ----: |
+| `components/forms/vetting-form.tsx`                | 1,493 |
+| `components/forms/inquiry-form.tsx`                | 1,144 |
+| `app/(auth)/applications/[id]/page.tsx`            |   874 |
+| `components/dashboard/voice-alignment-manager.tsx` |   832 |
+| `app/(public)/page.tsx`                            |   716 |
 
 23,475 lines across `app/`, `components/` and `lib/`. Two form files account
 for 2,637 of them, largely duplicated markup.
@@ -126,17 +126,17 @@ label, truncated "signals". The language is investment committee:
 
 Measured against the brief, the donor portal is missing:
 
-| Required | Present today |
-|---|---|
+| Required          | Present today          |
+| ----------------- | ---------------------- |
 | Browse ministries | Partial — a brief list |
-| Follow ministries | **Absent** |
-| Receive updates | **Absent** |
-| Track giving | **Absent** |
-| Annual statements | **Absent** |
-| Read testimonies | **Absent** |
-| See impact | **Absent** |
-| Prayer requests | **Absent** |
-| Save favourites | **Absent** |
+| Follow ministries | **Absent**             |
+| Receive updates   | **Absent**             |
+| Track giving      | **Absent**             |
+| Annual statements | **Absent**             |
+| Read testimonies  | **Absent**             |
+| See impact        | **Absent**             |
+| Prayer requests   | **Absent**             |
+| Save favourites   | **Absent**             |
 
 Eight of nine donor capabilities do not exist. What exists is a comparison
 tool, and comparison is exactly the transactional framing to avoid.
@@ -146,18 +146,18 @@ tool, and comparison is exactly the transactional framing to avoid.
 Four routes: `/portal`, `/portal/inquiry`, `/portal/application`,
 `/portal/documents`. The assessment is one 1,493-line form. Against the brief:
 
-| Required | Present today |
-|---|---|
-| Onboarding | Minimal — a welcome flag on `/portal` |
-| Assessment progress | A six-step timeline with animated ping |
+| Required            | Present today                               |
+| ------------------- | ------------------------------------------- |
+| Onboarding          | Minimal — a welcome flag on `/portal`       |
+| Assessment progress | A six-step timeline with animated ping      |
 | Evidence collection | `ministry-document-center.tsx`, upload only |
-| Findings | **Absent** |
-| Roadmap | **Absent** |
-| Implementation | **Absent** |
-| Profile editing | **Absent** |
-| Testimonies | **Absent** |
-| Reports | **Absent** |
-| Donor updates | **Absent** |
+| Findings            | **Absent**                                  |
+| Roadmap             | **Absent**                                  |
+| Implementation      | **Absent**                                  |
+| Profile editing     | **Absent**                                  |
+| Testimonies         | **Absent**                                  |
+| Reports             | **Absent**                                  |
+| Donor updates       | **Absent**                                  |
 
 A ministry currently has no way to see what SAVE concluded about it, no way to
 act on it, and no way to speak to its donors.

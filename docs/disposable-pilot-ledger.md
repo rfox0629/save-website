@@ -12,12 +12,12 @@ or ministry.
 
 Entries are classified as:
 
-| Class | Meaning |
-| --- | --- |
-| `PRODUCTION VERIFIED` | Exercised against production and behaved correctly |
-| `BUG FOUND + FIXED` | Defect found, repaired, merged and deployed |
-| `MISSING IMPLEMENTATION` | Promised or implied behaviour that does not exist |
-| `FOUNDER DECISION REQUIRED` | Product or policy question; not mine to settle |
+| Class                       | Meaning                                            |
+| --------------------------- | -------------------------------------------------- |
+| `PRODUCTION VERIFIED`       | Exercised against production and behaved correctly |
+| `BUG FOUND + FIXED`         | Defect found, repaired, merged and deployed        |
+| `MISSING IMPLEMENTATION`    | Promised or implied behaviour that does not exist  |
+| `FOUNDER DECISION REQUIRED` | Product or policy question; not mine to settle     |
 
 ---
 
@@ -51,7 +51,7 @@ details by hand. Nothing links them.
 
 **Founder direction (2026-09-17).** They should become connected, on this model:
 
-> Ministry-supplied Reference → staff-reviewed evidence → *optional*
+> Ministry-supplied Reference → staff-reviewed evidence → _optional_
 > staff-initiated Voice Alignment request
 
 - A Reference and a Voice Alignment respondent are **not synonymous**. The
@@ -59,7 +59,7 @@ details by hand. Nothing links them.
   Alignment with that person.
 - Submission must **never** automatically send an invitation.
 - Staff should eventually be able to initiate the existing Voice Alignment
-  request *from* a submitted reference, with name, email and relationship
+  request _from_ a submitted reference, with name, email and relationship
   prefilled, and must explicitly review and send it.
 - Staff may choose one, several, all, or request a further reference.
 
@@ -84,15 +84,15 @@ The submitted disposable pilot is the fixed reference point for any future
 scoring change. Recorded here so a later recalibration can be measured against
 a known result rather than a remembered one.
 
-| Category | Score |
-| --- | --- |
-| **Total** | **83 / 100** |
-| Leadership | 20 |
-| Doctrine | 15 |
-| Fruit | 16 |
-| Governance | 13 |
-| Financial | 12 |
-| External trust | 7 |
+| Category       | Score        |
+| -------------- | ------------ |
+| **Total**      | **83 / 100** |
+| Leadership     | 20           |
+| Doctrine       | 15           |
+| Fruit          | 16           |
+| Governance     | 13           |
+| Financial      | 12           |
+| External trust | 7            |
 
 - Hard stop: **none**
 - Medium risk flags: `family_on_board`, `recent_deficit`
@@ -288,3 +288,57 @@ verified end to end.
   policy question rather than a defect.
 - Four external checks are adverse (IRS TEOS, Website, Bylaws Analysis,
   Doctrinal Analysis) and three remain Pending (Form 990, Candid, References).
+## Scoring baselines — before and after the unsupported-credit repair
+
+**Historical pre-repair baseline: 83 / 100.** The score the submitted pilot
+received on 2026-09-23 before the repair below. Retained as the historical
+record of what the engine produced at submission.
+
+**Corrected mechanical score: 78 / 100.** The same submitted answers and the same
+recorded external checks, scored once unsupported default credit is removed.
+
+| Category       | Pre-repair | Corrected |
+| -------------- | ---------- | --------- |
+| Leadership     | 20         | 20        |
+| Doctrine       | 15         | 15        |
+| Fruit          | 16         | **13**    |
+| Governance     | 13         | 13        |
+| Financial      | 12         | 12        |
+| External trust | 7          | **5**     |
+| **Total**      | **83**     | **78**    |
+
+Only two components changed. `self_score_honesty` 3 → 0 and `irs_clean` 2 → 0.
+Nothing was rebalanced and the five points were not redistributed.
+
+**78 is a mechanical score, not a SAVE assessment or recommendation.** No
+reviewer judgment, relational diligence or decision is reflected in it.
+
+### The repair — `BUG FOUND + FIXED`
+
+Both components awarded credit for judgements nobody had made, and said so in
+their own rationales:
+
+- `self_score_honesty` gave 3/3 "pending manual review";
+- `irs_clean` gave 2/2 "pending analyst review", **while SAVE's own IRS TEOS
+  check had flagged "EIN not found in IRS database"**.
+
+A pending judgment is not positive evidence. Both now award zero with an
+accurate rationale, and IRS credit is read from the recorded check: `pass` earns
+the two points, `flag`/`fail` earns nothing as adverse evidence, and anything
+unrecorded reads as not established.
+
+This required the scoring engine to load `external_checks` for the first time —
+it previously scored external trust without ever reading SAVE's own external
+evidence, which is why the contradiction was possible.
+
+### `FOUNDER DECISION REQUIRED` — narrative scoring rewards presence, not quality
+
+`theory_of_change` (5/5), `spiritual_measurement_method` (4/4) and
+`leadership_conflict_notes` (3/3) are awarded on text length and keyword
+presence. `theory_of_change` requires over 200 characters containing one of a
+handful of words; `spiritual_measurement_method` requires over 100 characters;
+`leadership_conflict_notes` requires only that text exists, so "None." appears to
+earn the same three points as a described and mediated conflict.
+
+Deliberately unchanged by founder direction: how narrative evidence should
+contribute will be decided after relational diligence is exercised.

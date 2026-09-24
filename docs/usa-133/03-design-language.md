@@ -34,14 +34,14 @@ always tabular figures. A donor must be able to compare down a column.
 
 Six ramps replace the 96 hardcoded hex values found in the audit.
 
-| Ramp | Role | Anchor |
-|---|---|---|
-| `ink` | Text, primary action, authority | `ink-700` `#1d4378` |
+| Ramp    | Role                                    | Anchor                |
+| ------- | --------------------------------------- | --------------------- |
+| `ink`   | Text, primary action, authority         | `ink-700` `#1d4378`   |
 | `paper` | Surfaces and rules — the warm signature | `paper-100` `#faf8f4` |
-| `brass` | Verification only | `brass-700` `#8a6318` |
-| `sage` | Healthy, approved, on track | `sage-600` `#3b6b53` |
-| `clay` | Attention, in progress, needs work | `clay-600` `#a85a2e` |
-| `risk` | Declined, hard stop — warm, never neon | `risk-700` `#8e2f2f` |
+| `brass` | Verification only                       | `brass-700` `#8a6318` |
+| `sage`  | Healthy, approved, on track             | `sage-600` `#3b6b53`  |
+| `clay`  | Attention, in progress, needs work      | `clay-600` `#a85a2e`  |
+| `risk`  | Declined, hard stop — warm, never neon  | `risk-700` `#8e2f2f`  |
 
 Semantic aliases sit on top so screens name intent rather than value:
 `--save-bg`, `--save-surface`, `--save-surface-sunken`, `--save-hairline`,
@@ -92,19 +92,19 @@ and, critically, has genuine tabular figures for money and scores.
 One scale. Every size ships with its line height and tracking so no screen has
 to invent typography:
 
-| Token | Size / line | Use |
-|---|---|---|
-| `display-xl` | 56/60 | Marketing hero |
-| `display-lg` | 44/48 | Section hero |
-| `display-md` | 34/40 | Page title |
-| `display-sm` | 26/32 | Card hero, stat value |
-| `title` | 20/28 | Section heading |
-| `lg` | 17/26 | Lead paragraph |
-| `base` | 15/24 | Body |
-| `sm` | 13.5/20 | Dense body, table cell |
-| `caption` | 13/18 | Metadata |
-| `label` | 12/16 | Form label |
-| `micro` | 11/14 | Eyebrow, badge |
+| Token        | Size / line | Use                    |
+| ------------ | ----------- | ---------------------- |
+| `display-xl` | 56/60       | Marketing hero         |
+| `display-lg` | 44/48       | Section hero           |
+| `display-md` | 34/40       | Page title             |
+| `display-sm` | 26/32       | Card hero, stat value  |
+| `title`      | 20/28       | Section heading        |
+| `lg`         | 17/26       | Lead paragraph         |
+| `base`       | 15/24       | Body                   |
+| `sm`         | 13.5/20     | Dense body, table cell |
+| `caption`    | 13/18       | Metadata               |
+| `label`      | 12/16       | Form label             |
+| `micro`      | 11/14       | Eyebrow, badge         |
 
 Two utility classes carry the character: `.save-display` (Fraunces with optical
 sizing) and `.save-numeric` (tabular figures). The whole system is scoped under

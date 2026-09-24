@@ -38,7 +38,11 @@ export function scoreFruit(vetting: NormalizedVetting): CategoryScoreResult {
   const measurementScore =
     (vetting.spiritual_measurement_method?.trim().length ?? 0) > 100 ? 4 : 1;
   const evaluationScore = vetting.third_party_evaluation ? 3 : 0;
-  const honestyScore = 3;
+  // A pending judgment is not positive evidence. This used to award the full
+  // three points while its own rationale said reviewer review was outstanding,
+  // so every ministry carried credit nobody had granted. Until a reviewer can
+  // record this judgment, it scores zero and says why.
+  const honestyScore = 0;
 
   const components = [
     createComponent(
@@ -80,7 +84,7 @@ export function scoreFruit(vetting: NormalizedVetting): CategoryScoreResult {
       "self_score_honesty",
       honestyScore,
       3,
-      "Default reviewer honesty credit applied pending manual review.",
+      "Reviewer assessment not yet completed, so no credit is given.",
     ),
   ];
 

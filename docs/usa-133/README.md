@@ -2,14 +2,14 @@
 
 Start here: **[00-founder-review.md](00-founder-review.md)**
 
-| Document | Contents |
-|---|---|
-| [00-founder-review.md](00-founder-review.md) | Branch, commits, screenshots, rationale, MVP, open decisions |
-| [01-ux-audit.md](01-ux-audit.md) | What is broken today, measured |
-| [02-information-architecture.md](02-information-architecture.md) | New IA — desktop, tablet, mobile |
-| [03-design-language.md](03-design-language.md) | Colour, type, spacing, radius, elevation, motion |
-| [04-component-system.md](04-component-system.md) | The reusable component library |
-| [05-mvp-recommendation.md](05-mvp-recommendation.md) | Launch / V2 / Future and build order |
+| Document                                                                       | Contents                                                              |
+| ------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| [00-founder-review.md](00-founder-review.md)                                   | Branch, commits, screenshots, rationale, MVP, open decisions          |
+| [01-ux-audit.md](01-ux-audit.md)                                               | What is broken today, measured                                        |
+| [02-information-architecture.md](02-information-architecture.md)               | New IA — desktop, tablet, mobile                                      |
+| [03-design-language.md](03-design-language.md)                                 | Colour, type, spacing, radius, elevation, motion                      |
+| [04-component-system.md](04-component-system.md)                               | The reusable component library                                        |
+| [05-mvp-recommendation.md](05-mvp-recommendation.md)                           | Launch / V2 / Future and build order                                  |
 | [06-implementation-readiness-review.md](06-implementation-readiness-review.md) | Clean integration review, capability map, validation, launch sequence |
 
 Screenshots are in [`screenshots/`](screenshots/), numbered in review order —

@@ -69,22 +69,22 @@ Changing a portal's IA is a data change in `navs.tsx`. No page layout moves.
 
 Where SAVE's domain lives.
 
-| Component | Used by |
-|---|---|
-| `MinistryCard` | Public library, donor saved list |
-| `MinistryRow` | Donor home, following, staff lists |
-| `CategoryBreakdown` | Public profile, donor detail, staff review, findings |
-| `ConfidenceMark` | Inside category breakdown |
-| `ImpactGrid` | Public profile, donor detail, ministry profile edit, reports, publishing |
-| `TestimonyCard` | Public profile, donor home, donor detail, testimonies |
-| `UpdateItem` | Donor home, donor updates, donor detail, public profile |
-| `PrayerCard` | Donor home, donor prayer, donor detail |
-| `EvidenceRow` | Ministry evidence, ministry overview, staff review |
-| `FindingRow` | Ministry findings, ministry overview, staff review |
-| `RoadmapRow` | Ministry roadmap |
-| `GiftRow` | Donor giving |
-| `AssessmentProvenance` | Public profile, donor detail, staff publishing |
-| `TierExplainer` | Public profile, donor detail |
+| Component              | Used by                                                                  |
+| ---------------------- | ------------------------------------------------------------------------ |
+| `MinistryCard`         | Public library, donor saved list                                         |
+| `MinistryRow`          | Donor home, following, staff lists                                       |
+| `CategoryBreakdown`    | Public profile, donor detail, staff review, findings                     |
+| `ConfidenceMark`       | Inside category breakdown                                                |
+| `ImpactGrid`           | Public profile, donor detail, ministry profile edit, reports, publishing |
+| `TestimonyCard`        | Public profile, donor home, donor detail, testimonies                    |
+| `UpdateItem`           | Donor home, donor updates, donor detail, public profile                  |
+| `PrayerCard`           | Donor home, donor prayer, donor detail                                   |
+| `EvidenceRow`          | Ministry evidence, ministry overview, staff review                       |
+| `FindingRow`           | Ministry findings, ministry overview, staff review                       |
+| `RoadmapRow`           | Ministry roadmap                                                         |
+| `GiftRow`              | Donor giving                                                             |
+| `AssessmentProvenance` | Public profile, donor detail, staff publishing                           |
+| `TierExplainer`        | Public profile, donor detail                                             |
 
 `CategoryBreakdown` appearing on four surfaces is the point. A donor and a
 reviewer look at the same rendering of the same assessment — the reviewer just
