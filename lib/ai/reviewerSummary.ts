@@ -8,7 +8,6 @@ import {
   buildTimeWithLeadershipPayload,
   buildVoiceAlignmentPayload,
   compactRecord,
-  compactValue,
 } from "@/lib/ai/reviewer-summary-payload";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type {
