@@ -648,3 +648,81 @@ real-world conversation with a reference.
 One engagement — a `video_call` dated 2026-09-24 and labelled VERIFICATION
 RECORD — exists only to verify the repair. It is not diligence evidence and is
 excluded from the findings, the roadmap and the Brief.
+
+---
+
+## The decision lifecycle, built and verified (2026-09-24)
+
+### What changed
+
+Eleven columns, no new tables. `profiles.display_name`; seven review columns on
+`donor_briefs` with constraints so an outcome is one of two values and a request
+for changes cannot be stored without a reason; three decision-actor snapshot
+columns on `applications`, whose `decision*` columns already existed and had
+never been written.
+
+### `PRODUCTION VERIFIED` — every gate refuses in the right order
+
+Exercised against the deployed build:
+
+- recording a decision before independent approval — refused: "A second reviewer
+  must approve the donor brief before SAVE records a formal decision";
+- setting status to `approved` through the status API — refused: approving is a
+  formal decision, not a status change;
+- a score-shaped value as a decision (`"78"`) — refused: a decision is
+  `approved` or `declined`;
+- publishing without approval — refused;
+- requesting changes as the brief's own author — refused.
+
+After all five attempts the pilot is unchanged: unpublished, unapproved, never
+reviewed, three cautions intact, description hash `5b4b20cd…`, status
+`under_review`, decision null. The refused publish carried a throwaway headline
+and description, and the gate returned before the write, so nothing was
+overwritten.
+
+Boundaries re-verified as the ministry identity after the migrations: draft
+briefs 0, Voice Alignment responses 0, synthesis 0, diligence 0, internal notes
+0, shared findings 4, roadmap 7.
+
+### `BUG FOUND` and fixed during verification
+
+`toActorIdentity` was changed to prefer `profiles.display_name`, but the profile
+loaded for a mutation selected only `id, role, organization_id,
+deactivated_at`. The field was always undefined, so every new snapshot still
+recorded a null name — the repair would have silently done nothing. Caught by
+re-saving the pilot brief and finding `generated_actor_name` still null. After
+the fix the same action records "SAVE Pilot Admin". Historical nulls are
+untouched.
+
+This is worth remembering: a preference for a field is worthless if the query
+never loads it, and only a production check showed it.
+
+### Inquiry declines are unaffected
+
+`recordInquiryDecision` writes status directly and targets `inquiry_rejected`,
+not `declined`, so the new guard on `approved`/`declined` does not touch the
+inquiry stage. An inquiry can still be declined before assessment without a
+formal assessment decision, which is correct: SAVE declining to assess is not
+SAVE's judgement of a ministry.
+
+### Voice Alignment, stated honestly
+
+The staff page said reference feedback "is never attributed back to the person
+who gave it" while staff could read every response with its author attached. It
+now says what is true: responses are confidential internal diligence, visible to
+SAVE with the respondent attached, and never attributed back to anyone outside
+SAVE. No ministry or donor policy was broadened.
+
+### Still deliberately absent
+
+Ministry Brief sign-off. The tightened RLS stands — a ministry cannot read an
+unapproved, unpublished brief. The proposed model for later is a single
+`sent_to_ministry_at` timestamp plus the actor snapshot triple on
+`donor_briefs`, with RLS reading that state. Not implemented.
+
+### Where the pilot stops
+
+The lifecycle mechanics are built and verified. The pilot's own independent
+review is not done and was not faked: `pilot-reviewer@savestandard.org` has role
+exactly `reviewer`, is active, and has never signed in. No session was minted
+and nothing was approved on that identity's behalf.
