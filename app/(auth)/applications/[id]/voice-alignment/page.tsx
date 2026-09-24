@@ -11,9 +11,11 @@ import { getViewerContext } from "@/lib/view-mode";
 /**
  * Voice alignment for one application, on the approved design.
  *
- * Access is gated by getApplicationDetail (admin/reviewer only). Reference
- * feedback is confidential to the SAVE team and is never attributed back to
- * the person who gave it.
+ * Access is gated by getApplicationDetail (admin/reviewer only). Responses are
+ * confidential internal diligence: SAVE staff see them with the respondent
+ * attached, which is what makes them usable as evidence. Nothing outside SAVE
+ * ever attributes a finding back to the person who gave it — ministries,
+ * donors and the public see only the unattributed synthesis.
  */
 export default async function VoiceAlignmentPage({
   params,

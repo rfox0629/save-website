@@ -27,6 +27,9 @@ export type Database = {
           cycle_year: number | null;
           decision: string | null;
           decision_date: string | null;
+          decision_actor_email: string | null;
+          decision_actor_id: string | null;
+          decision_actor_name: string | null;
           decision_made_by: string | null;
           decision_notes: string | null;
           findings_shared_at: string | null;
@@ -45,6 +48,9 @@ export type Database = {
           cycle_year?: number | null;
           decision?: string | null;
           decision_date?: string | null;
+          decision_actor_email?: string | null;
+          decision_actor_id?: string | null;
+          decision_actor_name?: string | null;
           decision_made_by?: string | null;
           decision_notes?: string | null;
           findings_shared_at?: string | null;
@@ -63,6 +69,9 @@ export type Database = {
           cycle_year?: number | null;
           decision?: string | null;
           decision_date?: string | null;
+          decision_actor_email?: string | null;
+          decision_actor_id?: string | null;
+          decision_actor_name?: string | null;
           decision_made_by?: string | null;
           decision_notes?: string | null;
           findings_shared_at?: string | null;
@@ -303,6 +312,13 @@ export type Database = {
           published_at: string | null;
           rationale: string | null;
           recommendation_level: string | null;
+          review_outcome: string | null;
+          review_note: string | null;
+          reviewed_at: string | null;
+          reviewed_by: string | null;
+          reviewed_actor_id: string | null;
+          reviewed_actor_name: string | null;
+          reviewed_actor_email: string | null;
           slug: string | null;
         };
         Insert: {
@@ -328,6 +344,13 @@ export type Database = {
           published_at?: string | null;
           rationale?: string | null;
           recommendation_level?: string | null;
+          review_outcome?: string | null;
+          review_note?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          reviewed_actor_id?: string | null;
+          reviewed_actor_name?: string | null;
+          reviewed_actor_email?: string | null;
           slug?: string | null;
         };
         Update: {
@@ -353,6 +376,13 @@ export type Database = {
           published_at?: string | null;
           rationale?: string | null;
           recommendation_level?: string | null;
+          review_outcome?: string | null;
+          review_note?: string | null;
+          reviewed_at?: string | null;
+          reviewed_by?: string | null;
+          reviewed_actor_id?: string | null;
+          reviewed_actor_name?: string | null;
+          reviewed_actor_email?: string | null;
           slug?: string | null;
         };
         Relationships: [
@@ -671,6 +701,7 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string;
+          display_name: string | null;
           deactivated_at: string | null;
           id: string;
           organization_id: string | null;
@@ -679,6 +710,7 @@ export type Database = {
         };
         Insert: {
           created_at?: string;
+          display_name?: string | null;
           deactivated_at?: string | null;
           id: string;
           organization_id?: string | null;
@@ -687,6 +719,7 @@ export type Database = {
         };
         Update: {
           created_at?: string;
+          display_name?: string | null;
           deactivated_at?: string | null;
           id?: string;
           organization_id?: string | null;

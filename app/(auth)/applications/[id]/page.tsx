@@ -20,6 +20,7 @@ import {
 } from "@/components/dashboard/diligence-actions";
 import {
   BriefApprovalControls,
+  DecisionControls,
   LibraryVisibilityToggle,
 } from "@/components/dashboard/publishing-actions";
 import {
@@ -104,15 +105,18 @@ const CATEGORIES = [
   { key: "external", label: "External signals", max: 10 },
 ] as const;
 
+/**
+ * Workflow stages a reviewer moves an assessment through. `approved` and
+ * `declined` are deliberately absent: they are outcomes of SAVE's formal
+ * decision, recorded by its own action, and were previously settable from this
+ * dropdown. `hard_stop` is set by the scoring pipeline, not chosen here.
+ */
 const STATUS_OPTIONS = [
   "inquiry_submitted",
   "inquiry_approved",
   "vetting_submitted",
   "under_review",
   "more_info_requested",
-  "approved",
-  "declined",
-  "hard_stop",
 ] as const;
 
 function statusTone(status: string): BadgeTone {
@@ -1123,7 +1127,16 @@ export default async function ApplicationWorkspacePage({
                 </Callout>
               ) : null}
 
-              {data.application.decision ? (
+              {!isInquiryStageStatus(data.application.status) && isAdmin ? (
+                <DecisionControls
+                  applicationId={params.id}
+                  briefApproved={Boolean(data.brief?.approved_at)}
+                  decision={data.application.decision}
+                  decisionActorEmail={data.application.decision_actor_email}
+                  decisionDate={data.application.decision_date}
+                  decisionNotes={data.application.decision_notes}
+                />
+              ) : data.application.decision ? (
                 <Callout title="Recorded decision" tone="ink">
                   {getStatusLabel(data.application.decision)} on{" "}
                   {formatDate(data.application.decision_date)}
@@ -1253,6 +1266,9 @@ export default async function ApplicationWorkspacePage({
                       approvedAt={data.brief.approved_at}
                       approvedByEmail={data.briefApproverEmail}
                       isAuthor={data.brief.generated_by === viewer.userId}
+                      reviewNote={data.brief.review_note}
+                      reviewOutcome={data.brief.review_outcome}
+                      reviewedByEmail={data.brief.reviewed_actor_email}
                     />
                   </div>
                 </div>

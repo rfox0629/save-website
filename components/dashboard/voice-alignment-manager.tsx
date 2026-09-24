@@ -671,7 +671,7 @@ export function VoiceAlignmentManager({
           action={
             <Badge tone={sampleQuality.tone}>{sampleQuality.label}</Badge>
           }
-          description="Collect internal and external perspective through private invite links, then synthesize it into one reviewer-only summary. Reference feedback is never attributed back to the person who gave it."
+          description="Collect internal and external perspective through private invite links, then synthesize it into one reviewer-only summary. Responses are confidential internal diligence: the SAVE team can see who said what, and nobody outside SAVE ever can. Findings are never attributed back to a respondent in anything a ministry, donor or the public sees."
           title="Voice alignment"
         />
         <CardBody>
