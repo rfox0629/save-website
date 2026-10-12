@@ -86,7 +86,7 @@ export async function createRoadmapItem(
     title?: unknown;
   },
 ) {
-  const { user } = await requireReviewerMutationAccess();
+  const { profile, user } = await requireReviewerMutationAccess();
   const title = optionalText(input.title);
 
   if (!title) {
@@ -113,7 +113,7 @@ export async function createRoadmapItem(
     application_id: applicationId,
     category: optionalText(input.category),
     created_by: user.id,
-    ...buildActorSnapshot("created", toActorIdentity(user)),
+    ...buildActorSnapshot("created", toActorIdentity(user, profile)),
     detail: optionalText(input.detail),
     due_date: optionalText(input.dueDate),
     organization_id: organizationId,

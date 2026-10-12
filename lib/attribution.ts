@@ -24,9 +24,11 @@ export type ActorIdentity = {
 export type ActorSnapshot = Record<string, string | null>;
 
 /**
- * Reads a display name from whatever the auth provider holds. SAVE does not
- * collect staff names today, so this is usually null and the email carries the
- * identification — recorded honestly rather than invented.
+ * Reads a display name from whatever the auth provider holds.
+ *
+ * This is the fallback. A staff member's name is application data, so the
+ * profile is the source of truth: auth metadata is provider-controlled and
+ * mutable, and for accounts created by an administrator it is usually empty.
  */
 export function readActorName(
   metadata: Record<string, unknown> | null | undefined,
@@ -43,15 +45,23 @@ export function readActorName(
   return null;
 }
 
-export function toActorIdentity(user: {
-  email?: string | null;
-  id: string;
-  user_metadata?: Record<string, unknown> | null;
-}): ActorIdentity {
+export function toActorIdentity(
+  user: {
+    email?: string | null;
+    id: string;
+    user_metadata?: Record<string, unknown> | null;
+  },
+  profile?: { display_name?: string | null } | null,
+): ActorIdentity {
+  const profileName = profile?.display_name?.trim();
+
   return {
     email: user.email ?? null,
     id: user.id,
-    name: readActorName(user.user_metadata),
+    name:
+      profileName && profileName.length > 0
+        ? profileName
+        : readActorName(user.user_metadata),
   };
 }
 

@@ -52,9 +52,19 @@ export async function revokeBriefApprovalForMaterialChange(
     return { reason, revoked: false, wasPublished: false };
   }
 
+  // The approval described the brief as it was. Once the donor-facing content
+  // changes, the review no longer applies to what is there, so the brief
+  // returns to never-reviewed rather than to "changes requested" — no reviewer
+  // asked for this edit.
   const { error } = await db
     .from("donor_briefs")
-    .update({ approved_at: null, approved_by: null, published: false })
+    .update({
+      approved_at: null,
+      approved_by: null,
+      published: false,
+      review_note: null,
+      review_outcome: null,
+    })
     .eq("id", brief.id);
 
   if (error) {

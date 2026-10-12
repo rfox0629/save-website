@@ -103,7 +103,7 @@ export async function createDiligenceEngagement(
   applicationId: string,
   input: DiligenceEngagementInput,
 ) {
-  const { user } = await requireReviewerMutationAccess();
+  const { profile, user } = await requireReviewerMutationAccess();
   const admin = createAdminClient();
   const db = admin;
 
@@ -124,7 +124,7 @@ export async function createDiligenceEngagement(
     ...buildDiligencePayload(input),
     application_id: applicationId,
     created_by: user.id,
-    ...buildActorSnapshot("created", toActorIdentity(user)),
+    ...buildActorSnapshot("created", toActorIdentity(user, profile)),
     organization_id: organizationId,
   });
 
