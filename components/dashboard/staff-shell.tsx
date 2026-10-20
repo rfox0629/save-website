@@ -1,6 +1,7 @@
 import { Fraunces, Inter } from "next/font/google";
 import type { ReactNode } from "react";
 
+import { DisplayNamePrompt } from "@/components/dashboard/display-name-prompt";
 import { AppShell, type NavGroup } from "@/components/save/shell";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/lib/supabase/types";
@@ -83,17 +84,25 @@ export async function StaffShell({
   } = await supabase.auth.getUser();
 
   let role: Profile["role"] | null = null;
+  let displayName: string | null = null;
   if (user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
+      .select("role, display_name")
       .eq("id", user.id)
       .maybeSingle();
-    role = (profile as Pick<Profile, "role"> | null)?.role ?? null;
+    const resolved = profile as Pick<
+      Profile,
+      "display_name" | "role"
+    > | null;
+    role = resolved?.role ?? null;
+    displayName = resolved?.display_name?.trim() || null;
   }
 
   const account = {
-    name: user?.email ?? "SAVE Staff",
+    // The name a colleague recognises, falling back to the email rather than to
+    // something invented.
+    name: displayName ?? user?.email ?? "SAVE Staff",
     role:
       role === "admin"
         ? "SAVE Admin"
@@ -111,6 +120,7 @@ export async function StaffShell({
         persona="staff"
         topBar={topBar}
       >
+        {role && !displayName ? <DisplayNamePrompt /> : null}
         {children}
       </AppShell>
     </div>
