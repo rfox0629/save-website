@@ -13,6 +13,9 @@ permissions:
 
 jobs:
   ci:
+    # This name is the required status check on main. It now also runs the test
+    # suite; renaming it would stop the required check reporting and block every
+    # merge until the branch protection rule is updated to match.
     name: Lint, typecheck, and build
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -44,6 +47,11 @@ jobs:
 
       - name: Typecheck
         run: npm run typecheck
+
+      # Before the build, which is the slow step: a failing regression test
+      # should be reported in seconds rather than after a full compile.
+      - name: Test
+        run: npm test
 
       - name: Build
         run: npm run build
