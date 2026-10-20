@@ -32,7 +32,7 @@ describe("donor excerpt visibility invariant", () => {
     });
 
     expect(payload.visibility).toBe("internal_only");
-    expect(payload.donor_excerpt).toBe("GATE PROOF - this assertion is wrong on purpose");
+    expect(payload.donor_excerpt).toBeNull();
   });
 
   it("drops the excerpt when no visibility is supplied at all", () => {
